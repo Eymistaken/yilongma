@@ -5,17 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Skibidi Clicker Ultra</title>
     
-    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Tone.js -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
-    <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <!-- SortableJS -->
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
-    <!-- Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;500;700;800&display=swap" rel="stylesheet">
-    <!-- Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
     
     <script>
@@ -24,9 +18,7 @@
             theme: {
                 extend: {
                     fontFamily: { sans: ['"Plus Jakarta Sans"', 'sans-serif'] },
-                    colors: {
-                        darkBase: "#050508",
-                    },
+                    colors: { darkBase: "#050508" },
                     animation: {
                         'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
                         'sweep': 'sweep 0.3s ease-out forwards',
@@ -51,116 +43,53 @@
     </script>
 
     <style>
-        /* --- GENEL AYARLAR (SADECE KOYU) --- */
         body {
             background-color: #050508; color: #f0f0f0;
-            overflow-x: hidden; /* Yatay taşmayı engelle */
-            -webkit-tap-highlight-color: transparent;
+            overflow-x: hidden; -webkit-tap-highlight-color: transparent;
             -webkit-font-smoothing: antialiased; user-select: none; -webkit-user-select: none;
+            overscroll-behavior-y: none; /* Sayfa esnemesini engelle */
         }
-
-        /* --- ARKA PLAN --- */
         .liquid-bg-container { position: fixed; inset: 0; z-index: -1; overflow: hidden; background: #050508; }
-        
         .blob-shape { position: absolute; border-radius: 50%; filter: blur(80px); will-change: transform; animation: blob-morph 10s infinite ease-in-out; opacity: 0.6; mix-blend-mode: screen; }
-        
         .blob-1 { width: 60vw; height: 60vw; background: #4c1d95; }
         .blob-2 { width: 70vw; height: 70vw; background: #be185d; animation-delay: -2s; }
         .blob-3 { width: 50vw; height: 50vw; background: #0e7490; animation-delay: -5s; }
 
-        /* --- STAT CARD (Koyu Hap Tasarımı - O Özel İstek) --- */
         .stat-card { 
-            /* Çok koyu, neredeyse siyah cam */
-            background: rgba(5, 5, 10, 0.8); 
-            backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); 
-            /* İncecik, zarif bir kenarlık */
-            border: 1px solid rgba(255, 255, 255, 0.05); 
-            /* Tam yuvarlatılmış köşeler */
-            border-radius: 2.5rem; 
-            /* Hafif derinlik */
-            box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.5);
-            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); 
+            background: rgba(5, 5, 10, 0.8); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); 
+            border: 1px solid rgba(255, 255, 255, 0.05); border-radius: 2.5rem; 
+            box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.5); transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); 
         }
-        .stat-card:hover { border-color: rgba(255, 255, 255, 0.15); transform: translateY(-3px); }
-
-        /* --- PILL PANEL (Genel Paneller) --- */
         .pill-panel { 
             background: linear-gradient(180deg, rgba(30, 30, 45, 0.6) 0%, rgba(15, 15, 25, 0.8) 100%);
-            backdrop-filter: blur(24px) saturate(140%); -webkit-backdrop-filter: blur(24px) saturate(140%); 
-            border: 1px solid rgba(255, 255, 255, 0.08); 
-            box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.4), inset 0 1px 0 0 rgba(255, 255, 255, 0.15);
-            border-radius: 2rem; 
-            transition: all 0.3s ease; 
+            backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px); 
+            border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 2rem; transition: all 0.3s ease; 
         }
-        .pill-panel:hover { border-color: rgba(255, 255, 255, 0.15); transform: translateY(-2px); }
-
-        /* --- MARKET ITEM (Ghost Glass & Animasyon) --- */
         .ghost-glass-item { 
-            background: rgba(255, 255, 255, 0.03); 
-            backdrop-filter: blur(40px) saturate(120%); -webkit-backdrop-filter: blur(40px) saturate(120%); 
-            border: 1px solid rgba(255, 255, 255, 0.05); 
-            border-radius: 1.5rem; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            overflow: hidden; 
+            background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(40px); -webkit-backdrop-filter: blur(40px); 
+            border: 1px solid rgba(255, 255, 255, 0.05); border-radius: 1.5rem; transition: all 0.3s; overflow: hidden; 
         }
-        .ghost-glass-item:hover { background: rgba(255, 255, 255, 0.08); border-color: rgba(255, 255, 255, 0.15); }
-        .ghost-glass-item[open] { background: rgba(20, 20, 30, 0.3); border-color: rgba(255, 255, 255, 0.1); }
+        .ghost-glass-item[open] { background: rgba(20, 20, 30, 0.5); border-color: rgba(255, 255, 255, 0.1); }
         
-        details.market-item summary ~ * {
-            animation: sweep-in 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards;
-        }
-        
-        @keyframes sweep-in {
-            0% { opacity: 0; transform: translateY(-20px); }
-            100% { opacity: 1; transform: translateY(0); }
-        }
+        details.market-item summary ~ * { animation: sweep-in 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards; }
+        @keyframes sweep-in { 0% { opacity: 0; transform: translateY(-20px); } 100% { opacity: 1; transform: translateY(0); } }
 
-        /* --- SKITTER (Özel Animasyonlu & Servet Göstergeli) --- */
-        details#skitter-feed { 
-            /* Başlangıç genişliği: Servet sığacak kadar */
-            width: 160px; height: 60px; max-height: 60px; overflow: hidden; border-radius: 2rem; 
-            transition: width 0.4s cubic-bezier(0.34, 1.56, 0.64, 1),
-                        height 0.4s cubic-bezier(0.34, 1.56, 0.64, 1),
-                        max-height 0.4s ease;
-        }
+        details#skitter-feed { width: 160px; height: 60px; max-height: 60px; overflow: hidden; border-radius: 2rem; transition: width 0.4s, height 0.4s, max-height 0.4s; }
         details#skitter-feed[open] { width: 360px; height: auto; max-height: 600px; }
-        
-        details#skitter-feed summary { 
-            list-style: none; width: 100%; height: 60px; display: flex; align-items: center; justify-content: space-between; padding: 0 1rem; cursor: pointer; outline: none;
-        }
+        details#skitter-feed summary { list-style: none; width: 100%; height: 60px; display: flex; align-items: center; justify-content: space-between; padding: 0 1rem; outline: none; }
         details#skitter-feed summary::-webkit-details-marker { display: none; }
+        .skitt-bubble { background: rgba(0, 0, 0, 0.3); border: 1px solid rgba(255, 255, 255, 0.05); border-radius: 1.5rem; padding: 1rem; margin-bottom: 0.5rem; }
+        .notify-heartbeat { animation: heartbeat 1.5s ease-in-out infinite; border-color: rgba(56, 189, 248, 0.5) !important; background: rgba(56, 189, 248, 0.1) !important; }
 
-        .skitt-bubble { 
-            background: rgba(0, 0, 0, 0.3); 
-            border: 1px solid rgba(255, 255, 255, 0.05); 
-            backdrop-filter: blur(10px); border-radius: 1.5rem; padding: 1rem; margin-bottom: 0.5rem; 
-        }
-        
-        .notify-heartbeat {
-            animation: heartbeat 1.5s ease-in-out infinite;
-            border-color: rgba(56, 189, 248, 0.5) !important;
-            background: rgba(56, 189, 248, 0.1) !important;
-        }
-
-        /* --- DİĞER --- */
-        #skibidi-toilet { 
-            transition: transform 0.08s; filter: drop-shadow(0 10px 30px rgba(0,0,0,0.5)); z-index: 20; 
-        }
+        #skibidi-toilet { transition: transform 0.08s; filter: drop-shadow(0 10px 30px rgba(0,0,0,0.5)); z-index: 20; }
         #skibidi-toilet.clicked { transform: scale(0.92) rotate(-2deg); }
-
         .click-popup { position: absolute; font-weight: 900; pointer-events: none; animation: popup-anim 0.6s forwards; z-index: 50; }
         @keyframes popup-anim { 0% { transform: translateY(0) scale(0.5); opacity: 0; } 20% { transform: translateY(-30px) scale(1.2); opacity: 1; } 100% { transform: translateY(-100px) scale(1); opacity: 0; } }
-
-        .market-trend-up { color: #6EE7B7; text-shadow: 0 0 12px rgba(16, 185, 129, 0.4); }
-        .market-trend-down { color: #FDA4AF; text-shadow: 0 0 12px rgba(244, 63, 94, 0.4); }
-
-        ::-webkit-scrollbar { width: 4px; }
-        ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 10px; }
+        .market-trend-up { color: #6EE7B7; } .market-trend-down { color: #FDA4AF; }
     </style>
 </head>
 <body class="flex flex-col items-center min-h-screen relative font-sans overflow-x-hidden">
 
-    <!-- ARKA PLAN -->
     <div class="liquid-bg-container">
         <div class="blob-shape blob-1" id="blob1"></div>
         <div class="blob-shape blob-2" id="blob2"></div>
@@ -171,62 +100,53 @@
     <div id="popup-container" class="fixed inset-0 pointer-events-none z-50 overflow-hidden"></div>
     <div id="floater-container" class="fixed inset-0 pointer-events-none z-0 overflow-hidden"></div>
 
-    <!-- ZORLUK SEÇİMİ (Mobil Fix: Scroll & Alignment) -->
-    <div id="difficulty-selection" class="fixed inset-0 z-[200] bg-black/90 backdrop-blur-2xl transition-opacity duration-500 overflow-y-auto overflow-x-hidden flex items-center justify-center">
-        <!-- İçerik Kapsayıcısı -->
-        <div class="w-full min-h-full flex flex-col justify-center items-center py-10 px-4">
+    <!-- ZORLUK SEÇİMİ (Kesin Mobil Fix) -->
+    <div id="difficulty-selection" class="fixed inset-0 z-[200] flex flex-col justify-center items-center p-6 bg-black/95 backdrop-blur-3xl transition-opacity duration-500 overflow-y-auto touch-pan-y">
+        <div class="w-full min-h-full flex flex-col justify-center items-center py-10">
+            <h2 class="text-5xl md:text-7xl font-black mb-12 tracking-tighter text-transparent bg-clip-text bg-gradient-to-b from-white to-white/40 text-center" data-translate-key="difficultyTitle">Zorluk Seç</h2>
             
-            <h2 class="text-5xl md:text-7xl font-black mb-8 md:mb-12 tracking-tighter text-transparent bg-clip-text bg-gradient-to-b from-white to-white/40 text-center" data-translate-key="difficultyTitle">Zorluk Seç</h2>
-            
-            <div class="flex gap-4 mb-8 md:mb-12">
-                 <button class="pill-panel px-6 py-3 md:px-8 md:py-4 text-2xl md:text-3xl active:scale-95 hover:bg-white/5 transition-transform select-none" data-lang="en">🇬🇧</button>
-                 <button class="pill-panel px-6 py-3 md:px-8 md:py-4 text-2xl md:text-3xl active:scale-95 hover:bg-white/5 transition-transform select-none" data-lang="tr">🇹🇷</button>
+            <div class="flex gap-4 mb-12">
+                 <button class="pill-panel px-8 py-4 text-3xl active:scale-95 hover:bg-white/5 transition-transform" data-lang="en">🇬🇧</button>
+                 <button class="pill-panel px-8 py-4 text-3xl active:scale-95 hover:bg-white/5 transition-transform" data-lang="tr">🇹🇷</button>
             </div>
 
-            <!-- Butonlar için grid yapısı mobilde tek sütun, masaüstünde 5 sütun -->
-            <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4 md:gap-6 w-full max-w-6xl">
-                <button class="pill-panel p-6 md:p-8 flex flex-col items-center gap-4 group hover:bg-white/5 transition-transform active:scale-95 cursor-pointer select-none" onclick="startGame('peaceful')">
-                    <span class="text-4xl md:text-5xl filter drop-shadow-lg group-hover:scale-110 transition-transform">🕊️</span>
+            <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-6 w-full max-w-6xl pb-20">
+                <!-- Butonlara hem onclick hem de ontouchend ekleyerek garantiye alıyoruz -->
+                <div class="pill-panel p-8 flex flex-col items-center gap-4 group hover:bg-white/5 transition-transform active:scale-95 cursor-pointer select-none difficulty-btn" data-diff="peaceful">
+                    <span class="text-5xl">🕊️</span>
                     <span class="font-bold text-emerald-300 text-lg" data-translate-key="peaceful">Barışçıl</span>
-                </button>
-                <button class="pill-panel p-6 md:p-8 flex flex-col items-center gap-4 group hover:bg-white/5 transition-transform active:scale-95 cursor-pointer select-none" onclick="startGame('easy')">
-                    <span class="text-4xl md:text-5xl filter drop-shadow-lg group-hover:scale-110 transition-transform">👶</span>
+                </div>
+                <div class="pill-panel p-8 flex flex-col items-center gap-4 group hover:bg-white/5 transition-transform active:scale-95 cursor-pointer select-none difficulty-btn" data-diff="easy">
+                    <span class="text-5xl">👶</span>
                     <span class="font-bold text-cyan-300 text-lg" data-translate-key="easy">Kolay</span>
-                </button>
-                <button class="pill-panel p-6 md:p-8 flex flex-col items-center gap-4 group hover:bg-white/5 border-purple-500/30 transition-transform active:scale-95 cursor-pointer select-none" onclick="startGame('normal')">
-                    <span class="text-4xl md:text-5xl filter drop-shadow-lg group-hover:scale-110 transition-transform">😐</span>
+                </div>
+                <div class="pill-panel p-8 flex flex-col items-center gap-4 group hover:bg-white/5 border-purple-500/30 transition-transform active:scale-95 cursor-pointer select-none difficulty-btn" data-diff="normal">
+                    <span class="text-5xl">😐</span>
                     <span class="font-bold text-purple-300 text-lg" data-translate-key="normal">Normal</span>
-                </button>
-                <button class="pill-panel p-6 md:p-8 flex flex-col items-center gap-4 group hover:bg-white/5 transition-transform active:scale-95 cursor-pointer select-none" onclick="startGame('hard')">
-                    <span class="text-4xl md:text-5xl filter drop-shadow-lg group-hover:scale-110 transition-transform">😈</span>
+                </div>
+                <div class="pill-panel p-8 flex flex-col items-center gap-4 group hover:bg-white/5 transition-transform active:scale-95 cursor-pointer select-none difficulty-btn" data-diff="hard">
+                    <span class="text-5xl">😈</span>
                     <span class="font-bold text-rose-300 text-lg" data-translate-key="hard">Zor</span>
-                </button>
-                <button class="pill-panel p-6 md:p-8 flex flex-col items-center gap-4 group hover:bg-white/5 transition-transform active:scale-95 cursor-pointer select-none" onclick="startGame('hardcore')">
-                    <span class="text-4xl md:text-5xl filter drop-shadow-lg group-hover:scale-110 transition-transform">💀</span>
+                </div>
+                <div class="pill-panel p-8 flex flex-col items-center gap-4 group hover:bg-white/5 transition-transform active:scale-95 cursor-pointer select-none difficulty-btn" data-diff="hardcore">
+                    <span class="text-5xl">💀</span>
                     <span class="font-bold text-red-500 text-lg" data-translate-key="hardcore">Hardcore</span>
-                </button>
+                </div>
             </div>
         </div>
     </div>
 
     <!-- OYUN ALANI -->
     <div id="game-area" style="display: none;" class="w-full max-w-[1400px] px-4 py-6 z-10 flex-col gap-8 items-center">
-        
-        <!-- ÜST BAR -->
         <div class="flex justify-between items-start w-full max-w-6xl mx-auto relative z-[100]">
-            <!-- SKITTER -->
             <details id="skitter-feed" class="pill-panel bg-black/40">
                 <summary class="hover:bg-white/5 transition-colors flex items-center">
                     <div class="flex items-center gap-3 w-full">
                         <span id="skitter-icon" class="text-2xl select-none">🐦</span>
-                        
-                        <!-- Kapalıyken Görünen Servet -->
                         <div id="skitter-collapsed-info" class="flex flex-col leading-none">
                             <span class="text-[9px] text-slate-400 uppercase tracking-wider">Yilong Ma</span>
                             <span id="yilong-ma-servet-mini" class="font-mono text-sm text-yellow-400 font-bold">--</span>
                         </div>
-
-                        <!-- Açılınca Görünen Başlık -->
                         <div id="skitter-header-content" class="hidden flex-grow justify-between items-center opacity-0 transition-opacity duration-300 ml-4">
                             <div class="flex flex-col leading-none text-left">
                                 <span class="font-bold text-sky-400 text-lg">Skitter</span>
@@ -244,7 +164,6 @@
             </div>
         </div>
 
-        <!-- BAŞLIK & STATS -->
         <div class="flex flex-col items-center gap-8 mt-4 w-full">
             <div class="text-center space-y-3">
                 <h1 class="text-6xl md:text-8xl font-black tracking-tighter text-transparent bg-clip-text bg-gradient-to-b from-white via-purple-100 to-white/50 drop-shadow-2xl animate-pulse-slow select-none">
@@ -271,14 +190,12 @@
             </div>
         </div>
 
-        <!-- MAIN -->
         <div class="relative flex justify-center items-center py-12">
             <div class="absolute w-[320px] h-[320px] md:w-[400px] md:h-[400px] pill-panel opacity-30 rotate-12 z-0 blur-sm border-white/10 bg-gradient-to-br from-purple-500/10 to-blue-500/10 animate-pulse-slow"></div>
             <div class="absolute w-[320px] h-[320px] md:w-[400px] md:h-[400px] pill-panel opacity-30 -rotate-12 z-0 blur-sm border-white/10 bg-gradient-to-bl from-fuchsia-500/10 to-purple-500/10 animate-pulse-slow" style="animation-delay: -2s;"></div>
             <div id="skibidi-toilet" class="text-[160px] md:text-[200px] relative cursor-pointer z-10 active:scale-90 transition-all duration-75">🚽</div>
         </div>
 
-        <!-- PANELS -->
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 w-full max-w-7xl">
             <div class="lg:col-span-4 flex flex-col gap-4">
                 <div class="pill-panel p-6 h-full flex flex-col">
@@ -304,4 +221,58 @@
                     <div class="flex items-center justify-between mb-6 border-b border-white/5 pb-4">
                         <div class="flex items-center gap-3">
                             <div class="w-10 h-10 rounded-full bg-emerald-500/20 flex items-center justify-center text-emerald-300 shadow-[0_0_15px_rgba(16,185,129,0.3)]">📈</div>
-                            <h2 class="text-xl font-bold text-white tracking-tight" data-translate-key="marketsTit
+                            <h2 class="text-xl font-bold text-white tracking-tight" data-translate-key="marketsTitle">Markets</h2>
+                        </div>
+                        <span class="text-[10px] bg-white/5 px-3 py-1 rounded-full text-slate-400 border border-white/5 tracking-widest font-bold">REAL-TIME</span>
+                    </div>
+                    <div id="market-list-container" class="grid grid-cols-1 gap-3"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="message-box" class="fixed inset-0 z-[300] flex items-center justify-center bg-black/80 backdrop-blur-xl opacity-0 pointer-events-none transition-all duration-500">
+        <div class="pill-panel p-12 max-w-lg w-full text-center transform scale-90 transition-transform duration-300 border-purple-500/30 shadow-[0_0_60px_rgba(168,85,247,0.2)]">
+            <div id="message-text" class="mb-8 text-lg text-white"></div>
+            <button id="message-close" class="w-full py-4 rounded-2xl bg-gradient-to-r from-purple-600 to-blue-600 font-bold text-white text-lg shadow-lg hover:shadow-purple-500/40 hover:scale-[1.02] transition-all active:scale-95" data-translate-key="slay">SLAY 🔥</button>
+        </div>
+    </div>
+
+    <script>
+        lucide.createIcons();
+        
+        // --- GLOBAL START FUNCTION (Safe for Mobile) ---
+        window.startGame = function(difficulty) {
+            // 1. Hemen UI'ı değiştir (Gecikmesiz)
+            const diffScreen = document.getElementById('difficulty-selection');
+            const gameArea = document.getElementById('game-area');
+            
+            if (diffScreen) diffScreen.style.display = 'none';
+            if (gameArea) gameArea.style.display = 'flex';
+            
+            // 2. Ayarları kaydet ve oyunu başlat
+            currentSettings = difficultySettings[difficulty] || difficultySettings.normal;
+            
+            // 3. Kritik mantığı hafif gecikmeli çalıştır (UI donmasın)
+            requestAnimationFrame(() => {
+                try {
+                    initializeGame();
+                    updateUIText();
+                } catch(e) {
+                    console.error("Game Init Error:", e);
+                    alert("Oyun başlatılamadı! Lütfen sayfayı yenile.");
+                }
+            });
+        };
+
+        // --- PHYSICS ENGINE ---
+        document.addEventListener('DOMContentLoaded', () => {
+            const blobs = [
+                { el: document.getElementById('blob1'), x: 0, y: 0, baseX: 20, baseY: 20, phase: 0 },
+                { el: document.getElementById('blob2'), x: 0, y: 0, baseX: 80, baseY: 80, phase: 2 },
+                { el: document.getElementById('blob3'), x: 0, y: 0, baseX: 50, baseY: 50, phase: 4 }
+            ];
+            let mouse = { x: 0.5, y: 0.5 }, target = { x: 0.5, y: 0.5 };
+            window.addEventListener('mousemove', e => { target.x = e.clientX/window.innerWidth; target.y = e.clientY/window.innerHeight; });
+            function animate() {
+                mouse.x += (target.x - mouse.x) * 0.05; mouse.y += (targe
