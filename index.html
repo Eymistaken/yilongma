@@ -1,11 +1,10 @@
 <!DOCTYPE html>
 <html lang="en" class="dark">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Skibidi Clicker Ultra</title>
-
+    
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Tone.js -->
@@ -15,11 +14,10 @@
     <!-- SortableJS -->
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
     <!-- Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;500;700;800&display=swap"
-        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;500;700;800&display=swap" rel="stylesheet">
     <!-- Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
-
+    
     <script>
         tailwind.config = {
             darkMode: 'class',
@@ -53,168 +51,85 @@
     </script>
 
     <style>
-        /* --- GENEL AYARLAR (SADECE KOYU) --- */
+        /* --- GENEL AYARLAR --- */
         body {
-            background-color: #050508;
-            color: #f0f0f0;
-            overflow-x: hidden;
+            background-color: #050508; color: #f0f0f0;
+            overflow-x: hidden; /* Yatay kaydırmayı engelle */
             -webkit-tap-highlight-color: transparent;
-            -webkit-font-smoothing: antialiased;
-            user-select: none;
-            -webkit-user-select: none;
+            -webkit-font-smoothing: antialiased; user-select: none; -webkit-user-select: none;
         }
 
         /* --- ARKA PLAN --- */
-        .liquid-bg-container {
-            position: fixed;
-            inset: 0;
-            z-index: -1;
-            overflow: hidden;
-            background: #050508;
-        }
+        .liquid-bg-container { position: fixed; inset: 0; z-index: -1; overflow: hidden; background: #050508; }
+        
+        .blob-shape { position: absolute; border-radius: 50%; filter: blur(80px); will-change: transform; animation: blob-morph 10s infinite ease-in-out; opacity: 0.6; mix-blend-mode: screen; }
+        
+        .blob-1 { width: 60vw; height: 60vw; background: #4c1d95; }
+        .blob-2 { width: 70vw; height: 70vw; background: #be185d; animation-delay: -2s; }
+        .blob-3 { width: 50vw; height: 50vw; background: #0e7490; animation-delay: -5s; }
 
-        .blob-shape {
-            position: absolute;
-            border-radius: 50%;
-            filter: blur(80px);
-            will-change: transform;
-            animation: blob-morph 10s infinite ease-in-out;
-            opacity: 0.6;
-            mix-blend-mode: screen;
-        }
-
-        .blob-1 {
-            width: 60vw;
-            height: 60vw;
-            background: #4c1d95;
-        }
-
-        .blob-2 {
-            width: 70vw;
-            height: 70vw;
-            background: #be185d;
-            animation-delay: -2s;
-        }
-
-        .blob-3 {
-            width: 50vw;
-            height: 50vw;
-            background: #0e7490;
-            animation-delay: -5s;
-        }
-
-        /* --- STAT CARD (Koyu Hap Tasarımı) --- */
-        .stat-card {
-            background: rgba(10, 10, 15, 0.6);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            border-radius: 2.5rem;
+        /* --- STAT CARD --- */
+        .stat-card { 
+            background: rgba(10, 10, 15, 0.6); 
+            backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); 
+            border: 1px solid rgba(255, 255, 255, 0.08); 
+            border-radius: 2.5rem; 
             box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.5);
-            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); 
         }
+        .stat-card:hover { border-color: rgba(255, 255, 255, 0.15); transform: translateY(-3px); }
 
-        .stat-card:hover {
-            border-color: rgba(255, 255, 255, 0.15);
-            transform: translateY(-3px);
-        }
-
-        /* --- PILL PANEL (Genel Paneller) --- */
-        .pill-panel {
+        /* --- PILL PANEL --- */
+        .pill-panel { 
             background: linear-gradient(180deg, rgba(30, 30, 45, 0.6) 0%, rgba(15, 15, 25, 0.8) 100%);
-            backdrop-filter: blur(24px) saturate(140%);
-            -webkit-backdrop-filter: blur(24px) saturate(140%);
-            border: 1px solid rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(24px) saturate(140%); -webkit-backdrop-filter: blur(24px) saturate(140%); 
+            border: 1px solid rgba(255, 255, 255, 0.08); 
             box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.4), inset 0 1px 0 0 rgba(255, 255, 255, 0.15);
-            border-radius: 2rem;
-            transition: all 0.3s ease;
+            border-radius: 2rem; 
+            transition: all 0.3s ease; 
         }
+        .pill-panel:hover { border-color: rgba(255, 255, 255, 0.15); transform: translateY(-2px); }
 
-        .pill-panel:hover {
-            border-color: rgba(255, 255, 255, 0.15);
-            transform: translateY(-2px);
+        /* --- MARKET ITEM --- */
+        .ghost-glass-item { 
+            background: rgba(255, 255, 255, 0.03); 
+            backdrop-filter: blur(40px) saturate(120%); -webkit-backdrop-filter: blur(40px) saturate(120%); 
+            border: 1px solid rgba(255, 255, 255, 0.05); 
+            border-radius: 1.5rem; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            overflow: hidden; 
         }
-
-        /* --- MARKET ITEM (Ghost Glass & Animasyon) --- */
-        .ghost-glass-item {
-            background: rgba(255, 255, 255, 0.03);
-            backdrop-filter: blur(40px) saturate(120%);
-            -webkit-backdrop-filter: blur(40px) saturate(120%);
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            border-radius: 1.5rem;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            overflow: hidden;
-        }
-
-        .ghost-glass-item:hover {
-            background: rgba(255, 255, 255, 0.08);
-            border-color: rgba(255, 255, 255, 0.15);
-        }
-
-        .ghost-glass-item[open] {
-            background: rgba(20, 20, 30, 0.3);
-            border-color: rgba(255, 255, 255, 0.1);
-        }
-
-        details.market-item summary~* {
+        .ghost-glass-item:hover { background: rgba(255, 255, 255, 0.08); border-color: rgba(255, 255, 255, 0.15); }
+        .ghost-glass-item[open] { background: rgba(20, 20, 30, 0.3); border-color: rgba(255, 255, 255, 0.1); }
+        
+        details.market-item summary ~ * {
             animation: sweep-in 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards;
         }
-
+        
         @keyframes sweep-in {
-            0% {
-                opacity: 0;
-                transform: translateY(-20px);
-            }
-
-            100% {
-                opacity: 1;
-                transform: translateY(0);
-            }
+            0% { opacity: 0; transform: translateY(-20px); }
+            100% { opacity: 1; transform: translateY(0); }
         }
-
-        /* --- SKITTER (Özel Animasyonlu) --- */
-        details#skitter-feed {
-            width: 160px;
-            height: 60px;
-            max-height: 60px;
-            overflow: hidden;
-            border-radius: 2rem;
+        
+        /* --- SKITTER --- */
+        details#skitter-feed { 
+            width: 160px; height: 60px; max-height: 60px; overflow: hidden; border-radius: 2rem; 
             transition: width 0.4s cubic-bezier(0.34, 1.56, 0.64, 1),
-                height 0.4s cubic-bezier(0.34, 1.56, 0.64, 1),
-                max-height 0.4s ease;
+                        height 0.4s cubic-bezier(0.34, 1.56, 0.64, 1),
+                        max-height 0.4s ease;
         }
-
-        details#skitter-feed[open] {
-            width: 360px;
-            height: auto;
-            max-height: 600px;
+        details#skitter-feed[open] { width: 360px; height: auto; max-height: 600px; }
+        
+        details#skitter-feed summary { 
+            list-style: none; width: 100%; height: 60px; display: flex; align-items: center; justify-content: space-between; padding: 0 1rem; cursor: pointer; outline: none;
         }
+        details#skitter-feed summary::-webkit-details-marker { display: none; }
 
-        details#skitter-feed summary {
-            list-style: none;
-            width: 100%;
-            height: 60px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 0 1rem;
-            cursor: pointer;
-            outline: none;
+        .skitt-bubble { 
+            background: rgba(0, 0, 0, 0.3); 
+            border: 1px solid rgba(255, 255, 255, 0.05); 
+            backdrop-filter: blur(10px); border-radius: 1.5rem; padding: 1rem; margin-bottom: 0.5rem; 
         }
-
-        details#skitter-feed summary::-webkit-details-marker {
-            display: none;
-        }
-
-        .skitt-bubble {
-            background: rgba(0, 0, 0, 0.3);
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(10px);
-            border-radius: 1.5rem;
-            padding: 1rem;
-            margin-bottom: 0.5rem;
-        }
-
+        
         .notify-heartbeat {
             animation: heartbeat 1.5s ease-in-out infinite;
             border-color: rgba(56, 189, 248, 0.5) !important;
@@ -222,66 +137,22 @@
         }
 
         /* --- DİĞER --- */
-        #skibidi-toilet {
-            transition: transform 0.08s;
-            filter: drop-shadow(0 10px 30px rgba(0, 0, 0, 0.5));
-            z-index: 20;
+        #skibidi-toilet { 
+            transition: transform 0.08s; filter: drop-shadow(0 10px 30px rgba(0,0,0,0.5)); z-index: 20; 
         }
+        #skibidi-toilet.clicked { transform: scale(0.92) rotate(-2deg); }
 
-        #skibidi-toilet.clicked {
-            transform: scale(0.92) rotate(-2deg);
-        }
+        .click-popup { position: absolute; font-weight: 900; pointer-events: none; animation: popup-anim 0.6s forwards; z-index: 50; }
+        @keyframes popup-anim { 0% { transform: translateY(0) scale(0.5); opacity: 0; } 20% { transform: translateY(-30px) scale(1.2); opacity: 1; } 100% { transform: translateY(-100px) scale(1); opacity: 0; } }
 
-        .click-popup {
-            position: absolute;
-            font-weight: 900;
-            pointer-events: none;
-            animation: popup-anim 0.6s forwards;
-            z-index: 50;
-        }
+        .market-trend-up { color: #6EE7B7; text-shadow: 0 0 12px rgba(16, 185, 129, 0.4); }
+        .market-trend-down { color: #FDA4AF; text-shadow: 0 0 12px rgba(244, 63, 94, 0.4); }
 
-        @keyframes popup-anim {
-            0% {
-                transform: translateY(0) scale(0.5);
-                opacity: 0;
-            }
-
-            20% {
-                transform: translateY(-30px) scale(1.2);
-                opacity: 1;
-            }
-
-            100% {
-                transform: translateY(-100px) scale(1);
-                opacity: 0;
-            }
-        }
-
-        .market-trend-up {
-            color: #6EE7B7;
-            text-shadow: 0 0 12px rgba(16, 185, 129, 0.4);
-        }
-
-        .market-trend-down {
-            color: #FDA4AF;
-            text-shadow: 0 0 12px rgba(244, 63, 94, 0.4);
-        }
-
-        ::-webkit-scrollbar {
-            width: 4px;
-        }
-
-        ::-webkit-scrollbar-track {
-            background: transparent;
-        }
-
-        ::-webkit-scrollbar-thumb {
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 10px;
-        }
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 10px; }
     </style>
 </head>
-
 <body class="flex flex-col items-center min-h-screen relative font-sans overflow-x-hidden">
 
     <!-- ARKA PLAN -->
@@ -289,62 +160,50 @@
         <div class="blob-shape blob-1" id="blob1"></div>
         <div class="blob-shape blob-2" id="blob2"></div>
         <div class="blob-shape blob-3" id="blob3"></div>
-        <div
-            style="position: fixed; inset: 0; opacity: 0.04; background-image: url('data:image/svg+xml,%3Csvg viewBox=%220 0 200 200%22 xmlns=%22http://www.w3.org/2000/svg%22%3E%3Cfilter id=%22noiseFilter%22%3E%3CfeTurbulence type=%22fractalNoise%22 baseFrequency=%220.65%22 numOctaves=%223%22 stitchTiles=%22stitch%22/%3E%3C/filter%3E%3Crect width=%22100%25%22 height=%22100%25%22 filter=%22url(%23noiseFilter)%22/%3E%3C/svg%3E'); pointer-events: none;">
-        </div>
+        <div style="position: fixed; inset: 0; opacity: 0.04; background-image: url('data:image/svg+xml,%3Csvg viewBox=%220 0 200 200%22 xmlns=%22http://www.w3.org/2000/svg%22%3E%3Cfilter id=%22noiseFilter%22%3E%3CfeTurbulence type=%22fractalNoise%22 baseFrequency=%220.65%22 numOctaves=%223%22 stitchTiles=%22stitch%22/%3E%3C/filter%3E%3Crect width=%22100%25%22 height=%22100%25%22 filter=%22url(%23noiseFilter)%22/%3E%3C/svg%3E'); pointer-events: none;"></div>
     </div>
 
     <div id="popup-container" class="fixed inset-0 pointer-events-none z-50 overflow-hidden"></div>
     <div id="floater-container" class="fixed inset-0 pointer-events-none z-0 overflow-hidden"></div>
 
-    <!-- ZORLUK SEÇİMİ -->
-    <div id="difficulty-selection"
-        class="fixed inset-0 z-[200] flex flex-col justify-center items-center p-6 bg-black/80 backdrop-blur-2xl transition-opacity duration-500">
-        <h2 class="text-5xl md:text-7xl font-black mb-12 tracking-tighter text-transparent bg-clip-text bg-gradient-to-b from-white to-white/40"
-            data-translate-key="difficultyTitle">Zorluk Seç</h2>
-        <div class="flex gap-4 mb-12">
-            <button class="pill-panel px-8 py-4 text-3xl active:scale-95 hover:bg-white/5 transition-transform"
-                data-lang="en">🇬🇧</button>
-            <button class="pill-panel px-8 py-4 text-3xl active:scale-95 hover:bg-white/5 transition-transform"
-                data-lang="tr">🇹🇷</button>
-        </div>
-        <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-6 w-full max-w-6xl">
-            <button
-                class="pill-panel p-8 flex flex-col items-center gap-4 group hover:bg-white/5 transition-transform active:scale-95"
-                data-difficulty="peaceful">
-                <span class="text-5xl filter drop-shadow-lg group-hover:scale-110 transition-transform">🕊️</span>
-                <span class="font-bold text-emerald-300 text-lg" data-translate-key="peaceful">Barışçıl</span>
-            </button>
-            <button
-                class="pill-panel p-8 flex flex-col items-center gap-4 group hover:bg-white/5 transition-transform active:scale-95"
-                data-difficulty="easy">
-                <span class="text-5xl filter drop-shadow-lg group-hover:scale-110 transition-transform">👶</span>
-                <span class="font-bold text-cyan-300 text-lg" data-translate-key="easy">Kolay</span>
-            </button>
-            <button
-                class="pill-panel p-8 flex flex-col items-center gap-4 group hover:bg-white/5 transition-transform active:scale-95"
-                data-difficulty="normal">
-                <span class="text-5xl filter drop-shadow-lg group-hover:scale-110 transition-transform">😐</span>
-                <span class="font-bold text-purple-300 text-lg" data-translate-key="normal">Normal</span>
-            </button>
-            <button
-                class="pill-panel p-8 flex flex-col items-center gap-4 group hover:bg-white/5 transition-transform active:scale-95"
-                data-difficulty="hard">
-                <span class="text-5xl filter drop-shadow-lg group-hover:scale-110 transition-transform">😈</span>
-                <span class="font-bold text-rose-300 text-lg" data-translate-key="hard">Zor</span>
-            </button>
-            <button
-                class="pill-panel p-8 flex flex-col items-center gap-4 group hover:bg-white/5 transition-transform active:scale-95"
-                data-difficulty="hardcore">
-                <span class="text-5xl filter drop-shadow-lg group-hover:scale-110 transition-transform">💀</span>
-                <span class="font-bold text-red-500 text-lg" data-translate-key="hardcore">Hardcore</span>
-            </button>
+    <!-- ZORLUK SEÇİMİ (Mobil Kaydırma Düzeltmesi) -->
+    <div id="difficulty-selection" class="fixed inset-0 z-[200] overflow-y-auto bg-black/80 backdrop-blur-2xl transition-opacity duration-500">
+        <div class="min-h-full flex flex-col justify-center items-center p-4 md:p-8">
+            <h2 class="text-4xl md:text-7xl font-black mb-8 md:mb-12 tracking-tighter text-transparent bg-clip-text bg-gradient-to-b from-white to-white/40 text-center" data-translate-key="difficultyTitle">Zorluk Seç</h2>
+            
+            <div class="flex gap-4 mb-8 md:mb-12">
+                 <button class="pill-panel px-6 py-3 md:px-8 md:py-4 text-2xl md:text-3xl active:scale-95 hover:bg-white/5 transition-transform" data-lang="en">🇬🇧</button>
+                 <button class="pill-panel px-6 py-3 md:px-8 md:py-4 text-2xl md:text-3xl active:scale-95 hover:bg-white/5 transition-transform" data-lang="tr">🇹🇷</button>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4 md:gap-6 w-full max-w-6xl">
+                <button class="pill-panel p-6 md:p-8 flex flex-col items-center gap-4 group hover:bg-white/5 transition-transform active:scale-95 touch-manipulation" data-difficulty="peaceful">
+                    <span class="text-4xl md:text-5xl filter drop-shadow-lg group-hover:scale-110 transition-transform">🕊️</span>
+                    <span class="font-bold text-emerald-300 text-lg" data-translate-key="peaceful">Barışçıl</span>
+                </button>
+                <button class="pill-panel p-6 md:p-8 flex flex-col items-center gap-4 group hover:bg-white/5 transition-transform active:scale-95 touch-manipulation" data-difficulty="easy">
+                    <span class="text-4xl md:text-5xl filter drop-shadow-lg group-hover:scale-110 transition-transform">👶</span>
+                    <span class="font-bold text-cyan-300 text-lg" data-translate-key="easy">Kolay</span>
+                </button>
+                <button class="pill-panel p-6 md:p-8 flex flex-col items-center gap-4 group hover:bg-white/5 transition-transform active:scale-95 touch-manipulation" data-difficulty="normal">
+                    <span class="text-4xl md:text-5xl filter drop-shadow-lg group-hover:scale-110 transition-transform">😐</span>
+                    <span class="font-bold text-purple-300 text-lg" data-translate-key="normal">Normal</span>
+                </button>
+                <button class="pill-panel p-6 md:p-8 flex flex-col items-center gap-4 group hover:bg-white/5 transition-transform active:scale-95 touch-manipulation" data-difficulty="hard">
+                    <span class="text-4xl md:text-5xl filter drop-shadow-lg group-hover:scale-110 transition-transform">😈</span>
+                    <span class="font-bold text-rose-300 text-lg" data-translate-key="hard">Zor</span>
+                </button>
+                <button class="pill-panel p-6 md:p-8 flex flex-col items-center gap-4 group hover:bg-white/5 transition-transform active:scale-95 touch-manipulation" data-difficulty="hardcore">
+                    <span class="text-4xl md:text-5xl filter drop-shadow-lg group-hover:scale-110 transition-transform">💀</span>
+                    <span class="font-bold text-red-500 text-lg" data-translate-key="hardcore">Hardcore</span>
+                </button>
+            </div>
         </div>
     </div>
 
     <!-- OYUN ALANI -->
     <div id="game-area" style="display: none;" class="w-full max-w-[1400px] px-4 py-6 z-10 flex-col gap-8 items-center">
-
+        
         <!-- ÜST BAR -->
         <div class="flex justify-between items-start w-full max-w-6xl mx-auto relative z-[100]">
             <!-- SKITTER -->
@@ -352,17 +211,15 @@
                 <summary class="hover:bg-white/5 transition-colors flex items-center">
                     <div class="flex items-center gap-3 w-full">
                         <span id="skitter-icon" class="text-2xl select-none">🐦</span>
-
+                        
                         <!-- Kapalıyken Görünen Servet -->
                         <div id="skitter-collapsed-info" class="flex flex-col leading-none">
                             <span class="text-[9px] text-slate-400 uppercase tracking-wider">Yilong Ma</span>
-                            <span id="yilong-ma-servet-mini"
-                                class="font-mono text-sm text-yellow-400 font-bold">--</span>
+                            <span id="yilong-ma-servet-mini" class="font-mono text-sm text-yellow-400 font-bold">--</span>
                         </div>
 
                         <!-- Açılınca Görünen Başlık -->
-                        <div id="skitter-header-content"
-                            class="hidden flex-grow justify-between items-center opacity-0 transition-opacity duration-300 ml-4">
+                        <div id="skitter-header-content" class="hidden flex-grow justify-between items-center opacity-0 transition-opacity duration-300 ml-4">
                             <div class="flex flex-col leading-none text-left">
                                 <span class="font-bold text-sky-400 text-lg">Skitter</span>
                                 <span class="text-[10px] text-sky-400/60 tracking-wider">LIVE FEED</span>
@@ -370,64 +227,47 @@
                         </div>
                     </div>
                 </summary>
-                <div id="skitter-messages" class="px-4 pb-4 pt-2 flex flex-col gap-2 max-h-[400px] overflow-y-auto">
-                </div>
+                <div id="skitter-messages" class="px-4 pb-4 pt-2 flex flex-col gap-2 max-h-[400px] overflow-y-auto"></div>
             </details>
 
             <div class="pill-panel flex gap-2 p-2 bg-black/40">
-                <button id="language-toggle"
-                    class="w-10 h-10 rounded-full hover:bg-white/10 flex items-center justify-center transition-colors text-xl">🇬🇧</button>
-                <button id="restart-game-btn"
-                    class="w-10 h-10 rounded-full hover:bg-red-500/20 flex items-center justify-center transition-colors text-red-400 text-xl"
-                    title="Restart">🔄</button>
+                <button id="language-toggle" class="w-10 h-10 rounded-full hover:bg-white/10 flex items-center justify-center transition-colors text-xl">🇬🇧</button>
+                <button id="restart-game-btn" class="w-10 h-10 rounded-full hover:bg-red-500/20 flex items-center justify-center transition-colors text-red-400 text-xl" title="Restart">🔄</button>
             </div>
         </div>
 
         <!-- BAŞLIK & STATS -->
         <div class="flex flex-col items-center gap-8 mt-4 w-full">
             <div class="text-center space-y-3">
-                <h1
-                    class="text-6xl md:text-8xl font-black tracking-tighter text-transparent bg-clip-text bg-gradient-to-b from-white via-purple-100 to-white/50 drop-shadow-2xl animate-pulse-slow select-none">
+                <h1 class="text-5xl md:text-8xl font-black tracking-tighter text-transparent bg-clip-text bg-gradient-to-b from-white via-purple-100 to-white/50 drop-shadow-2xl animate-pulse-slow select-none">
                     SKIBIDI ULTRA
                 </h1>
                 <div class="pill-panel px-6 py-2 inline-block bg-black/50">
-                    <span id="win-condition-display"
-                        class="text-xs font-bold text-slate-300 uppercase tracking-[0.2em]">Loading...</span>
+                    <span id="win-condition-display" class="text-xs font-bold text-slate-300 uppercase tracking-[0.2em]">Loading...</span>
                 </div>
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4 w-full max-w-4xl">
                 <div class="stat-card p-6 flex flex-col items-center justify-center">
-                    <span class="text-slate-400 text-[11px] font-bold uppercase tracking-[0.15em] mb-2 opacity-80"
-                        data-translate-key="gyattPoints">Gyatt Points</span>
-                    <div class="text-4xl md:text-5xl font-bold text-violet-300 tracking-tight drop-shadow-[0_0_10px_rgba(167,139,250,0.3)]"
-                        id="score">0</div>
+                    <span class="text-slate-400 text-[11px] font-bold uppercase tracking-[0.15em] mb-2 opacity-80" data-translate-key="gyattPoints">Gyatt Points</span>
+                    <div class="text-4xl md:text-5xl font-bold text-violet-300 tracking-tight drop-shadow-[0_0_10px_rgba(167,139,250,0.3)]" id="score">0</div>
                 </div>
                 <div class="stat-card p-6 flex flex-col items-center justify-center">
-                    <span class="text-slate-400 text-[11px] font-bold uppercase tracking-[0.15em] mb-2 opacity-80"
-                        data-translate-key="cps">CPS</span>
-                    <div class="text-3xl md:text-4xl font-bold text-cyan-300 tracking-tight drop-shadow-[0_0_10px_rgba(103,232,249,0.3)]"
-                        id="cps">0.0</div>
+                    <span class="text-slate-400 text-[11px] font-bold uppercase tracking-[0.15em] mb-2 opacity-80" data-translate-key="cps">CPS</span>
+                    <div class="text-3xl md:text-4xl font-bold text-cyan-300 tracking-tight drop-shadow-[0_0_10px_rgba(103,232,249,0.3)]" id="cps">0.0</div>
                 </div>
                 <div class="stat-card p-6 flex flex-col items-center justify-center">
-                    <span class="text-slate-400 text-[11px] font-bold uppercase tracking-[0.15em] mb-2 opacity-80"
-                        data-translate-key="totalWealth">Net Worth</span>
-                    <div class="text-3xl md:text-4xl font-bold text-emerald-300 tracking-tight drop-shadow-[0_0_10px_rgba(110,231,183,0.3)]"
-                        id="total-wealth">0</div>
+                    <span class="text-slate-400 text-[11px] font-bold uppercase tracking-[0.15em] mb-2 opacity-80" data-translate-key="totalWealth">Net Worth</span>
+                    <div class="text-3xl md:text-4xl font-bold text-emerald-300 tracking-tight drop-shadow-[0_0_10px_rgba(110,231,183,0.3)]" id="total-wealth">0</div>
                 </div>
             </div>
         </div>
 
         <!-- MAIN -->
         <div class="relative flex justify-center items-center py-12">
-            <div
-                class="absolute w-[320px] h-[320px] md:w-[400px] md:h-[400px] pill-panel opacity-30 rotate-12 z-0 blur-sm border-white/10 bg-gradient-to-br from-purple-500/10 to-blue-500/10 animate-pulse-slow">
-            </div>
-            <div class="absolute w-[320px] h-[320px] md:w-[400px] md:h-[400px] pill-panel opacity-30 -rotate-12 z-0 blur-sm border-white/10 bg-gradient-to-bl from-fuchsia-500/10 to-purple-500/10 animate-pulse-slow"
-                style="animation-delay: -2s;"></div>
-            <div id="skibidi-toilet"
-                class="text-[160px] md:text-[200px] relative cursor-pointer z-10 active:scale-90 transition-all duration-75">
-                🚽</div>
+            <div class="absolute w-[320px] h-[320px] md:w-[400px] md:h-[400px] pill-panel opacity-30 rotate-12 z-0 blur-sm border-white/10 bg-gradient-to-br from-purple-500/10 to-blue-500/10 animate-pulse-slow"></div>
+            <div class="absolute w-[320px] h-[320px] md:w-[400px] md:h-[400px] pill-panel opacity-30 -rotate-12 z-0 blur-sm border-white/10 bg-gradient-to-bl from-fuchsia-500/10 to-purple-500/10 animate-pulse-slow" style="animation-delay: -2s;"></div>
+            <div id="skibidi-toilet" class="text-[160px] md:text-[200px] relative cursor-pointer z-10 active:scale-90 transition-all duration-75">🚽</div>
         </div>
 
         <!-- PANELS -->
@@ -435,23 +275,16 @@
             <div class="lg:col-span-4 flex flex-col gap-4">
                 <div class="pill-panel p-6 h-full flex flex-col">
                     <div class="flex items-center gap-3 mb-6 border-b border-white/5 pb-4">
-                        <div
-                            class="w-10 h-10 rounded-full bg-purple-500/20 flex items-center justify-center text-purple-300 shadow-[0_0_15px_rgba(168,85,247,0.3)]">
-                            ⚡</div>
-                        <h2 class="text-xl font-bold text-white tracking-tight" data-translate-key="upgradesTitle">
-                            Upgrades</h2>
+                        <div class="w-10 h-10 rounded-full bg-purple-500/20 flex items-center justify-center text-purple-300 shadow-[0_0_15px_rgba(168,85,247,0.3)]">⚡</div>
+                        <h2 class="text-xl font-bold text-white tracking-tight" data-translate-key="upgradesTitle">Upgrades</h2>
                     </div>
                     <button id="upgrade-ppc" class="ghost-glass-item p-5 flex flex-col gap-2 text-left group">
                         <div class="flex justify-between items-center">
-                            <span class="font-bold text-lg text-white group-hover:text-purple-200 transition-colors"
-                                data-translate-key="moreRizz">More Rizz</span>
-                            <span
-                                class="bg-purple-500/20 px-2 py-0.5 rounded text-[10px] text-purple-200 font-mono tracking-widest">LVL
-                                <span id="ppc-level">1</span></span>
+                            <span class="font-bold text-lg text-white group-hover:text-purple-200 transition-colors" data-translate-key="moreRizz">More Rizz</span>
+                            <span class="bg-purple-500/20 px-2 py-0.5 rounded text-[10px] text-purple-200 font-mono tracking-widest">LVL <span id="ppc-level">1</span></span>
                         </div>
                         <div class="flex justify-between items-center mt-2">
-                            <span class="text-xs text-slate-400 font-medium" data-translate-key="moreRizzDesc">+1 Click
-                                Power</span>
+                            <span class="text-xs text-slate-400 font-medium" data-translate-key="moreRizzDesc">+1 Click Power</span>
                             <span id="ppc-cost" class="text-purple-400 font-bold font-mono text-lg">10</span>
                         </div>
                     </button>
@@ -462,14 +295,10 @@
                 <div class="pill-panel p-6 h-full">
                     <div class="flex items-center justify-between mb-6 border-b border-white/5 pb-4">
                         <div class="flex items-center gap-3">
-                            <div
-                                class="w-10 h-10 rounded-full bg-emerald-500/20 flex items-center justify-center text-emerald-300 shadow-[0_0_15px_rgba(16,185,129,0.3)]">
-                                📈</div>
-                            <h2 class="text-xl font-bold text-white tracking-tight" data-translate-key="marketsTitle">
-                                Markets</h2>
+                            <div class="w-10 h-10 rounded-full bg-emerald-500/20 flex items-center justify-center text-emerald-300 shadow-[0_0_15px_rgba(16,185,129,0.3)]">📈</div>
+                            <h2 class="text-xl font-bold text-white tracking-tight" data-translate-key="marketsTitle">Markets</h2>
                         </div>
-                        <span
-                            class="text-[10px] bg-white/5 px-3 py-1 rounded-full text-slate-400 border border-white/5 tracking-widest font-bold">REAL-TIME</span>
+                        <span class="text-[10px] bg-white/5 px-3 py-1 rounded-full text-slate-400 border border-white/5 tracking-widest font-bold">REAL-TIME</span>
                     </div>
                     <div id="market-list-container" class="grid grid-cols-1 gap-3"></div>
                 </div>
@@ -478,405 +307,5 @@
     </div>
 
     <!-- MESSAGE -->
-    <div id="message-box"
-        class="fixed inset-0 z-[300] flex items-center justify-center bg-black/80 backdrop-blur-xl opacity-0 pointer-events-none transition-all duration-500">
-        <div
-            class="pill-panel p-12 max-w-lg w-full text-center transform scale-90 transition-transform duration-300 border-purple-500/30 shadow-[0_0_60px_rgba(168,85,247,0.2)]">
-            <div id="message-text" class="mb-8 text-lg text-white"></div>
-            <button id="message-close"
-                class="w-full py-4 rounded-2xl bg-gradient-to-r from-purple-600 to-blue-600 font-bold text-white text-lg shadow-lg hover:shadow-purple-500/40 hover:scale-[1.02] transition-all active:scale-95"
-                data-translate-key="slay">SLAY 🔥</button>
-        </div>
-    </div>
-
-    <script>
-        lucide.createIcons();
-
-        // --- PHYSICS ENGINE ---
-        document.addEventListener('DOMContentLoaded', () => {
-            const blobs = [
-                { el: document.getElementById('blob1'), x: 0, y: 0, baseX: 20, baseY: 20, phase: 0 },
-                { el: document.getElementById('blob2'), x: 0, y: 0, baseX: 80, baseY: 80, phase: 2 },
-                { el: document.getElementById('blob3'), x: 0, y: 0, baseX: 50, baseY: 50, phase: 4 }
-            ];
-            let mouse = { x: 0.5, y: 0.5 }, target = { x: 0.5, y: 0.5 };
-            window.addEventListener('mousemove', e => { target.x = e.clientX / window.innerWidth; target.y = e.clientY / window.innerHeight; });
-            function animate() {
-                mouse.x += (target.x - mouse.x) * 0.05; mouse.y += (target.y - mouse.y) * 0.05;
-                const t = Date.now() * 0.001;
-                blobs.forEach((b, i) => {
-                    const fx = Math.sin(t * 0.5 + b.phase) * 15, fy = Math.cos(t * 0.3 + b.phase) * 15;
-                    let mx, my;
-                    if (i === 0) { mx = (mouse.x - 0.5) * -30; my = (mouse.y - 0.5) * -30; }
-                    else if (i === 1) { mx = (mouse.x - 0.5) * 40; my = (mouse.y - 0.5) * 40; }
-                    else { mx = (mouse.x - 0.5) * 20; my = (mouse.y - 0.5) * 20; }
-                    b.el.style.transform = `translate(-50%, -50%) translate(${b.baseX + fx + mx}vw, ${b.baseY + fy + my}vh)`;
-                });
-                requestAnimationFrame(animate);
-            }
-            animate();
-        });
-
-        // --- GAME ENGINE ---
-        const translations = {
-            en: {
-                difficultyTitle: "Select Difficulty", peaceful: "Peaceful", easy: "Easy", normal: "Normal", hard: "Hard", hardcore: "Hardcore", winConditionText: "Goal: {multiplier}x Yilong's Wealth", gyattPoints: "Gyatt Points", cps: "CPS", totalWealth: "Net Worth", upgradesTitle: "Upgrades", moreRizz: "More Rizz", moreRizzDesc: "+1 Gyatt/Click", cost: "Cost", marketsTitle: "Assets", slay: "CONTINUE", yilongWealthTitle: "Yilong Ma", available: "Owned", buyButton: "Buy", sellButton: "Sell", buyAllButton: "MAX", sellAllButton: "DUMP",
-                asset_tl: "Lira", asset_usd: "Dollar", asset_eur: "Euro", asset_xag: "Silver", asset_aura: "AURA", asset_xau: "Gold", asset_plt: "Platinum", asset_btc: "Bitcoin", asset_dia: "Diamond",
-                yilongBuyBase: "Bought {amount} {asset}. LFG 🚀",
-                taxTime: "TAX ALERT! 🚨 -%{percent} ({amount}) seized.", winMessage: '<h1 class="text-5xl font-black mb-4 bg-clip-text text-transparent bg-gradient-to-r from-yellow-300 to-orange-400">VICTORY</h1><p class="text-slate-300 mb-6">You conquered the liquid markets.</p>'
-            },
-            tr: {
-                difficultyTitle: "Zorluk Seç", peaceful: "Barışçıl", easy: "Kolay", normal: "Normal", hard: "Zor", hardcore: "Hardcore", winConditionText: "Hedef: {multiplier}x Yilong Ma", gyattPoints: "Gyatt Puanı", cps: "CPS", totalWealth: "Net Servet", upgradesTitle: "Yükseltmeler", moreRizz: "More Rizz", moreRizzDesc: "+1 Gyatt/Tık", cost: "Bedel", marketsTitle: "Varlıklar", slay: "DEVAM ET", yilongWealthTitle: "Yilong Ma", available: "Adet", buyButton: "AL", sellButton: "SAT", buyAllButton: "MAX", sellAllButton: "HEPSİ",
-                asset_tl: "TL", asset_usd: "Dolar", asset_eur: "Euro", asset_xag: "Gümüş", asset_aura: "AURA", asset_xau: "Altın", asset_plt: "Platin", asset_btc: "Bitcoin", asset_dia: "Elmas",
-                yilongBuyBase: "{amount} {asset} aldım. 🚀",
-                taxTime: "VERGİ! 🚨 -%{percent} ({amount}) kesildi.", winMessage: '<h1 class="text-5xl font-black mb-4 bg-clip-text text-transparent bg-gradient-to-r from-yellow-300 to-orange-400">ZAFER</h1><p class="text-slate-300 mb-6">Sıvı piyasaların kralısın.</p>'
-            }
-        };
-
-        const difficultySettings = {
-            peaceful: { yilongStartWealth: 500_000_000_000, winMultiplier: 1.5, taxEnabled: false },
-            easy: { yilongStartWealth: 1_000_000_000_000, winMultiplier: 2.0, taxEnabled: true },
-            normal: { yilongStartWealth: 1_000_000_000_000, winMultiplier: 2.0, taxEnabled: true },
-            hard: { yilongStartWealth: 1_000_000_000_000, winMultiplier: 2.0, taxEnabled: true },
-            hardcore: { yilongStartWealth: 1_500_000_000_000, winMultiplier: 3.0, taxEnabled: true }
-        };
-
-        let currentLanguage = 'en', currentSettings = difficultySettings.normal, allAssets = null, skitterMessagesEl = null;
-
-        function translate(key, replacements = {}) {
-            let text = translations[currentLanguage]?.[key] || translations['en']?.[key] || key;
-            for (const placeholder in replacements) text = text.replace(new RegExp(`{${placeholder}}`, 'g'), replacements[placeholder]);
-            return text;
-        }
-        function updateUIText() {
-            document.querySelectorAll('[data-translate-key]').forEach(el => el.innerHTML = translate(el.dataset.translateKey));
-            document.getElementById('language-toggle').textContent = currentLanguage === 'en' ? '🇬🇧' : '🇹🇷';
-        }
-        function setLanguage(lang) { currentLanguage = lang; localStorage.setItem('skibidiLiquidLang', lang); updateUIText(); }
-
-        function startGame(difficulty) {
-            currentSettings = difficultySettings[difficulty];
-            document.getElementById('difficulty-selection').classList.add('opacity-0', 'pointer-events-none');
-            document.getElementById('game-area').style.display = 'flex';
-            initializeGame();
-            updateUIText();
-        }
-
-        function initializeGame() {
-            const scoreEl = document.getElementById('score'), cpsEl = document.getElementById('cps'), totalWealthEl = document.getElementById('total-wealth');
-            skitterMessagesEl = document.getElementById('skitter-messages');
-            const marketList = document.getElementById('market-list-container');
-
-            let score = 0, pointsPerClick = 1, ppcCost = 10, totalWealth = 0, gameWon = false, clicks = 0, lastCpsCheck = Date.now();
-            let synth, sellSynth;
-
-            allAssets = {
-                'tl': { name: "TL", colorClass: "text-pink-600 dark:text-pink-400", count: 0, price: 1.00, avgBuyPrice: 0, history: Array(30).fill(1.00) },
-                'usd': { name: "USD", colorClass: "text-green-600 dark:text-green-400", count: 0, price: 10.00, avgBuyPrice: 0, history: Array(30).fill(10.00) },
-                'eur': { name: "EUR", colorClass: "text-orange-600 dark:text-orange-400", count: 0, price: 12.00, avgBuyPrice: 0, history: Array(30).fill(12.00) },
-                'xag': { name: "XAG", colorClass: "text-slate-600 dark:text-slate-300", count: 0, price: 30.00, avgBuyPrice: 0, history: Array(30).fill(30.00) },
-                'aura': { name: "AURA", colorClass: "text-purple-600 dark:text-purple-400", count: 0, price: 100.00, avgBuyPrice: 0, history: Array(30).fill(100.00) },
-                'xau': { name: "XAU", colorClass: "text-yellow-600 dark:text-yellow-400", count: 0, price: 2300.00, avgBuyPrice: 0, history: Array(30).fill(2300.00) },
-                'plt': { name: "PLT", colorClass: "text-gray-700 dark:text-white", count: 0, price: 20000.00, avgBuyPrice: 0, history: Array(30).fill(20000.00) },
-                'btc': { name: "BTC", colorClass: "text-red-600 dark:text-red-500", count: 0, price: 50000.00, avgBuyPrice: 0, history: Array(30).fill(50000.00) },
-                'dia': { name: "DIA", colorClass: "text-blue-600 dark:text-blue-400", count: 0, price: 100000.00, avgBuyPrice: 0, history: Array(30).fill(100000.00) },
-            };
-
-            let yilongMa = { wealth: currentSettings.yilongStartWealth, portfolio: {}, avgBuyPrices: {} };
-            Object.keys(allAssets).forEach(k => { yilongMa.portfolio[k] = 0; yilongMa.avgBuyPrices[k] = 0; });
-
-            const initAudio = async () => { await Tone.start(); synth = new Tone.PolySynth().toDestination(); sellSynth = new Tone.MetalSynth().toDestination(); };
-            const playClick = () => synth?.triggerAttackRelease(["C5", "E5"][Math.floor(Math.random() * 2)], "16n");
-            const playSell = () => sellSynth?.triggerAttackRelease("G4", "32n");
-
-            const format = (n) => {
-                if (n < 1000) return Math.floor(n).toString();
-                if (n < 1000000) return (n / 1000).toFixed(2) + "K";
-                if (n < 1000000000) return (n / 1000000).toFixed(2) + "M";
-                if (n < 1000000000000) return (n / 1000000000).toFixed(2) + "B";
-                return (n / 1000000000000).toFixed(2) + "T";
-            };
-
-            marketList.innerHTML = '';
-            Object.keys(allAssets).forEach(key => {
-                const asset = allAssets[key];
-                const el = document.createElement('details');
-                el.className = "market-item ghost-glass-item group overflow-hidden mb-2"; // YENİ CLASS: ghost-glass-item
-                el.id = `market-${key}-container`;
-                el.innerHTML = `
-                    <summary class="p-4 flex items-center justify-between cursor-pointer">
-                        <div class="flex items-center gap-4">
-                            <div class="w-10 h-10 rounded-full dark:bg-white/5 bg-black/5 dark:border-white/10 border-black/10 border flex items-center justify-center text-xl font-bold ${asset.colorClass} shadow-sm backdrop-blur-sm">${key.substring(0, 1).toUpperCase()}</div>
-                            <div>
-                                <h3 class="font-bold text-slate-700 dark:text-slate-200 text-base tracking-wide" data-translate-key="asset_${key}">${asset.name}</h3>
-                                <div class="text-[11px] text-slate-500 font-mono tracking-wide opacity-70"><span id="${key}-count">0</span> <span data-translate-key="available">Owned</span></div>
-                            </div>
-                        </div>
-                        <div class="flex items-center gap-6">
-                            <div class="text-right">
-                                <div id="${key}-price" class="font-mono font-bold text-slate-800 dark:text-white text-base drop-shadow-sm">${asset.price.toFixed(2)}</div>
-                                <div id="${key}-pl" class="text-[10px] font-mono text-slate-500 dark:text-slate-500 opacity-70">0.00</div>
-                            </div>
-                            <div class="opacity-50 group-hover:opacity-100 transition-opacity text-slate-400">
-                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
-                            </div>
-                        </div>
-                    </summary>
-                    <div class="p-4 dark:bg-white/5 bg-black/5 border-t dark:border-white/5 border-black/5 space-y-4">
-                         <div class="h-32 w-full rounded-xl overflow-hidden dark:bg-black/20 bg-white/40 relative">
-                             <canvas id="${key}-chart"></canvas>
-                         </div>
-                         <div class="flex gap-2 justify-between">
-                            <button class="pill-panel flex-1 py-2 flex items-center justify-center text-emerald-600 dark:text-emerald-400 font-bold text-xs bg-emerald-500/10 hover:bg-emerald-500/20" data-asset="${key}" data-action="buy"><span data-translate-key="buyButton">AL</span></button>
-                            <button class="pill-panel flex-1 py-2 flex items-center justify-center text-emerald-500 dark:text-emerald-300 font-bold text-xs bg-emerald-500/5 hover:bg-emerald-500/15" data-asset="${key}" data-action="buy-all"><span data-translate-key="buyAllButton">MAX</span></button>
-                            <button class="pill-panel flex-1 py-2 flex items-center justify-center text-rose-600 dark:text-rose-400 font-bold text-xs bg-rose-500/10 hover:bg-rose-500/20" data-asset="${key}" data-action="sell"><span data-translate-key="sellButton">SAT</span></button>
-                            <button class="pill-panel flex-1 py-2 flex items-center justify-center text-rose-500 dark:text-rose-300 font-bold text-xs bg-rose-500/5 hover:bg-rose-500/15" data-asset="${key}" data-action="sell-all"><span data-translate-key="sellAllButton">HEPSİ</span></button>
-                        </div>
-                    </div>
-                `;
-                marketList.appendChild(el);
-            });
-
-            setTimeout(() => {
-                Object.keys(allAssets).forEach(key => {
-                    const canvas = document.getElementById(`${key}-chart`);
-                    if (canvas) {
-                        const ctx = canvas.getContext('2d');
-                        const grad = ctx.createLinearGradient(0, 0, 0, 120);
-                        grad.addColorStop(0, 'rgba(139, 92, 246, 0.4)'); grad.addColorStop(1, 'rgba(139, 92, 246, 0)');
-                        allAssets[key].chart = new Chart(ctx, {
-                            type: 'line',
-                            data: { labels: Array(30).fill(''), datasets: [{ data: allAssets[key].history, borderColor: '#8b5cf6', borderWidth: 2, backgroundColor: grad, fill: true, pointRadius: 0, tension: 0.4 }] },
-                            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: false, tooltip: false }, scales: { x: { display: false }, y: { display: false } }, animation: { duration: 0 } }
-                        });
-                    }
-                });
-            }, 100);
-
-            // Skitter Animasyonunu (Açılış) Tekrar Ekledim
-            const skitterFeed = document.getElementById('skitter-feed');
-            const skitterIcon = document.getElementById('skitter-icon');
-            const skitterHeader = document.getElementById('skitter-header-content');
-            const skitterCollapsedInfo = document.getElementById('skitter-collapsed-info');
-
-            skitterFeed.addEventListener('toggle', () => {
-                if (skitterFeed.open) {
-                    // Açılırken:
-                    skitterFeed.classList.remove('notify-heartbeat'); // Bildirimi durdur
-                    skitterIcon.classList.add('opacity-0');
-                    skitterCollapsedInfo.classList.add('hidden'); // Mini bilgiyi gizle
-                    skitterHeader.classList.remove('hidden');
-                    setTimeout(() => skitterHeader.classList.remove('opacity-0'), 100);
-                } else {
-                    // Kapanırken:
-                    skitterIcon.classList.remove('opacity-0');
-                    skitterHeader.classList.add('opacity-0');
-                    setTimeout(() => {
-                        skitterHeader.classList.add('hidden');
-                        skitterCollapsedInfo.classList.remove('hidden'); // Mini bilgiyi göster
-                    }, 100);
-                }
-            });
-
-            const postSkitt = (auth, keyOrTxt, key = null, rep = {}) => {
-                const div = document.createElement('div');
-                div.className = "skitt-bubble animate-sweep";
-                const txt = key ? translate(key, rep) : keyOrTxt;
-                const isYilong = auth === translate('yilongMa');
-                div.innerHTML = `
-                    <div class="flex justify-between mb-1.5 items-center">
-                        <span class="font-bold text-[11px] ${isYilong ? 'text-yellow-500 dark:text-yellow-400' : 'text-sky-500 dark:text-sky-400'} tracking-wide">${auth}</span>
-                        <span class="text-[9px] text-slate-500 dark:text-slate-600">NOW</span>
-                    </div>
-                    <p class="text-xs text-slate-700 dark:text-slate-200 leading-snug font-medium opacity-90">${txt}</p>
-                `;
-                skitterMessagesEl.prepend(div);
-                if (skitterMessagesEl.children.length > 15) skitterMessagesEl.lastChild.remove();
-
-                if (!skitterFeed.open) {
-                    // Bildirim efekti: Kalp atışı (Sürekli)
-                    skitterFeed.classList.add('notify-heartbeat');
-                }
-            };
-
-            const updateUI = () => {
-                if (!scoreEl) return;
-                scoreEl.textContent = format(score);
-                totalWealth = score;
-                Object.keys(allAssets).forEach(k => totalWealth += allAssets[k].count * allAssets[k].price);
-                if (totalWealthEl) totalWealthEl.textContent = format(totalWealth);
-
-                Object.keys(allAssets).forEach(key => {
-                    const asset = allAssets[key];
-                    const priceEl = document.getElementById(`${key}-price`);
-                    const countEl = document.getElementById(`${key}-count`);
-                    const plEl = document.getElementById(`${key}-pl`);
-
-                    if (priceEl && countEl && plEl) {
-                        const oldP = parseFloat(priceEl.textContent);
-                        priceEl.textContent = asset.price.toFixed(2);
-                        priceEl.className = `font-mono font-bold text-base ${asset.price > oldP ? 'market-trend-up' : (asset.price < oldP ? 'market-trend-down' : 'text-slate-800 dark:text-white')}`;
-                        countEl.textContent = format(asset.count);
-                        if (asset.count > 0) {
-                            const prof = asset.price - asset.avgBuyPrice;
-                            plEl.textContent = (prof >= 0 ? '+' : '') + prof.toFixed(2);
-                            plEl.className = `text-[10px] font-mono ${prof >= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'}`;
-                        } else plEl.textContent = "0.00";
-                    }
-                    if (asset.chart && document.getElementById(`market-${key}-container`)?.open) {
-                        asset.chart.data.datasets[0].data = asset.history;
-                        asset.chart.update('none');
-                    }
-                });
-
-                let yw = 0;
-                Object.keys(yilongMa.portfolio).forEach(k => yw += yilongMa.portfolio[k] * allAssets[k].price);
-                const finalYW = yilongMa.wealth + yw;
-                const fmtYW = format(finalYW);
-
-                const miniEl = document.getElementById('yilong-ma-servet-mini');
-                if (miniEl) miniEl.textContent = fmtYW;
-
-                const dispEl = document.getElementById('yilong-ma-servet-display');
-                if (dispEl) dispEl.textContent = fmtYW;
-
-                const winEl = document.getElementById('win-condition-display');
-                if (winEl) winEl.textContent = translate('winConditionText', { multiplier: currentSettings.winMultiplier });
-
-                const upgEl = document.getElementById('upgrade-ppc');
-                if (upgEl) upgEl.disabled = score < ppcCost;
-
-                if (!gameWon && totalWealth > finalYW * currentSettings.winMultiplier) {
-                    gameWon = true;
-                    const msgEl = document.getElementById('message-text');
-                    if (msgEl) msgEl.innerHTML = translate('winMessage', { playerWealth: format(totalWealth), yilongWealth: format(finalYW) });
-                    document.getElementById('message-box')?.classList.remove('opacity-0', 'pointer-events-none');
-                }
-            };
-
-            const skibidi = document.getElementById('skibidi-toilet');
-            skibidi.addEventListener('pointerdown', (e) => {
-                if (gameWon) return;
-                if (Tone.context.state !== 'running') initAudio();
-                score += pointsPerClick;
-                clicks++;
-                updateUI();
-                playClick();
-                skibidi.classList.add('clicked'); setTimeout(() => skibidi.classList.remove('clicked'), 80);
-
-                const pop = document.createElement('div');
-                pop.className = 'click-popup text-3xl dark:text-white text-slate-900';
-                pop.textContent = ["RIZZ", "GYATT", "SKIBIDI", "SIGMA", "OHIO", "W"][Math.floor(Math.random() * 6)];
-                const cx = e.clientX || (e.touches && e.touches[0].clientX);
-                const cy = e.clientY || (e.touches && e.touches[0].clientY);
-                if (cx) { pop.style.left = `${cx}px`; pop.style.top = `${cy}px`; }
-                else { pop.style.left = '50%'; pop.style.top = '50%'; }
-
-                document.getElementById('popup-container').appendChild(pop);
-                setTimeout(() => pop.remove(), 600);
-            });
-
-            document.getElementById('upgrade-ppc').addEventListener('click', () => {
-                if (score >= ppcCost) {
-                    score -= ppcCost; pointsPerClick++; ppcCost = Math.floor(ppcCost * 1.5);
-                    document.getElementById('ppc-level').textContent = pointsPerClick;
-                    document.getElementById('ppc-cost').textContent = format(ppcCost);
-                    updateUI();
-                }
-            });
-
-            marketList.addEventListener('click', (e) => {
-                const btn = e.target.closest('button');
-                if (!btn) return;
-                const k = btn.dataset.asset; const act = btn.dataset.action; const as = allAssets[k];
-
-                if (act === 'buy' && score >= as.price) {
-                    const cost = as.price; as.avgBuyPrice = ((as.count * as.avgBuyPrice) + cost) / (as.count + 1);
-                    score -= cost; as.count++;
-                } else if (act === 'buy-all') {
-                    const amt = Math.floor(score / as.price);
-                    if (amt > 0) {
-                        const cost = amt * as.price; as.avgBuyPrice = ((as.count * as.avgBuyPrice) + cost) / (as.count + amt);
-                        score -= cost; as.count += amt;
-                    }
-                } else if (act === 'sell' && as.count > 0) {
-                    score += as.price; as.count--; if (as.count === 0) as.avgBuyPrice = 0;
-                    playSell();
-                } else if (act === 'sell-all' && as.count > 0) {
-                    score += as.count * as.price; as.count = 0; as.avgBuyPrice = 0;
-                    playSell();
-                }
-                updateUI();
-            });
-
-            // LOOPS
-            setInterval(() => { // Market
-                if (gameWon) return;
-                Object.keys(allAssets).forEach(k => {
-                    const as = allAssets[k];
-                    const ch = (Math.random() - 0.48) * (k === 'btc' || k === 'aura' ? 0.1 : 0.05);
-                    as.price += as.price * ch;
-                    if (as.price < 1) as.price = 1;
-                    as.history.push(as.price);
-                    if (as.history.length > 30) as.history.shift();
-                });
-                if (allAssets['plt'].count > 0) score += allAssets['plt'].count * allAssets['plt'].price * currentSettings.pltPayoutRate;
-                updateUI();
-            }, 3000);
-
-            setInterval(() => { // CPS
-                const now = Date.now(); const dt = (now - lastCpsCheck) / 1000;
-                if (cpsEl) cpsEl.textContent = (clicks / dt).toFixed(1);
-                clicks = 0; lastCpsCheck = now;
-            }, 1000);
-
-            // Yilong & Taxes
-            setInterval(() => {
-                if (gameWon) return;
-                if (Math.random() < 0.3) {
-                    const k = Object.keys(allAssets)[Math.floor(Math.random() * 9)];
-                    const inv = yilongMa.wealth * 0.08;
-                    if (inv > allAssets[k].price) {
-                        const amt = Math.floor(inv / allAssets[k].price);
-                        yilongMa.wealth -= amt * allAssets[k].price;
-                        yilongMa.portfolio[k] = (yilongMa.portfolio[k] || 0) + amt;
-                        if (Math.random() < 0.6) postSkitt(translate('yilongMa'), null, 'yilongBuyBase', { amount: format(amt), asset: allAssets[k].name });
-                    }
-                }
-                if (currentSettings.taxEnabled && Math.random() < 0.05) {
-                    const tax = Math.floor(totalWealth * 0.15);
-                    if (tax > 0) {
-                        score = Math.max(0, score - tax);
-                        postSkitt(translate('taxOffice'), null, 'taxTime', { percent: '15', amount: format(tax) });
-                    }
-                }
-            }, 5000);
-
-            // Floaters
-            const floats = ['💧', '🔮', '🧬', '🧿', '🫧'];
-            setInterval(() => {
-                const f = document.createElement('div'); f.className = 'absolute text-2xl opacity-10 pointer-events-none animate-float-slow blur-sm z-0';
-                f.textContent = floats[Math.floor(Math.random() * floats.length)];
-                f.style.left = Math.random() * 100 + 'vw'; f.style.bottom = '-50px';
-                f.style.animationDuration = (Math.random() * 10 + 10) + 's';
-                document.getElementById('floater-container').appendChild(f);
-                setTimeout(() => f.remove(), 20000);
-            }, 2000);
-
-            postSkitt(translate('skitterDev'), null, 'skitterWelcome');
-            updateUI();
-        }
-
-        document.querySelectorAll('.pill-panel[data-difficulty]').forEach(b => b.addEventListener('click', () => startGame(b.dataset.difficulty)));
-        document.querySelectorAll('.pill-panel[data-lang]').forEach(b => b.addEventListener('click', () => setLanguage(b.dataset.lang)));
-        document.getElementById('language-toggle').addEventListener('click', () => setLanguage(currentLanguage === 'en' ? 'tr' : 'en'));
-        document.getElementById('restart-game-btn').addEventListener('click', () => window.location.reload());
-        document.getElementById('message-close').addEventListener('click', () => document.getElementById('message-box').classList.add('opacity-0', 'pointer-events-none'));
-
-        const savedL = localStorage.getItem('skibidiLiquidLang');
-        if (savedL) setLanguage(savedL); else setLanguage('en');
-
-    </script>
-</body>
-
-</html>
+    <div id="message-box" class="fixed inset-0 z-[300] flex items-center justify-center bg-black/80 backdrop-blur-xl opacity-0 pointer-events-none transition-all duration-500">
+        <div class="pill-panel p-12 max-w-lg w-full text-cen
