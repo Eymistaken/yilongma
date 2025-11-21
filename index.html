@@ -51,10 +51,10 @@
     </script>
 
     <style>
-        /* --- GENEL AYARLAR --- */
+        /* --- GENEL AYARLAR (SADECE KOYU) --- */
         body {
             background-color: #050508; color: #f0f0f0;
-            overflow-x: hidden; /* Yatay kaydırmayı engelle */
+            overflow-x: hidden; /* Yatay taşmayı engelle */
             -webkit-tap-highlight-color: transparent;
             -webkit-font-smoothing: antialiased; user-select: none; -webkit-user-select: none;
         }
@@ -68,18 +68,22 @@
         .blob-2 { width: 70vw; height: 70vw; background: #be185d; animation-delay: -2s; }
         .blob-3 { width: 50vw; height: 50vw; background: #0e7490; animation-delay: -5s; }
 
-        /* --- STAT CARD --- */
+        /* --- STAT CARD (Koyu Hap Tasarımı - O Özel İstek) --- */
         .stat-card { 
-            background: rgba(10, 10, 15, 0.6); 
+            /* Çok koyu, neredeyse siyah cam */
+            background: rgba(5, 5, 10, 0.8); 
             backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); 
-            border: 1px solid rgba(255, 255, 255, 0.08); 
+            /* İncecik, zarif bir kenarlık */
+            border: 1px solid rgba(255, 255, 255, 0.05); 
+            /* Tam yuvarlatılmış köşeler */
             border-radius: 2.5rem; 
+            /* Hafif derinlik */
             box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.5);
             transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); 
         }
         .stat-card:hover { border-color: rgba(255, 255, 255, 0.15); transform: translateY(-3px); }
 
-        /* --- PILL PANEL --- */
+        /* --- PILL PANEL (Genel Paneller) --- */
         .pill-panel { 
             background: linear-gradient(180deg, rgba(30, 30, 45, 0.6) 0%, rgba(15, 15, 25, 0.8) 100%);
             backdrop-filter: blur(24px) saturate(140%); -webkit-backdrop-filter: blur(24px) saturate(140%); 
@@ -90,7 +94,7 @@
         }
         .pill-panel:hover { border-color: rgba(255, 255, 255, 0.15); transform: translateY(-2px); }
 
-        /* --- MARKET ITEM --- */
+        /* --- MARKET ITEM (Ghost Glass & Animasyon) --- */
         .ghost-glass-item { 
             background: rgba(255, 255, 255, 0.03); 
             backdrop-filter: blur(40px) saturate(120%); -webkit-backdrop-filter: blur(40px) saturate(120%); 
@@ -109,9 +113,10 @@
             0% { opacity: 0; transform: translateY(-20px); }
             100% { opacity: 1; transform: translateY(0); }
         }
-        
-        /* --- SKITTER --- */
+
+        /* --- SKITTER (Özel Animasyonlu & Servet Göstergeli) --- */
         details#skitter-feed { 
+            /* Başlangıç genişliği: Servet sığacak kadar */
             width: 160px; height: 60px; max-height: 60px; overflow: hidden; border-radius: 2rem; 
             transition: width 0.4s cubic-bezier(0.34, 1.56, 0.64, 1),
                         height 0.4s cubic-bezier(0.34, 1.56, 0.64, 1),
@@ -166,34 +171,37 @@
     <div id="popup-container" class="fixed inset-0 pointer-events-none z-50 overflow-hidden"></div>
     <div id="floater-container" class="fixed inset-0 pointer-events-none z-0 overflow-hidden"></div>
 
-    <!-- ZORLUK SEÇİMİ (Mobil Kaydırma Düzeltmesi) -->
-    <div id="difficulty-selection" class="fixed inset-0 z-[200] overflow-y-auto bg-black/80 backdrop-blur-2xl transition-opacity duration-500">
-        <div class="min-h-full flex flex-col justify-center items-center p-4 md:p-8">
-            <h2 class="text-4xl md:text-7xl font-black mb-8 md:mb-12 tracking-tighter text-transparent bg-clip-text bg-gradient-to-b from-white to-white/40 text-center" data-translate-key="difficultyTitle">Zorluk Seç</h2>
+    <!-- ZORLUK SEÇİMİ (Mobil Fix: Scroll & Alignment) -->
+    <div id="difficulty-selection" class="fixed inset-0 z-[200] bg-black/90 backdrop-blur-2xl transition-opacity duration-500 overflow-y-auto overflow-x-hidden flex items-center justify-center">
+        <!-- İçerik Kapsayıcısı -->
+        <div class="w-full min-h-full flex flex-col justify-center items-center py-10 px-4">
+            
+            <h2 class="text-5xl md:text-7xl font-black mb-8 md:mb-12 tracking-tighter text-transparent bg-clip-text bg-gradient-to-b from-white to-white/40 text-center" data-translate-key="difficultyTitle">Zorluk Seç</h2>
             
             <div class="flex gap-4 mb-8 md:mb-12">
-                 <button class="pill-panel px-6 py-3 md:px-8 md:py-4 text-2xl md:text-3xl active:scale-95 hover:bg-white/5 transition-transform" data-lang="en">🇬🇧</button>
-                 <button class="pill-panel px-6 py-3 md:px-8 md:py-4 text-2xl md:text-3xl active:scale-95 hover:bg-white/5 transition-transform" data-lang="tr">🇹🇷</button>
+                 <button class="pill-panel px-6 py-3 md:px-8 md:py-4 text-2xl md:text-3xl active:scale-95 hover:bg-white/5 transition-transform select-none" data-lang="en">🇬🇧</button>
+                 <button class="pill-panel px-6 py-3 md:px-8 md:py-4 text-2xl md:text-3xl active:scale-95 hover:bg-white/5 transition-transform select-none" data-lang="tr">🇹🇷</button>
             </div>
 
+            <!-- Butonlar için grid yapısı mobilde tek sütun, masaüstünde 5 sütun -->
             <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4 md:gap-6 w-full max-w-6xl">
-                <button class="pill-panel p-6 md:p-8 flex flex-col items-center gap-4 group hover:bg-white/5 transition-transform active:scale-95 touch-manipulation" data-difficulty="peaceful">
+                <button class="pill-panel p-6 md:p-8 flex flex-col items-center gap-4 group hover:bg-white/5 transition-transform active:scale-95 cursor-pointer select-none" onclick="startGame('peaceful')">
                     <span class="text-4xl md:text-5xl filter drop-shadow-lg group-hover:scale-110 transition-transform">🕊️</span>
                     <span class="font-bold text-emerald-300 text-lg" data-translate-key="peaceful">Barışçıl</span>
                 </button>
-                <button class="pill-panel p-6 md:p-8 flex flex-col items-center gap-4 group hover:bg-white/5 transition-transform active:scale-95 touch-manipulation" data-difficulty="easy">
+                <button class="pill-panel p-6 md:p-8 flex flex-col items-center gap-4 group hover:bg-white/5 transition-transform active:scale-95 cursor-pointer select-none" onclick="startGame('easy')">
                     <span class="text-4xl md:text-5xl filter drop-shadow-lg group-hover:scale-110 transition-transform">👶</span>
                     <span class="font-bold text-cyan-300 text-lg" data-translate-key="easy">Kolay</span>
                 </button>
-                <button class="pill-panel p-6 md:p-8 flex flex-col items-center gap-4 group hover:bg-white/5 transition-transform active:scale-95 touch-manipulation" data-difficulty="normal">
+                <button class="pill-panel p-6 md:p-8 flex flex-col items-center gap-4 group hover:bg-white/5 border-purple-500/30 transition-transform active:scale-95 cursor-pointer select-none" onclick="startGame('normal')">
                     <span class="text-4xl md:text-5xl filter drop-shadow-lg group-hover:scale-110 transition-transform">😐</span>
                     <span class="font-bold text-purple-300 text-lg" data-translate-key="normal">Normal</span>
                 </button>
-                <button class="pill-panel p-6 md:p-8 flex flex-col items-center gap-4 group hover:bg-white/5 transition-transform active:scale-95 touch-manipulation" data-difficulty="hard">
+                <button class="pill-panel p-6 md:p-8 flex flex-col items-center gap-4 group hover:bg-white/5 transition-transform active:scale-95 cursor-pointer select-none" onclick="startGame('hard')">
                     <span class="text-4xl md:text-5xl filter drop-shadow-lg group-hover:scale-110 transition-transform">😈</span>
                     <span class="font-bold text-rose-300 text-lg" data-translate-key="hard">Zor</span>
                 </button>
-                <button class="pill-panel p-6 md:p-8 flex flex-col items-center gap-4 group hover:bg-white/5 transition-transform active:scale-95 touch-manipulation" data-difficulty="hardcore">
+                <button class="pill-panel p-6 md:p-8 flex flex-col items-center gap-4 group hover:bg-white/5 transition-transform active:scale-95 cursor-pointer select-none" onclick="startGame('hardcore')">
                     <span class="text-4xl md:text-5xl filter drop-shadow-lg group-hover:scale-110 transition-transform">💀</span>
                     <span class="font-bold text-red-500 text-lg" data-translate-key="hardcore">Hardcore</span>
                 </button>
@@ -239,7 +247,7 @@
         <!-- BAŞLIK & STATS -->
         <div class="flex flex-col items-center gap-8 mt-4 w-full">
             <div class="text-center space-y-3">
-                <h1 class="text-5xl md:text-8xl font-black tracking-tighter text-transparent bg-clip-text bg-gradient-to-b from-white via-purple-100 to-white/50 drop-shadow-2xl animate-pulse-slow select-none">
+                <h1 class="text-6xl md:text-8xl font-black tracking-tighter text-transparent bg-clip-text bg-gradient-to-b from-white via-purple-100 to-white/50 drop-shadow-2xl animate-pulse-slow select-none">
                     SKIBIDI ULTRA
                 </h1>
                 <div class="pill-panel px-6 py-2 inline-block bg-black/50">
@@ -296,16 +304,4 @@
                     <div class="flex items-center justify-between mb-6 border-b border-white/5 pb-4">
                         <div class="flex items-center gap-3">
                             <div class="w-10 h-10 rounded-full bg-emerald-500/20 flex items-center justify-center text-emerald-300 shadow-[0_0_15px_rgba(16,185,129,0.3)]">📈</div>
-                            <h2 class="text-xl font-bold text-white tracking-tight" data-translate-key="marketsTitle">Markets</h2>
-                        </div>
-                        <span class="text-[10px] bg-white/5 px-3 py-1 rounded-full text-slate-400 border border-white/5 tracking-widest font-bold">REAL-TIME</span>
-                    </div>
-                    <div id="market-list-container" class="grid grid-cols-1 gap-3"></div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- MESSAGE -->
-    <div id="message-box" class="fixed inset-0 z-[300] flex items-center justify-center bg-black/80 backdrop-blur-xl opacity-0 pointer-events-none transition-all duration-500">
-        <div class="pill-panel p-12 max-w-lg w-full text-cen
+                            <h2 class="text-xl font-bold text-white tracking-tight" data-translate-key="marketsTit
