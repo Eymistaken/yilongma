@@ -1,718 +1,883 @@
 <!DOCTYPE html>
-<!-- Dil başlangıçta İngilizce olacak, JS ile değiştirilecek -->
-<html lang="en">
+<html lang="en" class="dark">
+
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- Başlık da JS ile ayarlanacak -->
-    <title>Skibidi Clicker v2</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Skibidi Clicker Ultra</title>
+
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Tone.js (Sesler için) -->
+    <!-- Tone.js -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
-    <!-- Chart.js (Grafikler için) -->
+    <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <!-- Sürükle-Bırak için SortableJS -->
+    <!-- SortableJS -->
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;500;700;800&display=swap"
+        rel="stylesheet">
+    <!-- Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['"Plus Jakarta Sans"', 'sans-serif'] },
+                    colors: {
+                        darkBase: "#050508",
+                    },
+                    animation: {
+                        'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        'sweep': 'sweep 0.3s ease-out forwards',
+                        'blob-morph': 'blob-morph 10s infinite ease-in-out',
+                        'heartbeat': 'heartbeat 1.5s ease-in-out infinite',
+                    },
+                    keyframes: {
+                        sweep: { '0%': { opacity: 0, transform: 'translateY(-10px)' }, '100%': { opacity: 1, transform: 'translateY(0)' } },
+                        'blob-morph': {
+                            '0%': { borderRadius: '60% 40% 30% 70% / 60% 30% 70% 40%' },
+                            '50%': { borderRadius: '30% 60% 70% 40% / 50% 60% 30% 60%' },
+                            '100%': { borderRadius: '60% 40% 30% 70% / 60% 30% 70% 40%' },
+                        },
+                        'heartbeat': {
+                            '0%, 100%': { transform: 'scale(1)', boxShadow: '0 0 0 0 rgba(14, 165, 233, 0)' },
+                            '50%': { transform: 'scale(1.05)', boxShadow: '0 0 20px 0 rgba(14, 165, 233, 0.6)', borderColor: 'rgba(56, 189, 248, 0.8)' }
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
     <style>
+        /* --- GENEL AYARLAR (SADECE KOYU) --- */
         body {
-            font-family: 'Inter', sans-serif;
-            background-color: #111;
-            color: #eee;
+            background-color: #050508;
+            color: #f0f0f0;
+            overflow-x: hidden;
+            -webkit-tap-highlight-color: transparent;
+            -webkit-font-smoothing: antialiased;
             user-select: none;
-            overflow-y: auto;
+            -webkit-user-select: none;
         }
 
-        #skibidi-toilet {
-            width: 200px;
-            height: 200px;
-            font-size: 150px;
-            line-height: 200px;
-            text-align: center;
+        /* --- ARKA PLAN --- */
+        .liquid-bg-container {
+            position: fixed;
+            inset: 0;
+            z-index: -1;
+            overflow: hidden;
+            background: #050508;
+        }
+
+        .blob-shape {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            will-change: transform;
+            animation: blob-morph 10s infinite ease-in-out;
+            opacity: 0.6;
+            mix-blend-mode: screen;
+        }
+
+        .blob-1 {
+            width: 60vw;
+            height: 60vw;
+            background: #4c1d95;
+        }
+
+        .blob-2 {
+            width: 70vw;
+            height: 70vw;
+            background: #be185d;
+            animation-delay: -2s;
+        }
+
+        .blob-3 {
+            width: 50vw;
+            height: 50vw;
+            background: #0e7490;
+            animation-delay: -5s;
+        }
+
+        /* --- STAT CARD (Koyu Hap Tasarımı) --- */
+        .stat-card {
+            background: rgba(10, 10, 15, 0.6);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 2.5rem;
+            box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.5);
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+
+        .stat-card:hover {
+            border-color: rgba(255, 255, 255, 0.15);
+            transform: translateY(-3px);
+        }
+
+        /* --- PILL PANEL (Genel Paneller) --- */
+        .pill-panel {
+            background: linear-gradient(180deg, rgba(30, 30, 45, 0.6) 0%, rgba(15, 15, 25, 0.8) 100%);
+            backdrop-filter: blur(24px) saturate(140%);
+            -webkit-backdrop-filter: blur(24px) saturate(140%);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.4), inset 0 1px 0 0 rgba(255, 255, 255, 0.15);
+            border-radius: 2rem;
+            transition: all 0.3s ease;
+        }
+
+        .pill-panel:hover {
+            border-color: rgba(255, 255, 255, 0.15);
+            transform: translateY(-2px);
+        }
+
+        /* --- MARKET ITEM (Ghost Glass & Animasyon) --- */
+        .ghost-glass-item {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(40px) saturate(120%);
+            -webkit-backdrop-filter: blur(40px) saturate(120%);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 1.5rem;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            overflow: hidden;
+        }
+
+        .ghost-glass-item:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(255, 255, 255, 0.15);
+        }
+
+        .ghost-glass-item[open] {
+            background: rgba(20, 20, 30, 0.3);
+            border-color: rgba(255, 255, 255, 0.1);
+        }
+
+        details.market-item summary~* {
+            animation: sweep-in 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+        }
+
+        @keyframes sweep-in {
+            0% {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* --- SKITTER (Özel Animasyonlu) --- */
+        details#skitter-feed {
+            width: 160px;
+            height: 60px;
+            max-height: 60px;
+            overflow: hidden;
+            border-radius: 2rem;
+            transition: width 0.4s cubic-bezier(0.34, 1.56, 0.64, 1),
+                height 0.4s cubic-bezier(0.34, 1.56, 0.64, 1),
+                max-height 0.4s ease;
+        }
+
+        details#skitter-feed[open] {
+            width: 360px;
+            height: auto;
+            max-height: 600px;
+        }
+
+        details#skitter-feed summary {
+            list-style: none;
+            width: 100%;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 1rem;
             cursor: pointer;
-            transition: transform 0.1s ease;
-            text-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
+            outline: none;
+        }
+
+        details#skitter-feed summary::-webkit-details-marker {
+            display: none;
+        }
+
+        .skitt-bubble {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border-radius: 1.5rem;
+            padding: 1rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .notify-heartbeat {
+            animation: heartbeat 1.5s ease-in-out infinite;
+            border-color: rgba(56, 189, 248, 0.5) !important;
+            background: rgba(56, 189, 248, 0.1) !important;
+        }
+
+        /* --- DİĞER --- */
+        #skibidi-toilet {
+            transition: transform 0.08s;
+            filter: drop-shadow(0 10px 30px rgba(0, 0, 0, 0.5));
+            z-index: 20;
         }
 
         #skibidi-toilet.clicked {
-            transform: scale(0.9);
-        }
-
-        #popup-container {
-            pointer-events: none;
+            transform: scale(0.92) rotate(-2deg);
         }
 
         .click-popup {
             position: absolute;
-            font-size: 2rem;
             font-weight: 900;
             pointer-events: none;
-            opacity: 1;
-            transition: transform 0.5s ease-out, opacity 0.5s ease-out;
-            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
-        }
-
-        .floater {
-            position: absolute;
-            font-size: 2rem;
-            pointer-events: none;
-            opacity: 0.1;
-            animation: float-up 10s linear infinite;
-        }
-
-        @keyframes float-up {
-            from { transform: translateY(100vh) scale(1); opacity: 0.1; }
-            to { transform: translateY(-10vh) scale(1.5); opacity: 0.3; }
-        }
-
-        .features-frame {
-            background-color: rgba(0, 0, 0, 0.3);
-            border: 2px solid #444;
-            border-radius: 0.75rem;
-            padding: 1.5rem;
-            width: 100%;
-            max-width: 900px;
-            margin: 1.5rem auto;
-            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
-        }
-
-        .upgrade-btn, .difficulty-btn, .language-btn, .restart-btn { /* Restart butonu eklendi */
-            background-color: #333;
-            border: 2px solid #555;
-            color: #eee;
-            padding: 1rem;
-            border-radius: 0.5rem;
-            font-weight: 700;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            text-align: center;
-            height: 100%;
-        }
-         /* Dil ve Restart butonu özel */
-        .language-btn, .restart-btn {
-            padding: 0.5rem 1rem;
-            font-size: 1.5rem; /* İkonlar/Bayraklar için */
-            height: auto;
-        }
-        .language-btn.active {
-             border-color: #a78bfa; /* Mor vurgu */
-             background-color: #444;
-        }
-
-
-        .upgrade-btn:hover:not(:disabled), .difficulty-btn:hover, .language-btn:hover:not(.active), .restart-btn:hover {
-            background-color: #444;
-            border-color: #777;
-            transform: translateY(-2px);
-        }
-
-        .upgrade-btn:disabled {
-            opacity: 0.4;
-            cursor: not-allowed;
-        }
-
-        #message-box {
-            position: fixed; top: 50%; left: 50%;
-            transform: translate(-50%, -50%) scale(0.9);
-            background: linear-gradient(145deg, #333, #222); color: #fff;
-            padding: 2.5rem; border-radius: 0.75rem; border: 2px solid #555;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6); z-index: 100;
-            opacity: 0; pointer-events: none;
-            transition: all 0.3s cubic-bezier(0.18, 0.89, 0.32, 1.28);
-            text-align: center; font-size: 1.5rem; font-weight: 700;
-        }
-        #message-box.show { transform: translate(-50%, -50%) scale(1); opacity: 1; pointer-events: all; }
-
-        /* Skitter & Dil/Restart Değiştirme */
-        #top-left-controls {
-            position: fixed;
-            top: 1rem;
-            left: 1rem;
-            display: flex;
-            align-items: flex-start; /* Üstten hizala */
-            gap: 0.5rem; /* Aradaki boşluk */
+            animation: popup-anim 0.6s forwards;
             z-index: 50;
         }
-        details#skitter-feed {
-            position: relative; /* Normal akışta kalsın */
-            width: 300px; max-height: 400px;
-            background-color: rgba(10, 10, 20, 0.8); backdrop-filter: blur(5px);
-            border: 1px solid #444; border-radius: 0.75rem;
-            overflow: hidden; transition: all 0.3s ease;
+
+        @keyframes popup-anim {
+            0% {
+                transform: translateY(0) scale(0.5);
+                opacity: 0;
+            }
+
+            20% {
+                transform: translateY(-30px) scale(1.2);
+                opacity: 1;
+            }
+
+            100% {
+                transform: translateY(-100px) scale(1);
+                opacity: 0;
+            }
         }
-        details#skitter-feed:not([open]) { width: 80px; height: 80px; max-height: 80px; }
-        summary#skitter-header { font-size: 1.25rem; font-weight: 900; color: #38bdf8; padding: 1rem; cursor: pointer; list-style: none; display: flex; justify-content: space-between; align-items: center; }
-        details#skitter-feed:not([open]) summary#skitter-header { padding: 0; height: 100%; justify-content: center; flex-direction: column; }
-        #skitter-title { display: block; }
-        details#skitter-feed:not([open]) #skitter-title,
-        details#skitter-feed:not([open]) [data-translate-key="yilongWealthTitle"] { display: none; }
-        #yilong-ma-servet-display { font-size: 1.1rem; color: #f59e0b; }
-        details#skitter-feed:not([open]) #yilong-ma-servet-display { font-size: 1.25rem; font-weight: 900; }
-        summary#skitter-header::-webkit-details-marker { display: none; }
-        details#skitter-feed[open] summary#skitter-header { border-bottom: 1px solid #333; }
-        #skitter-content { padding: 0 1rem 1rem 1rem; max-height: 300px; display: flex; flex-direction: column; overflow: hidden; }
-        details#skitter-feed:not([open]) #skitter-content { display: none; }
-        #skitter-messages { overflow-y: auto; display: flex; flex-direction: column-reverse; flex-grow: 1; }
-        .skitt { background-color: rgba(255, 255, 255, 0.05); border-radius: 0.5rem; padding: 0.75rem; margin-bottom: 0.5rem; animation: fadeIn 0.5s ease; }
-        .skitt-author { font-weight: 700; color: #eee; }
-        .skitt-author.yilong { color: #f59e0b; }
-        .skitt-content { font-size: 0.9rem; color: #ccc; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* Pazar Kutusu */
-        details.market-box { background-color: rgba(0, 0, 0, 0.2); border-radius: 0.5rem; border: 1px solid #333; transition: background-color 0.2s; }
-        details.market-box[open] { background-color: rgba(0, 0, 0, 0.4); }
-        summary.market-summary { display: flex; justify-content: space-between; align-items: center; padding: 1rem; cursor: pointer; list-style: none; }
-        summary.market-summary::-webkit-details-marker { display: none; }
-        .market-content { padding: 0 1rem 1rem 1rem; border-top: 1px solid #333; }
-        .price-up { color: #4ade80 !important; text-shadow: 0 0 5px #4ade80; }
-        .price-down { color: #f87171 !important; text-shadow: 0 0 5px #f87171; }
-        .boosted, .player-boosted { animation: pulse-boost 1s infinite; }
-        .notify-glow { animation: notify-glow 1.5s infinite; }
-        @keyframes pulse-boost { 0%, 100% { box-shadow: 0 0 15px #f59e0b; } 50% { box-shadow: 0 0 5px #f59e0b; } }
-        @keyframes notify-glow { 0%, 100% { box-shadow: 0 0 20px rgba(245, 158, 11, 0.8); border-color: #f59e0b; } 50% { box-shadow: 0 0 5px rgba(245, 158, 11, 0.3); border-color: #444; } }
+        .market-trend-up {
+            color: #6EE7B7;
+            text-shadow: 0 0 12px rgba(16, 185, 129, 0.4);
+        }
 
-        /* Sürükleme */
-        .drag-handle { cursor: grab; padding: 0.5rem; margin-left: 0.5rem; opacity: 0.6; transition: opacity 0.2s; }
-        .drag-handle:hover { opacity: 1; }
-        .drag-handle:active { cursor: grabbing; }
-        .sortable-ghost { opacity: 0.4; background: #4a5568; border-radius: 0.5rem; }
+        .market-trend-down {
+            color: #FDA4AF;
+            text-shadow: 0 0 12px rgba(244, 63, 94, 0.4);
+        }
 
-        /* Zorluk & Dil Seçimi */
-        #difficulty-selection { position: fixed; inset: 0; background-color: rgba(0, 0, 0, 0.85); backdrop-filter: blur(10px); z-index: 200; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 2rem; }
-        #difficulty-selection h2 { font-size: 3rem; font-weight: 900; color: #c084fc; margin-bottom: 1rem; text-shadow: 0 0 15px #c084fc; }
-        #language-selection-initial { margin-bottom: 2rem; display: flex; gap: 1rem; }
-        #difficulty-buttons { display: grid; grid-template-columns: repeat(1, 1fr); gap: 1rem; width: 100%; max-width: 400px; }
-        @media (min-width: 640px) { #difficulty-buttons { grid-template-columns: repeat(5, 1fr); max-width: 800px; } }
-        .difficulty-btn span:first-child { font-size: 1.25rem; }
-        .difficulty-btn span:last-child { font-size: 0.8rem; color: #a1a1aa; margin-top: 0.5rem; }
+        ::-webkit-scrollbar {
+            width: 4px;
+        }
 
-        /* Renkler */
-        .text-purple-400 { color: #c084fc; } .text-red-500 { color: #ef4444; } .text-green-400 { color: #4ade80; } .text-orange-400 { color: #fb923c; } .text-pink-400 { color: #f472b6; } .text-yellow-400 { color: #facc15; } .text-slate-300 { color: #cbd5e1; } .text-blue-400 { color: #60a5fa; } .text-slate-100 { color: #f1f5f9; }
-        .text-violet-400 { color: #a78bfa; } .text-cyan-400 { color: #22d3ee; } .text-emerald-400 { color: #34d399; } .text-lime-400 { color: #a3e635; } .text-red-400 { color: #f87171; }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+        }
     </style>
 </head>
-<body class="bg-zinc-900 text-zinc-100 min-h-screen p-4 md:p-8 overflow-y-auto">
 
-    <!-- Zorluk ve Dil Seçim Ekranı -->
-    <div id="difficulty-selection">
-        <h2 data-translate-key="difficultyTitle">Zorluk Seç</h2>
-        <!-- Dil Seçimi (Başlangıç) -->
-        <div id="language-selection-initial">
-             <button class="language-btn active" data-lang="en">🇬🇧</button>
-             <button class="language-btn" data-lang="tr">🇹🇷</button>
+<body class="flex flex-col items-center min-h-screen relative font-sans overflow-x-hidden">
+
+    <!-- ARKA PLAN -->
+    <div class="liquid-bg-container">
+        <div class="blob-shape blob-1" id="blob1"></div>
+        <div class="blob-shape blob-2" id="blob2"></div>
+        <div class="blob-shape blob-3" id="blob3"></div>
+        <div
+            style="position: fixed; inset: 0; opacity: 0.04; background-image: url('data:image/svg+xml,%3Csvg viewBox=%220 0 200 200%22 xmlns=%22http://www.w3.org/2000/svg%22%3E%3Cfilter id=%22noiseFilter%22%3E%3CfeTurbulence type=%22fractalNoise%22 baseFrequency=%220.65%22 numOctaves=%223%22 stitchTiles=%22stitch%22/%3E%3C/filter%3E%3Crect width=%22100%25%22 height=%22100%25%22 filter=%22url(%23noiseFilter)%22/%3E%3C/svg%3E'); pointer-events: none;">
         </div>
-        <div id="difficulty-buttons">
-            <button class="difficulty-btn" data-difficulty="peaceful">
-                <span data-translate-key="peaceful">Barışçıl</span>
-                <span data-translate-key="peacefulDesc">Yilong Ma ile tanış, rekabet yok denecek kadar az.</span>
+    </div>
+
+    <div id="popup-container" class="fixed inset-0 pointer-events-none z-50 overflow-hidden"></div>
+    <div id="floater-container" class="fixed inset-0 pointer-events-none z-0 overflow-hidden"></div>
+
+    <!-- ZORLUK SEÇİMİ -->
+    <div id="difficulty-selection"
+        class="fixed inset-0 z-[200] flex flex-col justify-center items-center p-6 bg-black/80 backdrop-blur-2xl transition-opacity duration-500">
+        <h2
+            class="text-5xl md:text-7xl font-black mb-12 tracking-tighter text-transparent bg-clip-text bg-gradient-to-b from-white to-white/40">
+            Zorluk Seç</h2>
+        <div class="flex gap-4 mb-12">
+            <button class="pill-panel px-8 py-4 text-3xl active:scale-95 hover:bg-white/5 transition-transform"
+                data-lang="en">🇬🇧</button>
+            <button class="pill-panel px-8 py-4 text-3xl active:scale-95 hover:bg-white/5 transition-transform"
+                data-lang="tr">🇹🇷</button>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-6 w-full max-w-6xl">
+            <button
+                class="pill-panel p-8 flex flex-col items-center gap-4 group hover:bg-white/5 transition-transform active:scale-95"
+                data-difficulty="peaceful">
+                <span class="text-5xl filter drop-shadow-lg group-hover:scale-110 transition-transform">🕊️</span>
+                <span class="font-bold text-emerald-300 text-lg" data-translate-key="peaceful">Barışçıl</span>
             </button>
-            <button class="difficulty-btn" data-difficulty="easy">
-                <span data-translate-key="easy">Kolay</span>
-                <span data-translate-key="easyDesc">Öğrenme modu, Yilong Ma çok hata yapar.</span>
+            <button
+                class="pill-panel p-8 flex flex-col items-center gap-4 group hover:bg-white/5 transition-transform active:scale-95"
+                data-difficulty="easy">
+                <span class="text-5xl filter drop-shadow-lg group-hover:scale-110 transition-transform">👶</span>
+                <span class="font-bold text-cyan-300 text-lg" data-translate-key="easy">Kolay</span>
             </button>
-            <button class="difficulty-btn" data-difficulty="normal">
-                <span data-translate-key="normal">Normal</span>
-                <span data-translate-key="normalDesc">Dengeli bir rekabet, standart deneyim.</span>
+            <button
+                class="pill-panel p-8 flex flex-col items-center gap-4 group hover:bg-white/5 transition-transform active:scale-95"
+                data-difficulty="normal">
+                <span class="text-5xl filter drop-shadow-lg group-hover:scale-110 transition-transform">😐</span>
+                <span class="font-bold text-purple-300 text-lg" data-translate-key="normal">Normal</span>
             </button>
-            <button class="difficulty-btn" data-difficulty="hard">
-                <span data-translate-key="hard">Zor</span>
-                <span data-translate-key="hardDesc">Ciddi meydan okuma, Yilong Ma güçlü.</span>
+            <button
+                class="pill-panel p-8 flex flex-col items-center gap-4 group hover:bg-white/5 transition-transform active:scale-95"
+                data-difficulty="hard">
+                <span class="text-5xl filter drop-shadow-lg group-hover:scale-110 transition-transform">😈</span>
+                <span class="font-bold text-rose-300 text-lg" data-translate-key="hard">Zor</span>
             </button>
-            <button class="difficulty-btn" data-difficulty="hardcore">
-                <span data-translate-key="hardcore">Hardcore</span>
-                <span data-translate-key="hardcoreDesc">Neredeyse imkansız, maksimum ceza.</span>
+            <button
+                class="pill-panel p-8 flex flex-col items-center gap-4 group hover:bg-white/5 transition-transform active:scale-95"
+                data-difficulty="hardcore">
+                <span class="text-5xl filter drop-shadow-lg group-hover:scale-110 transition-transform">💀</span>
+                <span class="font-bold text-red-500 text-lg" data-translate-key="hardcore">Hardcore</span>
             </button>
         </div>
     </div>
 
-    <!-- Oyun Alanı (Başlangıçta Gizli) -->
-    <div id="game-area" style="display: none;">
+    <!-- OYUN ALANI -->
+    <div id="game-area" style="display: none;" class="w-full max-w-[1400px] px-4 py-6 z-10 flex-col gap-8 items-center">
 
-        <!-- Skitter & Dil/Restart Değiştirme -->
-        <div id="top-left-controls">
-            <details id="skitter-feed">
-                <summary id="skitter-header">
-                    <span id="skitter-title" data-translate-key="skitterTitle">Skitter 🐦</span>
-                    <div class="text-center">
-                         <span data-translate-key="yilongWealthTitle" class="text-xs text-zinc-400 block">Yilong Ma Serveti</span>
-                         <span id="yilong-ma-servet-display">--</span>
+        <!-- ÜST BAR -->
+        <div class="flex justify-between items-start w-full max-w-6xl mx-auto relative z-[100]">
+            <!-- SKITTER -->
+            <details id="skitter-feed" class="pill-panel bg-black/40">
+                <summary class="hover:bg-white/5 transition-colors flex items-center">
+                    <div class="flex items-center gap-3 w-full">
+                        <span id="skitter-icon" class="text-2xl select-none">🐦</span>
+
+                        <!-- Kapalıyken Görünen Servet -->
+                        <div id="skitter-collapsed-info" class="flex flex-col leading-none">
+                            <span class="text-[9px] text-slate-400 uppercase tracking-wider">Yilong Ma</span>
+                            <span id="yilong-ma-servet-mini"
+                                class="font-mono text-sm text-yellow-400 font-bold">--</span>
+                        </div>
+
+                        <!-- Açılınca Görünen Başlık -->
+                        <div id="skitter-header-content"
+                            class="hidden flex-grow justify-between items-center opacity-0 transition-opacity duration-300 ml-4">
+                            <div class="flex flex-col leading-none text-left">
+                                <span class="font-bold text-sky-400 text-lg">Skitter</span>
+                                <span class="text-[10px] text-sky-400/60 tracking-wider">LIVE FEED</span>
+                            </div>
+                        </div>
                     </div>
                 </summary>
-                <div id="skitter-content">
-                    <div id="skitter-messages">
-                        <!-- Skitler JS ile eklenecek, çeviri gerekebilir -->
-                    </div>
+                <div id="skitter-messages" class="px-4 pb-4 pt-2 flex flex-col gap-2 max-h-[400px] overflow-y-auto">
                 </div>
             </details>
-            <!-- Dil Değiştirme Butonu (Oyun İçi) -->
-            <button id="language-toggle" class="language-btn">🇬🇧</button>
-            <!-- YENİ: Yeniden Başlatma Butonu -->
-            <button id="restart-game-btn" class="restart-btn" title="Oyunu Yeniden Başlat">🔄</button>
+
+            <div class="pill-panel flex gap-2 p-2 bg-black/40">
+                <button id="language-toggle"
+                    class="w-10 h-10 rounded-full hover:bg-white/10 flex items-center justify-center transition-colors text-xl">🇬🇧</button>
+                <button id="restart-game-btn"
+                    class="w-10 h-10 rounded-full hover:bg-red-500/20 flex items-center justify-center transition-colors text-red-400 text-xl"
+                    title="Restart">🔄</button>
+            </div>
         </div>
 
-
-        <!-- Ana oyun alanı -->
-        <div class="container mx-auto max-w-5xl text-center">
-
-            <h1 class="text-5xl md:text-7xl font-black uppercase" style="text-shadow: 0 0 20px #8b5cf6;">
-                skibidi clicker
-            </h1>
-            <p id="win-condition-display" class="text-lg text-zinc-400 mb-4" data-translate-key="winConditionText" data-translate-multiplier="1.5">Hedef: Yilong Ma'yı 1.5x katlamak!</p>
-
-            <!-- Skor alanı -->
-            <div class="score-container bg-zinc-800 p-4 rounded-lg shadow-lg inline-block mb-4">
-                <h2 class="text-4xl font-bold">
-                    <span id="score" class="text-violet-400">0</span>
-                </h2>
-                <p class="text-zinc-400" data-translate-key="gyattPoints">Gyatt Points</p>
+        <!-- BAŞLIK & STATS -->
+        <div class="flex flex-col items-center gap-8 mt-4 w-full">
+            <div class="text-center space-y-3">
+                <h1
+                    class="text-6xl md:text-8xl font-black tracking-tighter text-transparent bg-clip-text bg-gradient-to-b from-white via-purple-100 to-white/50 drop-shadow-2xl animate-pulse-slow select-none">
+                    SKIBIDI ULTRA
+                </h1>
+                <div class="pill-panel px-6 py-2 inline-block bg-black/50">
+                    <span id="win-condition-display"
+                        class="text-xs font-bold text-slate-300 uppercase tracking-[0.2em]">Loading...</span>
+                </div>
             </div>
 
-            <div class="cps-container bg-zinc-800 p-3 rounded-lg shadow-lg inline-block mb-4 ml-4">
-                <h3 class="text-2xl font-bold">
-                    <span id="cps" class="text-cyan-400">0.0</span>
-                </h3>
-                <p class="text-zinc-400" data-translate-key="cps">CPS</p>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 w-full max-w-4xl">
+                <div class="stat-card p-6 flex flex-col items-center justify-center">
+                    <span class="text-slate-400 text-[11px] font-bold uppercase tracking-[0.15em] mb-2 opacity-80"
+                        data-translate-key="gyattPoints">Gyatt Points</span>
+                    <div class="text-4xl md:text-5xl font-bold text-violet-300 tracking-tight drop-shadow-[0_0_10px_rgba(167,139,250,0.3)]"
+                        id="score">0</div>
+                </div>
+                <div class="stat-card p-6 flex flex-col items-center justify-center">
+                    <span class="text-slate-400 text-[11px] font-bold uppercase tracking-[0.15em] mb-2 opacity-80"
+                        data-translate-key="cps">CPS</span>
+                    <div class="text-3xl md:text-4xl font-bold text-cyan-300 tracking-tight drop-shadow-[0_0_10px_rgba(103,232,249,0.3)]"
+                        id="cps">0.0</div>
+                </div>
+                <div class="stat-card p-6 flex flex-col items-center justify-center">
+                    <span class="text-slate-400 text-[11px] font-bold uppercase tracking-[0.15em] mb-2 opacity-80"
+                        data-translate-key="totalWealth">Net Worth</span>
+                    <div class="text-3xl md:text-4xl font-bold text-emerald-300 tracking-tight drop-shadow-[0_0_10px_rgba(110,231,183,0.3)]"
+                        id="total-wealth">0</div>
+                </div>
             </div>
+        </div>
 
-            <!-- Toplam Servet Göstergesi -->
-            <div class="cps-container bg-zinc-800 p-3 rounded-lg shadow-lg inline-block mb-4 ml-4">
-                <h3 class="text-2xl font-bold">
-                    <span id="total-wealth" class="text-emerald-400">0</span>
-                </h3>
-                <p class="text-zinc-400" data-translate-key="totalWealth">Toplam Servet</p>
+        <!-- MAIN -->
+        <div class="relative flex justify-center items-center py-12">
+            <div
+                class="absolute w-[320px] h-[320px] md:w-[400px] md:h-[400px] pill-panel opacity-30 rotate-12 z-0 blur-sm border-white/10 bg-gradient-to-br from-purple-500/10 to-blue-500/10 animate-pulse-slow">
             </div>
+            <div class="absolute w-[320px] h-[320px] md:w-[400px] md:h-[400px] pill-panel opacity-30 -rotate-12 z-0 blur-sm border-white/10 bg-gradient-to-bl from-fuchsia-500/10 to-purple-500/10 animate-pulse-slow"
+                style="animation-delay: -2s;"></div>
+            <div id="skibidi-toilet"
+                class="text-[160px] md:text-[200px] relative cursor-pointer z-10 active:scale-90 transition-all duration-75">
+                🚽</div>
+        </div>
 
-            <!-- Skibidi -->
-            <div class="relative flex justify-center items-center my-8">
-                <div id="skibidi-toilet" class="select-none">🚽</div>
-                <div id="popup-container" class="absolute inset-0"></div>
-            </div>
-
-            <div id="floater-container" class="absolute top-0 left-0 w-full h-full -z-10 overflow-hidden"></div>
-
-            <!-- Yükseltmeler -->
-            <div class="features-frame" id="upgrades-frame">
-                <h2 class="text-2xl font-bold text-center mb-4" data-translate-key="upgradesTitle">Yükseltmeler</h2>
-                <div id="upgrades-container" class="grid grid-cols-1 gap-4 w-full max-w-xs mx-auto">
-                    <button id="upgrade-ppc" class="upgrade-btn bg-zinc-800 border-zinc-700">
-                        <span class="text-xl" data-translate-key="moreRizz">More Rizz (Level <span id="ppc-level">1</span>)</span>
-                        <span class="text-sm text-zinc-400" data-translate-key="moreRizzDesc">Tıklama başına +1 Gyatt</span>
-                        <span class="text-lg font-bold mt-2">
-                            <span data-translate-key="cost">Bedel</span>: <span id="ppc-cost" class="text-violet-400">10</span>
-                        </span>
+        <!-- PANELS -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 w-full max-w-7xl">
+            <div class="lg:col-span-4 flex flex-col gap-4">
+                <div class="pill-panel p-6 h-full flex flex-col">
+                    <div class="flex items-center gap-3 mb-6 border-b border-white/5 pb-4">
+                        <div
+                            class="w-10 h-10 rounded-full bg-purple-500/20 flex items-center justify-center text-purple-300 shadow-[0_0_15px_rgba(168,85,247,0.3)]">
+                            ⚡</div>
+                        <h2 class="text-xl font-bold text-white tracking-tight" data-translate-key="upgradesTitle">
+                            Upgrades</h2>
+                    </div>
+                    <button id="upgrade-ppc" class="ghost-glass-item p-5 flex flex-col gap-2 text-left group">
+                        <div class="flex justify-between items-center">
+                            <span class="font-bold text-lg text-white group-hover:text-purple-200 transition-colors"
+                                data-translate-key="moreRizz">More Rizz</span>
+                            <span
+                                class="bg-purple-500/20 px-2 py-0.5 rounded text-[10px] text-purple-200 font-mono tracking-widest">LVL
+                                <span id="ppc-level">1</span></span>
+                        </div>
+                        <div class="flex justify-between items-center mt-2">
+                            <span class="text-xs text-slate-400 font-medium" data-translate-key="moreRizzDesc">+1 Click
+                                Power</span>
+                            <span id="ppc-cost" class="text-purple-400 font-bold font-mono text-lg">10</span>
+                        </div>
                     </button>
                 </div>
             </div>
 
-            <!-- Piyasalar -->
-            <div class="features-frame" id="markets-frame">
-                <h2 class="text-2xl font-bold text-center mb-4" data-translate-key="marketsTitle">Piyasalar 📈</h2>
-                <div id="market-list-container" class="space-y-4">
-                    <!-- Para birimleri buraya JavaScript ile eklenecek -->
+            <div class="lg:col-span-8">
+                <div class="pill-panel p-6 h-full">
+                    <div class="flex items-center justify-between mb-6 border-b border-white/5 pb-4">
+                        <div class="flex items-center gap-3">
+                            <div
+                                class="w-10 h-10 rounded-full bg-emerald-500/20 flex items-center justify-center text-emerald-300 shadow-[0_0_15px_rgba(16,185,129,0.3)]">
+                                📈</div>
+                            <h2 class="text-xl font-bold text-white tracking-tight" data-translate-key="marketsTitle">
+                                Markets</h2>
+                        </div>
+                        <span
+                            class="text-[10px] bg-white/5 px-3 py-1 rounded-full text-slate-400 border border-white/5 tracking-widest font-bold">REAL-TIME</span>
+                    </div>
+                    <div id="market-list-container" class="grid grid-cols-1 gap-3"></div>
                 </div>
             </div>
-
         </div>
+    </div>
 
-        <!-- Mesaj kutusu -->
-        <div id="message-box">
-            <p id="message-text"></p>
-            <button id="message-close" class="mt-6 bg-violet-600 hover:bg-violet-700 px-6 py-2 rounded-lg font-bold transition-all" data-translate-key="slay">Slay</button>
+    <!-- MESSAGE -->
+    <div id="message-box"
+        class="fixed inset-0 z-[300] flex items-center justify-center bg-black/80 backdrop-blur-xl opacity-0 pointer-events-none transition-all duration-500">
+        <div
+            class="pill-panel p-12 max-w-lg w-full text-center transform scale-90 transition-transform duration-300 border-purple-500/30 shadow-[0_0_60px_rgba(168,85,247,0.2)]">
+            <div id="message-text" class="mb-8 text-lg text-white"></div>
+            <button id="message-close"
+                class="w-full py-4 rounded-2xl bg-gradient-to-r from-purple-600 to-blue-600 font-bold text-white text-lg shadow-lg hover:shadow-purple-500/40 hover:scale-[1.02] transition-all active:scale-95"
+                data-translate-key="slay">SLAY 🔥</button>
         </div>
-    </div> <!-- Oyun Alanı Sonu -->
+    </div>
 
     <script>
-        // --- DİL VERİSİ ---
+        lucide.createIcons();
+
+        // --- PHYSICS ENGINE ---
+        document.addEventListener('DOMContentLoaded', () => {
+            const blobs = [
+                { el: document.getElementById('blob1'), x: 0, y: 0, baseX: 20, baseY: 20, phase: 0 },
+                { el: document.getElementById('blob2'), x: 0, y: 0, baseX: 80, baseY: 80, phase: 2 },
+                { el: document.getElementById('blob3'), x: 0, y: 0, baseX: 50, baseY: 50, phase: 4 }
+            ];
+            let mouse = { x: 0.5, y: 0.5 }, target = { x: 0.5, y: 0.5 };
+            window.addEventListener('mousemove', e => { target.x = e.clientX / window.innerWidth; target.y = e.clientY / window.innerHeight; });
+            function animate() {
+                mouse.x += (target.x - mouse.x) * 0.05; mouse.y += (target.y - mouse.y) * 0.05;
+                const t = Date.now() * 0.001;
+                blobs.forEach((b, i) => {
+                    const fx = Math.sin(t * 0.5 + b.phase) * 15, fy = Math.cos(t * 0.3 + b.phase) * 15;
+                    let mx, my;
+                    if (i === 0) { mx = (mouse.x - 0.5) * -30; my = (mouse.y - 0.5) * -30; }
+                    else if (i === 1) { mx = (mouse.x - 0.5) * 40; my = (mouse.y - 0.5) * 40; }
+                    else { mx = (mouse.x - 0.5) * 20; my = (mouse.y - 0.5) * 20; }
+                    b.el.style.transform = `translate(-50%, -50%) translate(${b.baseX + fx + mx}vw, ${b.baseY + fy + my}vh)`;
+                });
+                requestAnimationFrame(animate);
+            }
+            animate();
+        });
+
+        // --- GAME ENGINE ---
         const translations = {
             en: {
-                // ... (Önceki çeviriler) ...
-                 restartGameTitle: "Restart Game", // Yeni
-                 // Diğer çeviriler...
-                 gameTitle: "Skibidi Clicker v2", difficultyTitle: "Select Difficulty", peaceful: "Peaceful", peacefulDesc: "Meet Yilong Ma, almost no competition.", easy: "Easy", easyDesc: "Learning mode, Yilong Ma makes many mistakes.", normal: "Normal", normalDesc: "Balanced competition, standard experience.", hard: "Hard", hardDesc: "Serious challenge, Yilong Ma is strong.", hardcore: "Hardcore", hardcoreDesc: "Almost impossible, maximum penalty.", winConditionText: "Goal: Beat Yilong Ma by {multiplier}x!", gyattPoints: "Gyatt Points", cps: "CPS", totalWealth: "Total Wealth", upgradesTitle: "Upgrades", moreRizz: "More Rizz (Level {level})", moreRizzDesc: "+1 Gyatt per click", cost: "Cost", marketsTitle: "Markets 📈", slay: "Slay", skitterTitle: "Skitter 🐦", yilongWealthTitle: "Yilong Ma Wealth", available: "Available", profitLabel: "Profit/Loss", yieldLabel: "Yield (sec)", buyButton: "Buy (1)", sellButton: "Sell (1)", buyAllButton: "Buy All ({amount})", sellAllButton: "Sell All ({amount})", asset_tl: "Turkish Lira (TL)", asset_usd: "Dollar (USD)", asset_eur: "Euro (EUR)", asset_xag: "Silver (XAG)", asset_aura: "AURA", asset_xau: "Gold (XAU)", asset_plt: "Platinum (PLT)", asset_btc: "Bitcoin (BTC)", asset_dia: "Diamond (DIA)", popupRizz: "+1 RIZZ! 🔥", popupBuy: "{asset}+ 📈", popupSell: "SOLD! 💸", popupBuyAll: "{amount} {asset} BOUGHT 📈", popupSellAll: "ALL SOLD! 💸", popupTax: "-{percent}% TAX! 💸", skitterDev: "Skitter Dev", skitterAnalysis: "Skitter Analysis", taxOffice: "Tax Office", yilongMa: "Yilong Ma", skitterWelcome: "Skitter is live! Check out the markets.", yilongBored: "Markets are boring... Need to farm some Gyatt points.", yilongSoldProfit: "Closed my {asset} position just now. Nice profit.", yilongSoldTax: "This {asset} sale hurt, but taxes... 😒", yilongSoldForced: "Forced {asset} sale. Tax office is after me.", yilongSoldStopLoss: "Said HODL but {asset} started dropping. Cut my losses.", yilongSoldTakeProfit: "Take-profit time for {asset}.", yilongSoldCash: "Markets risky, converting some to cash. {asset} sold.", yilongSoldBad: "Didn't go as expected, exited {asset} position.", yilongHodl: "Look at the {asset} price... I think it will go higher. Not selling! #HODL",
-                yilongBuyMsgKey: ["yilongBuyBase", "yilongBuyAdd", "yilongBuyOpportunity", "yilongBuyDip", "yilongBuyCheap", "yilongBuyQuiet", "yilongBuyFuture", "yilongBuyRizz", "yilongBuyThink", "yilongBuyInteresting"],
-                yilongSellMsgKey: ["yilongSoldProfit", "yilongSoldProfit", "yilongSoldTax", "yilongSoldForced", "yilongSoldStopLoss", "yilongSoldTakeProfit", "yilongSoldCash", "yilongSoldBad"],
-                skitterPumpMsgKey: ["analysisPump", "analysisOrders", "analysisJump", "analysisVolume", "analysisWhale", "analysisSignal", "analysisFuel", "analysisMomentum", "analysisFomo", "analysisBreakout"],
-                yilongBuyBase: "Just bought {amount} {asset}! This is the future. 🚀 #tothemoon", yilongBuyAdd: "Added some {asset} to the portfolio. The future is here.", yilongBuyOpportunity: "Saw a good entry point for {asset}.", yilongBuyDip: "Buying {asset} while everyone is selling. 😉", yilongBuyCheap: "This {asset} price is a steal, had to get in.", yilongBuyQuiet: "Quietly accumulating {asset}...", yilongBuyFuture: "Investing in the future: {asset}.", yilongBuyRizz: "Used my rizz to buy {asset}.", yilongBuyThink: "I think {asset} will rise. Position taken.", yilongBuyInteresting: "{asset}... looks interesting. Made a small buy.", analysisPump: "LOOKS LIKE {asset} IS MOVING! Pump might be starting!", analysisOrders: "ANALYSIS: Large buy orders detected for {asset}! 📈", analysisJump: "Sudden jump in {asset} price! What's happening?", analysisVolume: "Caught on radar: {asset} volume increasing!", analysisWhale: "A big whale might be accumulating {asset}. Watch out!", analysisSignal: "Skitter Signal: STRONG BUY for {asset}.", analysisFuel: "{asset}... Rocket fueling up... 🚀", analysisMomentum: "Hot Update: {asset} price gaining momentum!", analysisFomo: "FOMO STARTING? {asset} is trending!", analysisBreakout: "Technical Analysis: Breakout moment for {asset}!",
-                taxTime: "TAX TIME! 🚨 A deduction of %{percent} ({amount} Gyatt) has been made from your total wealth.", taxEvasionSuccess: "Yilong Ma managed to evade taxes this time... 🦅", taxPaymentYilong: "%{percent} ({amount} Gyatt) tax deducted from Yilong Ma's total wealth.", taxLiquidationWarning: "Yilong Ma doesn't have enough cash for taxes! Selling assets for {amount} debt...", taxLiquidationReport: "Yilong Ma was forced to sell {assets} for tax debt.", taxLiquidationFail: "Yilong Ma sold all assets but still has {amount} debt! On the verge of bankruptcy!", winMessage: '<span class="text-5xl">🏆 YOU WON! 🏆</span><br><br>Your Wealth: <span class="text-emerald-400">{playerWealth}</span><br>Yilong Ma\'s Wealth: <span class="text-red-400">{yilongWealth}</span><br><br>You beat him by {multiplier}x! Ultimate Rizz!'
-
+                difficultyTitle: "Select Difficulty", peaceful: "Peaceful", easy: "Easy", normal: "Normal", hard: "Hard", hardcore: "Hardcore", winConditionText: "Goal: {multiplier}x Yilong's Wealth", gyattPoints: "Gyatt Points", cps: "CPS", totalWealth: "Net Worth", upgradesTitle: "Upgrades", moreRizz: "More Rizz", moreRizzDesc: "+1 Gyatt/Click", cost: "Cost", marketsTitle: "Assets", slay: "CONTINUE", yilongWealthTitle: "Yilong Ma", available: "Owned", buyButton: "Buy", sellButton: "Sell", buyAllButton: "MAX", sellAllButton: "DUMP",
+                asset_tl: "Lira", asset_usd: "Dollar", asset_eur: "Euro", asset_xag: "Silver", asset_aura: "AURA", asset_xau: "Gold", asset_plt: "Platinum", asset_btc: "Bitcoin", asset_dia: "Diamond",
+                yilongBuyBase: "Bought {amount} {asset}. LFG 🚀",
+                taxTime: "TAX ALERT! 🚨 -%{percent} ({amount}) seized.", winMessage: '<h1 class="text-5xl font-black mb-4 bg-clip-text text-transparent bg-gradient-to-r from-yellow-300 to-orange-400">VICTORY</h1><p class="text-slate-300 mb-6">You conquered the liquid markets.</p>'
             },
             tr: {
-                // ... (Önceki çeviriler) ...
-                restartGameTitle: "Oyunu Yeniden Başlat", // Yeni
-                // Diğer çeviriler...
-                 gameTitle: "Skibidi Clicker v2", difficultyTitle: "Zorluk Seç", peaceful: "Barışçıl", peacefulDesc: "Yilong Ma ile tanış, rekabet yok denecek kadar az.", easy: "Kolay", easyDesc: "Öğrenme modu, Yilong Ma çok hata yapar.", normal: "Normal", normalDesc: "Dengeli bir rekabet, standart deneyim.", hard: "Zor", hardDesc: "Ciddi meydan okuma, Yilong Ma güçlü.", hardcore: "Hardcore", hardcoreDesc: "Neredeyse imkansız, maksimum ceza.", winConditionText: "Hedef: Yilong Ma'yı {multiplier}x katlamak!", gyattPoints: "Gyatt Puanı", cps: "GPS", totalWealth: "Toplam Servet", upgradesTitle: "Yükseltmeler", moreRizz: "More Rizz (Seviye {level})", moreRizzDesc: "Tıklama başına +1 Gyatt", cost: "Bedel", marketsTitle: "Piyasalar 📈", slay: "Slay", skitterTitle: "Skitter 🐦", yilongWealthTitle: "Yilong Ma Serveti", available: "Mevcut", profitLabel: "Kâr/Zarar", yieldLabel: "Getiri (sn)", buyButton: "Al (1)", sellButton: "Sat (1)", buyAllButton: "Hepsini Al ({amount})", sellAllButton: "Hepsini Sat ({amount})", asset_tl: "Türk Lirası (TL)", asset_usd: "Dolar (USD)", asset_eur: "Euro (EUR)", asset_xag: "Gümüş (XAG)", asset_aura: "AURA", asset_xau: "Altın (XAU)", asset_plt: "Platinyum (PLT)", asset_btc: "Bitcoin (BTC)", asset_dia: "Elmas (DIA)", popupRizz: "+1 RIZZ! 🔥", popupBuy: "{asset}+ 📈", popupSell: "SATILDI! 💸", popupBuyAll: "{amount} {asset} ALINDI 📈", popupSellAll: "HEPSİ SATILDI! 💸", popupTax: "-%{percent} VERGİ! 💸", skitterDev: "Skitter Dev", skitterAnalysis: "Skitter Analiz", taxOffice: "Vergi Dairesi", yilongMa: "Yilong Ma", skitterWelcome: "Skitter yayında! Piyasalara göz atın.", yilongBored: "Piyasalar çok sıkıcı... Biraz Gyatt puanı biriktirmem lazım.", yilongSoldProfit: "Az önce aldığım {asset} pozisyonunu kapattım. Kâr güzel.", yilongSoldTax: "Bu {asset} satışı canımı sıktı ama vergi... 😒", yilongSoldForced: "Zorunlu {asset} satışı. Vergi dairesi peşimde.", yilongSoldStopLoss: "HODL dedim ama {asset} düşmeye başladı. Zarar kes (Stop-loss) yaptım.", yilongSoldTakeProfit: "{asset} için kar al (Take-profit) zamanı.", yilongSoldCash: "Piyasalar riskli, biraz nakite dönüyorum. {asset} satıldı.", yilongSoldBad: "Beklediğim gibi gitmedi, {asset} pozisyonundan çıktım.", yilongHodl: "{asset} fiyatına bak... Bence daha da artacak. Satmıyorum! #HODL",
-                 yilongBuyMsgKey: ["yilongBuyBase", "yilongBuyAdd", "yilongBuyOpportunity", "yilongBuyDip", "yilongBuyCheap", "yilongBuyQuiet", "yilongBuyFuture", "yilongBuyRizz", "yilongBuyThink", "yilongBuyInteresting"],
-                 yilongSellMsgKey: ["yilongSoldProfit", "yilongSoldProfit", "yilongSoldTax", "yilongSoldForced", "yilongSoldStopLoss", "yilongSoldTakeProfit", "yilongSoldCash", "yilongSoldBad"],
-                 skitterPumpMsgKey: ["analysisPump", "analysisOrders", "analysisJump", "analysisVolume", "analysisWhale", "analysisSignal", "analysisFuel", "analysisMomentum", "analysisFomo", "analysisBreakout"],
-                 yilongBuyBase: "Az önce {amount} adet {asset} aldım! Bu geleceğin parası. 🚀 #tothemoon", yilongBuyAdd: "Portföye biraz {asset} ekledim. Gelecek burada.", yilongBuyOpportunity: "{asset} için güzel bir alım fırsatı gördüm.", yilongBuyDip: "Herkes satarken ben {asset} topluyorum. 😉", yilongBuyCheap: "Bu {asset} fiyatı bedava, girmemek olmazdı.", yilongBuyQuiet: "Sessizce {asset} biriktiriyorum...", yilongBuyFuture: "Geleceğe yatırım: {asset}.", yilongBuyRizz: "Rizz'imi {asset} almak için kullandım.", yilongBuyThink: "Bence {asset} yükselecek. Pozisyon alındı.", yilongBuyInteresting: "{asset}... ilginç görünüyor. Küçük bir alım yaptım.", analysisPump: "GÖRÜNÜŞE GÖRE {asset} HAREKETLENİYOR! Pump başlıyor olabilir!", analysisOrders: "ANALİZ: {asset} için büyük alım emirleri görüldü! 📈", analysisJump: "{asset} fiyatında ani bir sıçrama! Neler oluyor?", analysisVolume: "Radarımıza yakalandı: {asset} hacmi artıyor!", analysisWhale: "Büyük bir balina {asset} topluyor olabilir. Dikkat!", analysisSignal: "Skitter Sinyali: {asset} için GÜÇLÜ AL.", analysisFuel: "{asset}... Roket yakıtı dolduruluyor... 🚀", analysisMomentum: "Sıcak Gelişme: {asset} fiyatı ivme kazanıyor!", analysisFomo: "FOMO BAŞLIYOR MU? {asset} trendlerde!", analysisBreakout: "Teknik Analiz: {asset} için kırılma (breakout) anı!",
-                 taxTime: "VERGİ ZAMANI! 🚨 Toplam servetiniz üzerinden %{percent} oranında ({amount} Gyatt) kesinti yapıldı.", taxEvasionSuccess: "Yilong Ma bu sefer vergiden kaçınmayı başardı... 🦅", taxPaymentYilong: "Yilong Ma'nın toplam servetinden (%{percent}) {amount} Gyatt vergi kesildi.", taxLiquidationWarning: "Yilong Ma'nın vergi için nakdi yetmedi! Varlık satıyor ({amount} borç için)...", taxLiquidationReport: "Yilong Ma, vergi borcu için zorunlu olarak {assets} sattı.", taxLiquidationFail: "Yilong Ma'nın tüm varlıkları satıldı ama hala {amount} borcu var! İflasın eşiğinde!", winMessage: '<span class="text-5xl">🏆 KAZANDIN! 🏆</span><br><br>Servetin: <span class="text-emerald-400">{playerWealth}</span><br>Yilong Ma\'nın Serveti: <span class="text-red-400">{yilongWealth}</span><br><br>Onu {multiplier}x katladın! Muhteşem Rizz!'
+                difficultyTitle: "Zorluk Seç", peaceful: "Barışçıl", easy: "Kolay", normal: "Normal", hard: "Zor", hardcore: "Hardcore", winConditionText: "Hedef: {multiplier}x Yilong Ma", gyattPoints: "Gyatt Puanı", cps: "CPS", totalWealth: "Net Servet", upgradesTitle: "Yükseltmeler", moreRizz: "More Rizz", moreRizzDesc: "+1 Gyatt/Tık", cost: "Bedel", marketsTitle: "Varlıklar", slay: "DEVAM ET", yilongWealthTitle: "Yilong Ma", available: "Adet", buyButton: "AL", sellButton: "SAT", buyAllButton: "MAX", sellAllButton: "HEPSİ",
+                asset_tl: "TL", asset_usd: "Dolar", asset_eur: "Euro", asset_xag: "Gümüş", asset_aura: "AURA", asset_xau: "Altın", asset_plt: "Platin", asset_btc: "Bitcoin", asset_dia: "Elmas",
+                yilongBuyBase: "{amount} {asset} aldım. 🚀",
+                taxTime: "VERGİ! 🚨 -%{percent} ({amount}) kesildi.", winMessage: '<h1 class="text-5xl font-black mb-4 bg-clip-text text-transparent bg-gradient-to-r from-yellow-300 to-orange-400">ZAFER</h1><p class="text-slate-300 mb-6">Sıvı piyasaların kralısın.</p>'
             }
         };
 
-        // --- ZORLUK AYARLARI ---
-        const difficultySettings = { /* ... (önceki koddan kopyalanacak) ... */
-             peaceful: { yilongStartWealth: 500_000_000_000, winMultiplier: 1.5, taxEnabled: false, yilongPumpDuration: 10, playerBoostEnabled: true, playerBoostDuration: 5, pltPayoutRate: 0.0005, pltStableDuration: Infinity, pltStartPrice: 20000.00, yilongHodlChance: 0.50, yilongInvestmentAmount: 0.05, yilongPostVisibility: 1.00, yilongPortfolio: ['tl', 'usd', 'eur'], yilongStrategy: 'passive' },
-             easy: { yilongStartWealth: 1_000_000_000_000, winMultiplier: 2.0, taxEnabled: true, taxSymmetry: true, playerTaxRange: [0.10, 0.20], yilongTaxRange: [0.10, 0.20], yilongEvasionChance: 0.00, yilongPumpDuration: 10, playerBoostEnabled: false, pltPayoutRate: 0.0001, pltStableDuration: 600, pltStartPrice: 10000.00, yilongHodlChance: 0.40, yilongInvestmentAmount: 0.06, yilongPostVisibility: 0.50, yilongPortfolio: ['tl', 'usd', 'eur', 'xag', 'aura', 'xau', 'plt', 'btc'], yilongStrategy: 'cheap' },
-             normal: { yilongStartWealth: 1_000_000_000_000, winMultiplier: 2.0, taxEnabled: true, taxSymmetry: false, playerTaxRange: [0.20, 0.60], yilongTaxRange: [0.20, 0.40], yilongEvasionChance: 0.50, yilongPumpDuration: 10, playerBoostEnabled: false, pltPayoutRate: 0.0001, pltStableDuration: 180, pltStartPrice: 20000.00, yilongHodlChance: 0.25, yilongInvestmentAmount: 0.08, yilongPostVisibility: 0.50, yilongPortfolio: ['aura', 'btc', 'usd', 'eur', 'xau', 'xag', 'dia', 'plt'], yilongStrategy: 'balanced' },
-             hard: { yilongStartWealth: 1_000_000_000_000, winMultiplier: 2.0, taxEnabled: true, taxSymmetry: false, playerTaxRange: [0.20, 0.60], yilongTaxRange: [0.10, 0.30], yilongEvasionChance: 0.95, yilongPumpDuration: 5, playerBoostEnabled: false, pltPayoutRate: 0.0001, pltStableDuration: 60, pltStartPrice: 20000.00, yilongHodlChance: 0.10, yilongInvestmentAmount: 0.12, yilongPostVisibility: 0.70, yilongPortfolio: ['aura', 'btc', 'usd', 'eur', 'xau', 'xag', 'dia', 'plt'], yilongStrategy: 'expensive' },
-             hardcore: { yilongStartWealth: 1_500_000_000_000, winMultiplier: 3.0, taxEnabled: true, taxSymmetry: false, playerTaxRange: [0.30, 0.70], yilongTaxRange: [0.10, 0.30], yilongEvasionChance: 0.99, yilongPumpDuration: 2.5, playerBoostEnabled: false, pltPayoutRate: 0.00005, pltStableDuration: 0, pltStartPrice: 20000.00, yilongHodlChance: 0.05, yilongInvestmentAmount: 0.15, yilongPostVisibility: 0.95, yilongPortfolio: ['aura', 'btc', 'usd', 'eur', 'xau', 'xag', 'dia', 'plt'], yilongStrategy: 'aggressive_expensive' }
+        const difficultySettings = {
+            peaceful: { yilongStartWealth: 500_000_000_000, winMultiplier: 1.5, taxEnabled: false },
+            easy: { yilongStartWealth: 1_000_000_000_000, winMultiplier: 2.0, taxEnabled: true },
+            normal: { yilongStartWealth: 1_000_000_000_000, winMultiplier: 2.0, taxEnabled: true },
+            hard: { yilongStartWealth: 1_000_000_000_000, winMultiplier: 2.0, taxEnabled: true },
+            hardcore: { yilongStartWealth: 1_500_000_000_000, winMultiplier: 3.0, taxEnabled: true }
         };
 
-        // --- MEVCUT DURUM ---
-        let currentLanguage = 'en';
-        let selectedDifficulty = 'normal';
-        let currentSettings = difficultySettings.normal;
-        let allAssets = null;
-        let skitterMessagesEl = null;
+        let currentLanguage = 'en', currentSettings = difficultySettings.normal, allAssets = null, skitterMessagesEl = null;
 
-
-        // --- DİL FONKSİYONLARI ---
         function translate(key, replacements = {}) {
             let text = translations[currentLanguage]?.[key] || translations['en']?.[key] || key;
-            for (const placeholder in replacements) {
-                const regex = new RegExp(`{${placeholder}}`, 'g');
-                text = text.replace(regex, replacements[placeholder]);
-            }
+            for (const placeholder in replacements) text = text.replace(new RegExp(`{${placeholder}}`, 'g'), replacements[placeholder]);
             return text;
         }
-
         function updateUIText() {
-            document.documentElement.lang = currentLanguage;
-            document.title = translate('gameTitle');
-
-            document.querySelectorAll('[data-translate-key]').forEach(element => {
-                const key = element.dataset.translateKey;
-                const replacements = {};
-                if (key === 'moreRizz') replacements.level = document.getElementById('ppc-level')?.textContent || '1';
-                if (key === 'winConditionText') replacements.multiplier = currentSettings.winMultiplier;
-                if ((key.startsWith('buyAllButton') || key.startsWith('sellAllButton')) && allAssets) {
-                    const assetKey = element.closest('.market-box')?.id.split('-')[1];
-                    if (assetKey && allAssets[assetKey]) {
-                         if(key.startsWith('buyAllButton')) replacements.amount = document.getElementById(`${assetKey}-buy-all-amount`)?.textContent || '0';
-                         else replacements.amount = document.getElementById(`${assetKey}-sell-all-amount`)?.textContent || '0';
-                    } else {
-                        replacements.amount = '0';
-                    }
-                     const amountSpan = element.nextElementSibling; // Parantez içindeki span
-                     const currentText = translate(key, replacements); // Önce çevir
-                      // DÜZELTME: Buton metnini span'e ata, amount'u ayrı elemana
-                     if(element.tagName === 'SPAN' && element.parentElement.tagName === 'BUTTON') {
-                         // Eğer butonun içindeki ana metin span'ı ise
-                         element.textContent = currentText.replace(/ *\([^)]*\) */g, ""); // Miktarı sil
-                     } else {
-                         // Diğer tüm elementler için normal çeviri
-                         element.textContent = currentText;
-                     }
-
-                } else {
-                     element.textContent = translate(key, replacements);
-                }
-            });
-
-             // Skitter mesajlarını yeniden çevir
-             if(skitterMessagesEl){
-                 skitterMessagesEl.querySelectorAll('.skitt-content[data-translate-key]').forEach(contentEl => {
-                    const key = contentEl.dataset.translateKey;
-                    let replacements = {};
-                    try {
-                        replacements = JSON.parse(contentEl.dataset.translateReplacements || '{}');
-                    } catch (e) {
-                        console.error("Error parsing skitter replacements:", e);
-                    }
-                    contentEl.innerHTML = translate(key, replacements); // innerHTML kullanıyoruz çünkü renkli span'ler var
-                 });
-                  // Skitter yazarlarını da çevir (Yilong Ma, Skitter Analysis vb.)
-                 skitterMessagesEl.querySelectorAll('.skitt-author').forEach(authorEl => {
-                     // Basit bir kontrol, daha sağlam hale getirilebilir
-                     if (authorEl.textContent === 'Yilong Ma' || authorEl.textContent === 'Yilong Ma') authorEl.textContent = translate('yilongMa');
-                     else if (authorEl.textContent === 'Skitter Analysis' || authorEl.textContent === 'Skitter Analiz') authorEl.textContent = translate('skitterAnalysis');
-                     else if (authorEl.textContent === 'Tax Office' || authorEl.textContent === 'Vergi Dairesi') authorEl.textContent = translate('taxOffice');
-                     else if (authorEl.textContent === 'Skitter Dev') authorEl.textContent = translate('skitterDev'); // Başlangıç mesajı için
-                 });
-
-             }
-
-
-             document.querySelectorAll('.language-btn').forEach(btn => {
-                 btn.classList.toggle('active', btn.dataset.lang === currentLanguage);
-             });
-             const langToggle = document.getElementById('language-toggle');
-             if(langToggle) langToggle.textContent = currentLanguage === 'tr' ? '🇹🇷' : '🇬🇧';
-
-             // Yeniden başlat butonunun title'ını çevir
-             const restartBtn = document.getElementById('restart-game-btn');
-             if (restartBtn) restartBtn.title = translate('restartGameTitle');
+            document.querySelectorAll('[data-translate-key]').forEach(el => el.innerHTML = translate(el.dataset.translateKey));
+            document.getElementById('language-toggle').textContent = currentLanguage === 'en' ? '🇬🇧' : '🇹🇷';
         }
+        function setLanguage(lang) { currentLanguage = lang; localStorage.setItem('skibidiLiquidLang', lang); updateUIText(); }
 
-
-        function setLanguage(lang) {
-            if (translations[lang]) {
-                currentLanguage = lang;
-                localStorage.setItem('skibidiLanguage', lang);
-                updateUIText();
-            }
-        }
-
-
-        // --- OYUN BAŞLATMA ---
         function startGame(difficulty) {
-            selectedDifficulty = difficulty;
             currentSettings = difficultySettings[difficulty];
-            document.getElementById('difficulty-selection').style.display = 'none';
-            document.getElementById('game-area').style.display = 'block';
+            document.getElementById('difficulty-selection').classList.add('opacity-0', 'pointer-events-none');
+            document.getElementById('game-area').style.display = 'flex';
             initializeGame();
-            updateUIText(); // Arayüzü oyun başladıktan SONRA çevir
+            updateUIText();
         }
 
-        // --- OYUNUN ANA BAŞLATMA MANTIĞI ---
         function initializeGame() {
-            const gameStartTime = Date.now();
-            const skibidi = document.getElementById('skibidi-toilet');
-            const scoreEl = document.getElementById('score');
-            const cpsEl = document.getElementById('cps');
-            const popupContainer = document.getElementById('popup-container');
-            const floaterContainer = document.getElementById('floater-container');
-            const totalWealthEl = document.getElementById('total-wealth');
-            const upgradePpcBtn = document.getElementById('upgrade-ppc');
-            const ppcCostEl = document.getElementById('ppc-cost');
-            const ppcLevelEl = document.getElementById('ppc-level');
-            const messageBox = document.getElementById('message-box');
-            const messageText = document.getElementById('message-text');
-            const messageCloseBtn = document.getElementById('message-close');
+            const scoreEl = document.getElementById('score'), cpsEl = document.getElementById('cps'), totalWealthEl = document.getElementById('total-wealth');
             skitterMessagesEl = document.getElementById('skitter-messages');
-            const skitterFeed = document.getElementById('skitter-feed');
-            const yilongServetDisplay = document.getElementById('yilong-ma-servet-display');
-            const winConditionDisplay = document.getElementById('win-condition-display');
-            const marketListContainer = document.getElementById('market-list-container');
-            // YENİ: Yeniden Başlatma Butonu Elementi
-            const restartBtn = document.getElementById('restart-game-btn');
+            const marketList = document.getElementById('market-list-container');
 
+            let score = 0, pointsPerClick = 1, ppcCost = 10, totalWealth = 0, gameWon = false, clicks = 0, lastCpsCheck = Date.now();
+            let synth, sellSynth;
 
-            let score = 0;
-            let pointsPerClick = 1;
-            let ppcCost = 10;
-            let totalWealth = 0;
-            let gameWon = false;
-            let clicks = 0;
-            let lastCpsCheck = Date.now();
-            let synth;
-            let sellSynth;
-            const popupTexts = {
-                 en: ["RIZZ!", "GYATT!", "SO SKIBIDI!", "BUSSIN'", "SIGMA!", "OHIO!", "LOOKSMAXING", "MEWING mew~", "IT'S GIVING...", "SO BASED!", "ATE THAT"],
-                 tr: ["RIZZ!", "GYATT!", "ÇOK SKIBIDI!", "İŞTE BU!", "SIGMA!", "OHIO!", "BAKIŞLAR", "MEWING mew~", "HAVASI VAR...", "İŞTE BU!", "YEDİ ONU"]
-            };
-            const floaters = ['🗿', '🗺️', '💜', '🤓', '🍑', '✨', '🔥', '👽', '👻', '🤖', '👑', '💯', '🧠'];
-
-             allAssets = {
-                'tl': { name: "TL", colorClass: "text-pink-400", count: 0, price: 1.00, totalInvestment: 0, avgBuyPrice: 0, history: Array(30).fill(1.00), chart: null, boostTimer: 0, playerBoostTimer: 0 },
-                'usd': { name: "USD", colorClass: "text-green-400", count: 0, price: 10.00, totalInvestment: 0, avgBuyPrice: 0, history: Array(30).fill(10.00), chart: null, boostTimer: 0, playerBoostTimer: 0 },
-                'eur': { name: "EUR", colorClass: "text-orange-400", count: 0, price: 12.00, totalInvestment: 0, avgBuyPrice: 0, history: Array(30).fill(12.00), chart: null, boostTimer: 0, playerBoostTimer: 0 },
-                'xag': { name: "XAG", colorClass: "text-slate-300", count: 0, price: 30.00, totalInvestment: 0, avgBuyPrice: 0, history: Array(30).fill(30.00), chart: null, boostTimer: 0, playerBoostTimer: 0 },
-                'aura': { name: "AURA", colorClass: "text-purple-400", count: 0, price: 100.00, totalInvestment: 0, avgBuyPrice: 0, history: Array(30).fill(100.00), chart: null, boostTimer: 0, playerBoostTimer: 0 },
-                'xau': { name: "XAU", colorClass: "text-yellow-400", count: 0, price: 2300.00, totalInvestment: 0, avgBuyPrice: 0, history: Array(30).fill(2300.00), chart: null, boostTimer: 0, playerBoostTimer: 0 },
-                'plt': { name: "PLT", colorClass: "text-slate-100", count: 0, price: currentSettings.pltStartPrice, payoutRate: currentSettings.pltPayoutRate, totalInvestment: 0, avgBuyPrice: 0, history: Array(30).fill(currentSettings.pltStartPrice), chart: null, boostTimer: 0, playerBoostTimer: 0 },
-                'btc': { name: "BTC", colorClass: "text-red-500", count: 0, price: 50000.00, totalInvestment: 0, avgBuyPrice: 0, history: Array(30).fill(50000.00), chart: null, boostTimer: 0, playerBoostTimer: 0 },
-                'dia': { name: "DIA", colorClass: "text-blue-400", count: 0, price: 100000.00, totalInvestment: 0, avgBuyPrice: 0, history: Array(30).fill(100000.00), chart: null, boostTimer: 0, playerBoostTimer: 0 },
+            allAssets = {
+                'tl': { name: "TL", colorClass: "text-pink-600 dark:text-pink-400", count: 0, price: 1.00, avgBuyPrice: 0, history: Array(30).fill(1.00) },
+                'usd': { name: "USD", colorClass: "text-green-600 dark:text-green-400", count: 0, price: 10.00, avgBuyPrice: 0, history: Array(30).fill(10.00) },
+                'eur': { name: "EUR", colorClass: "text-orange-600 dark:text-orange-400", count: 0, price: 12.00, avgBuyPrice: 0, history: Array(30).fill(12.00) },
+                'xag': { name: "XAG", colorClass: "text-slate-600 dark:text-slate-300", count: 0, price: 30.00, avgBuyPrice: 0, history: Array(30).fill(30.00) },
+                'aura': { name: "AURA", colorClass: "text-purple-600 dark:text-purple-400", count: 0, price: 100.00, avgBuyPrice: 0, history: Array(30).fill(100.00) },
+                'xau': { name: "XAU", colorClass: "text-yellow-600 dark:text-yellow-400", count: 0, price: 2300.00, avgBuyPrice: 0, history: Array(30).fill(2300.00) },
+                'plt': { name: "PLT", colorClass: "text-gray-700 dark:text-white", count: 0, price: 20000.00, avgBuyPrice: 0, history: Array(30).fill(20000.00) },
+                'btc': { name: "BTC", colorClass: "text-red-600 dark:text-red-500", count: 0, price: 50000.00, avgBuyPrice: 0, history: Array(30).fill(50000.00) },
+                'dia': { name: "DIA", colorClass: "text-blue-600 dark:text-blue-400", count: 0, price: 100000.00, avgBuyPrice: 0, history: Array(30).fill(100000.00) },
             };
 
-            // Varlık Güncelleme Mantığı (updateLogic)
-             Object.keys(allAssets).forEach(key => {
-                allAssets[key].updateLogic = function() {
-                    let volatility, changePercent, baseVolatility; const timeSinceStart = (Date.now() - gameStartTime) / 1000;
-                    switch (key) { case 'tl': baseVolatility = 0.03; break; case 'usd': case 'eur': baseVolatility = 0.01; break; case 'xag': case 'btc': baseVolatility = 0.05; break; case 'aura': baseVolatility = 0.1 + (score / 50000000); if (baseVolatility > 0.4) baseVolatility = 0.4; break; case 'xau': baseVolatility = 0.02; break; case 'plt': baseVolatility = 0.08; break; case 'dia': baseVolatility = 0.1; break; default: baseVolatility = 0.05; }
-                    if (this.boostTimer > 0) { if (Math.random() < 0.90) { changePercent = (Math.random() * baseVolatility * 1.5) + baseVolatility * 0.5; } else { changePercent = (Math.random() * -baseVolatility * 0.5) - baseVolatility * 0.1; } this.boostTimer--; if (this.boostTimer === 0) { document.getElementById(`market-${key}-container`)?.classList.remove('boosted'); const assetNameKey = `asset_${key}`; const coloredAssetName = `<span class="${this.colorClass} font-bold">${translate(assetNameKey)}</span>`; if (Math.random() > currentSettings.yilongHodlChance) { if (yilongMa.portfolio[key] > 0) { const profit = (this.price - (yilongMa.avgBuyPrices[key] || this.price)) * yilongMa.portfolio[key]; yilongMa.wealth += yilongMa.portfolio[key] * this.price; yilongMa.portfolio[key] = 0; yilongMa.avgBuyPrices[key] = 0; if (Math.random() < currentSettings.yilongPostVisibility) { postSkitt(translate('yilongMa'), null, getRandomMessageKey('yilongSellMsgKey'), {asset: coloredAssetName}); } updateYilongWealthUI(); } } else { if (Math.random() < currentSettings.yilongPostVisibility) { postSkitt(translate('yilongMa'), null, 'yilongHodl', {asset: coloredAssetName}); } } } } else if (this.playerBoostTimer > 0) { changePercent = (Math.random() * baseVolatility * 0.5) + baseVolatility * 0.1; this.playerBoostTimer--; if (this.playerBoostTimer === 0) { document.getElementById(`market-${key}-container`)?.classList.remove('player-boosted'); } } else if (key === 'plt' && timeSinceStart < currentSettings.pltStableDuration) { volatility = 0.005; changePercent = (Math.random() - 0.5) * volatility; } else { volatility = baseVolatility; let trendFactor = 0.5; if (key === 'tl') trendFactor = 0.60; if (key === 'usd' || key === 'eur') trendFactor = 0.48; if (key === 'xau') trendFactor = 0.4; changePercent = (Math.random() - trendFactor) * volatility; } this.price += this.price * changePercent; if (key === 'tl' && this.price < 0.01) this.price = 0.01; else if ((key === 'usd' || key === 'eur' || key === 'xag' || key === 'aura') && this.price < 1) this.price = 1; else if (key === 'dia' && this.price < 1000) this.price = 1000; else if (key === 'plt' && this.price < 10000) this.price = 10000;
-                };
+            let yilongMa = { wealth: currentSettings.yilongStartWealth, portfolio: {}, avgBuyPrices: {} };
+            Object.keys(allAssets).forEach(k => { yilongMa.portfolio[k] = 0; yilongMa.avgBuyPrices[k] = 0; });
+
+            const initAudio = async () => { await Tone.start(); synth = new Tone.PolySynth().toDestination(); sellSynth = new Tone.MetalSynth().toDestination(); };
+            const playClick = () => synth?.triggerAttackRelease(["C5", "E5"][Math.floor(Math.random() * 2)], "16n");
+            const playSell = () => sellSynth?.triggerAttackRelease("G4", "32n");
+
+            const format = (n) => {
+                if (n < 1000) return Math.floor(n).toString();
+                if (n < 1000000) return (n / 1000).toFixed(2) + "K";
+                if (n < 1000000000) return (n / 1000000).toFixed(2) + "M";
+                if (n < 1000000000000) return (n / 1000000000).toFixed(2) + "B";
+                return (n / 1000000000000).toFixed(2) + "T";
+            };
+
+            marketList.innerHTML = '';
+            Object.keys(allAssets).forEach(key => {
+                const asset = allAssets[key];
+                const el = document.createElement('details');
+                el.className = "market-item ghost-glass-item group overflow-hidden mb-2"; // YENİ CLASS: ghost-glass-item
+                el.id = `market-${key}-container`;
+                el.innerHTML = `
+                    <summary class="p-4 flex items-center justify-between cursor-pointer">
+                        <div class="flex items-center gap-4">
+                            <div class="w-10 h-10 rounded-full dark:bg-white/5 bg-black/5 dark:border-white/10 border-black/10 border flex items-center justify-center text-xl font-bold ${asset.colorClass} shadow-sm backdrop-blur-sm">${key.substring(0, 1).toUpperCase()}</div>
+                            <div>
+                                <h3 class="font-bold text-slate-700 dark:text-slate-200 text-base tracking-wide" data-translate-key="asset_${key}">${asset.name}</h3>
+                                <div class="text-[11px] text-slate-500 font-mono tracking-wide opacity-70"><span id="${key}-count">0</span> <span data-translate-key="available">Owned</span></div>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-6">
+                            <div class="text-right">
+                                <div id="${key}-price" class="font-mono font-bold text-slate-800 dark:text-white text-base drop-shadow-sm">${asset.price.toFixed(2)}</div>
+                                <div id="${key}-pl" class="text-[10px] font-mono text-slate-500 dark:text-slate-500 opacity-70">0.00</div>
+                            </div>
+                            <div class="opacity-50 group-hover:opacity-100 transition-opacity text-slate-400">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                            </div>
+                        </div>
+                    </summary>
+                    <div class="p-4 dark:bg-white/5 bg-black/5 border-t dark:border-white/5 border-black/5 space-y-4">
+                         <div class="h-32 w-full rounded-xl overflow-hidden dark:bg-black/20 bg-white/40 relative">
+                             <canvas id="${key}-chart"></canvas>
+                         </div>
+                         <div class="flex gap-2 justify-between">
+                            <button class="pill-panel flex-1 py-2 flex items-center justify-center text-emerald-600 dark:text-emerald-400 font-bold text-xs bg-emerald-500/10 hover:bg-emerald-500/20" data-asset="${key}" data-action="buy"><span data-translate-key="buyButton">AL</span></button>
+                            <button class="pill-panel flex-1 py-2 flex items-center justify-center text-emerald-500 dark:text-emerald-300 font-bold text-xs bg-emerald-500/5 hover:bg-emerald-500/15" data-asset="${key}" data-action="buy-all"><span data-translate-key="buyAllButton">MAX</span></button>
+                            <button class="pill-panel flex-1 py-2 flex items-center justify-center text-rose-600 dark:text-rose-400 font-bold text-xs bg-rose-500/10 hover:bg-rose-500/20" data-asset="${key}" data-action="sell"><span data-translate-key="sellButton">SAT</span></button>
+                            <button class="pill-panel flex-1 py-2 flex items-center justify-center text-rose-500 dark:text-rose-300 font-bold text-xs bg-rose-500/5 hover:bg-rose-500/15" data-asset="${key}" data-action="sell-all"><span data-translate-key="sellAllButton">HEPSİ</span></button>
+                        </div>
+                    </div>
+                `;
+                marketList.appendChild(el);
             });
 
-            // YILONG MA
-            let yilongMa = { wealth: currentSettings.yilongStartWealth, portfolio: { 'aura': 0, 'btc': 0, 'usd': 0, 'eur': 0, 'tl': 0, 'xau': 0, 'xag': 0, 'dia': 0, 'plt': 0 }, avgBuyPrices: { 'aura': 0, 'btc': 0, 'usd': 0, 'eur': 0, 'tl': 0, 'xau': 0, 'xag': 0, 'dia': 0, 'plt': 0 } };
-            let yilongMaTotalWealth = currentSettings.yilongStartWealth;
-            winConditionDisplay.textContent = translate('winConditionText', { multiplier: currentSettings.winMultiplier });
+            setTimeout(() => {
+                Object.keys(allAssets).forEach(key => {
+                    const canvas = document.getElementById(`${key}-chart`);
+                    if (canvas) {
+                        const ctx = canvas.getContext('2d');
+                        const grad = ctx.createLinearGradient(0, 0, 0, 120);
+                        grad.addColorStop(0, 'rgba(139, 92, 246, 0.4)'); grad.addColorStop(1, 'rgba(139, 92, 246, 0)');
+                        allAssets[key].chart = new Chart(ctx, {
+                            type: 'line',
+                            data: { labels: Array(30).fill(''), datasets: [{ data: allAssets[key].history, borderColor: '#8b5cf6', borderWidth: 2, backgroundColor: grad, fill: true, pointRadius: 0, tension: 0.4 }] },
+                            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: false, tooltip: false }, scales: { x: { display: false }, y: { display: false } }, animation: { duration: 0 } }
+                        });
+                    }
+                });
+            }, 100);
 
-            // Rastgele Mesaj Anahtarı Seçme
-            function getRandomMessageKey(keyArrayName) {
-                 const keyArray = translations[currentLanguage]?.[keyArrayName] || translations['en']?.[keyArrayName] || [];
-                 if (keyArray.length === 0) return "";
-                 return keyArray[Math.floor(Math.random() * keyArray.length)];
-            }
+            // Skitter Animasyonunu (Açılış) Tekrar Ekledim
+            const skitterFeed = document.getElementById('skitter-feed');
+            const skitterIcon = document.getElementById('skitter-icon');
+            const skitterHeader = document.getElementById('skitter-header-content');
+            const skitterCollapsedInfo = document.getElementById('skitter-collapsed-info');
 
-
-            // SES
-            const initAudio = async () => { await Tone.start(); console.log("Audio ready"); synth = new Tone.MembraneSynth({ pitchDecay: 0.01, octaves: 2, envelope: { attack: 0.001, decay: 0.2, sustain: 0 } }).toDestination(); sellSynth = new Tone.MetalSynth({ frequency: 200, envelope: { attack: 0.001, decay: 0.1, release: 0.1 }, harmonicity: 5.1, modulationIndex: 32, resonance: 4000, octaves: 1.5 }).toDestination(); }
-            const playClickSound = () => { if (!synth) return; synth.triggerAttackRelease("C2", "8n"); }
-            const playSellSound = () => { if (!sellSynth) return; sellSynth.triggerAttackRelease("G4", "8n"); }
-
-            // FORMATLAMA
-            const formatNumber = (num) => { if (num < 1000) return Math.floor(num).toString(); if (num < 1000000) return (num / 1000).toFixed(2) + "K"; if (num < 1000000000) return (num / 1000000).toFixed(2) + "M"; if (num < 1000000000000) return (num / 1000000000).toFixed(2) + "B"; if (num < 1000000000000000) return (num / 1000000000000).toFixed(2) + "T"; return (num / 1000000000000000).toFixed(2) + "Q"; };
-
-            // UI GÜNCELLEME
-            const updateScoreUI = () => { scoreEl.textContent = formatNumber(score); totalWealth = score; for (const key in allAssets) { totalWealth += allAssets[key].count * allAssets[key].price; } totalWealthEl.textContent = formatNumber(totalWealth); upgradePpcBtn.disabled = score < ppcCost; renderAllMarketsUI(); checkWinCondition(); };
-            const updateYilongWealthUI = () => { let portfolioValue = 0; for (const key in yilongMa.portfolio) { if (allAssets[key]) { portfolioValue += yilongMa.portfolio[key] * allAssets[key].price; } } yilongMaTotalWealth = yilongMa.wealth + portfolioValue; yilongServetDisplay.textContent = formatNumber(yilongMaTotalWealth); };
-            const renderAllMarketsUI = () => { for (const key in allAssets) { renderMarketUI(key); } };
-            const renderMarketUI = (assetKey) => {
-                 const asset = allAssets[assetKey]; if (!asset) return;
-                 const priceEl = document.getElementById(`${assetKey}-price`);
-                 const countEl = document.getElementById(`${assetKey}-count`);
-                 const profitLossEl = document.getElementById(`${assetKey}-profit-loss`);
-                 const buyAllAmountEl = document.getElementById(`${assetKey}-buy-all-amount`);
-                 const sellAllAmountEl = document.getElementById(`${assetKey}-sell-all-amount`);
-                 const nameEl = document.querySelector(`#market-${assetKey}-container .market-summary h3`);
-                 const availableSpan = document.querySelector(`#market-${assetKey}-container .market-summary span[data-translate-key="available"]`);
-                 const profitLabelSpan = document.querySelector(`#market-${assetKey}-container .market-content span[data-translate-key="profitLabel"]`);
-                 const yieldLabelSpan = document.querySelector(`#market-${assetKey}-container .market-content span[data-translate-key="yieldLabel"]`);
-
-                 if (!priceEl || !countEl || !profitLossEl || !buyAllAmountEl || !sellAllAmountEl || !nameEl || !availableSpan) { return; }
-
-                 nameEl.textContent = translate(`asset_${assetKey}`);
-                 availableSpan.textContent = translate('available');
-                 if(profitLabelSpan) profitLabelSpan.textContent = translate('profitLabel');
-                 if(yieldLabelSpan && assetKey === 'plt') yieldLabelSpan.textContent = translate('yieldLabel');
-
-                priceEl.textContent = asset.price.toFixed(2);
-                countEl.textContent = formatNumber(asset.count);
-                if (asset.count > 0) { const profit = asset.price - asset.avgBuyPrice; if (profit >= 0) { profitLossEl.textContent = `+${profit.toFixed(2)}`; profitLossEl.className = 'font-bold text-emerald-400'; } else { profitLossEl.textContent = `${profit.toFixed(2)}`; profitLossEl.className = 'font-bold text-red-400'; } } else { profitLossEl.textContent = '0.00'; profitLossEl.className = 'font-bold text-zinc-400'; }
-                const buyAllAmount = Math.floor(score / asset.price); buyAllAmountEl.textContent = formatNumber(buyAllAmount); sellAllAmountEl.textContent = formatNumber(asset.count);
-                const buyBtnSpan = document.querySelector(`button[data-asset="${assetKey}"][data-action="buy"] span`); const sellBtnSpan = document.querySelector(`button[data-asset="${assetKey}"][data-action="sell"] span`); const buyAllBtnSpan = document.querySelector(`button[data-asset="${assetKey}"][data-action="buy-all"] span:first-child`); const sellAllBtnSpan = document.querySelector(`button[data-asset="${assetKey}"][data-action="sell-all"] span:first-child`);
-                if(buyBtnSpan) buyBtnSpan.textContent = translate('buyButton'); if(sellBtnSpan) sellBtnSpan.textContent = translate('sellButton'); if(buyAllBtnSpan) buyAllBtnSpan.textContent = translate('buyAllButton', {amount: ''}).replace(/ *\([^)]*\) */g, ""); if(sellAllBtnSpan) sellAllBtnSpan.textContent = translate('sellAllButton', {amount: ''}).replace(/ *\([^)]*\) */g, "");
-                const buttons = document.querySelectorAll(`button[data-asset="${assetKey}"]`); buttons.forEach(btn => { const action = btn.dataset.action; if (action === 'buy') btn.disabled = score < asset.price; if (action === 'sell') btn.disabled = asset.count === 0; if (action === 'buy-all') btn.disabled = buyAllAmount <= 0; if (action === 'sell-all') btn.disabled = asset.count === 0; }); if (assetKey === 'plt') { const payoutEl = document.getElementById('plt-payout'); if (payoutEl) { if (asset.count > 0) { const payout = (asset.count * asset.price) * asset.payoutRate; payoutEl.textContent = payout.toFixed(2); } else { payoutEl.textContent = '0.00'; } } }
-             };
-
-            const createPopup = (text, color = '#fff', xPos = 'random') => { /* ... */ const popup = document.createElement('div'); popup.className = 'click-popup'; popup.textContent = text; popup.style.color = color; let x; if (xPos === 'random') x = Math.random() * 80 + 10; else if (xPos === 'center') x = 40 + Math.random() * 20; else x = xPos; const y = Math.random() * 20 + 30; popup.style.left = `${x}%`; popup.style.top = `${y}%`; popupContainer.appendChild(popup); requestAnimationFrame(() => { popup.style.transform = 'translateY(-100px) scale(1.2)'; popup.style.opacity = '0'; }); setTimeout(() => popup.remove(), 500); };
-            const createFloater = () => { /* ... */ const floater = document.createElement('div'); floater.className = 'floater'; floater.textContent = floaters[Math.floor(Math.random() * floaters.length)]; floater.style.left = `${Math.random() * 100}vw`; floater.style.animationDuration = `${Math.random() * 5 + 5}s`; floater.style.fontSize = `${Math.random() * 1 + 1}rem`; floaterContainer.appendChild(floater); setTimeout(() => floater.remove(), 10000); };
-            const showMessage = (text) => { /* ... */ messageText.innerHTML = text; messageBox.classList.add('show'); };
-            messageCloseBtn.addEventListener('click', () => { /* ... */ messageBox.classList.remove('show'); });
-            const checkWinCondition = () => { /* ... */ if (gameWon) return; if (totalWealth > (yilongMaTotalWealth * currentSettings.winMultiplier)) { gameWon = true; showMessage(translate('winMessage', { playerWealth: formatNumber(totalWealth), yilongWealth: formatNumber(yilongMaTotalWealth), multiplier: currentSettings.winMultiplier })); } };
-
-            // SKITTER POST (Çeviri Anahtarı ve Replacements ile)
-            const postSkitt = (author, contentOrKey, key = null, replacements = {}) => {
-                const skitt = document.createElement('div'); skitt.className = 'skitt';
-                const authorEl = document.createElement('span'); authorEl.className = 'skitt-author';
-                authorEl.textContent = author;
-                if (author === translate('yilongMa')) { authorEl.classList.add('yilong'); }
-
-                const contentEl = document.createElement('p'); contentEl.className = 'skitt-content';
-                if (key) {
-                    contentEl.dataset.translateKey = key;
-                    // DÜZELTME: Replacements'ı JSON string olarak sakla
-                    contentEl.dataset.translateReplacements = JSON.stringify(replacements);
-                    contentEl.innerHTML = translate(key, replacements);
+            skitterFeed.addEventListener('toggle', () => {
+                if (skitterFeed.open) {
+                    // Açılırken:
+                    skitterFeed.classList.remove('notify-heartbeat'); // Bildirimi durdur
+                    skitterIcon.classList.add('opacity-0');
+                    skitterCollapsedInfo.classList.add('hidden'); // Mini bilgiyi gizle
+                    skitterHeader.classList.remove('hidden');
+                    setTimeout(() => skitterHeader.classList.remove('opacity-0'), 100);
                 } else {
-                    contentEl.innerHTML = contentOrKey;
+                    // Kapanırken:
+                    skitterIcon.classList.remove('opacity-0');
+                    skitterHeader.classList.add('opacity-0');
+                    setTimeout(() => {
+                        skitterHeader.classList.add('hidden');
+                        skitterCollapsedInfo.classList.remove('hidden'); // Mini bilgiyi göster
+                    }, 100);
                 }
+            });
 
-                skitt.appendChild(authorEl); skitt.appendChild(contentEl);
-                if(skitterMessagesEl) skitterMessagesEl.prepend(skitt); else console.error("skitterMessagesEl is null!");
-                if (!skitterFeed.open) { skitterFeed.classList.add('notify-glow'); }
-                if (skitterMessagesEl && skitterMessagesEl.children.length > 20) { skitterMessagesEl.removeChild(skitterMessagesEl.lastChild); }
+            const postSkitt = (auth, keyOrTxt, key = null, rep = {}) => {
+                const div = document.createElement('div');
+                div.className = "skitt-bubble animate-sweep";
+                const txt = key ? translate(key, rep) : keyOrTxt;
+                const isYilong = auth === translate('yilongMa');
+                div.innerHTML = `
+                    <div class="flex justify-between mb-1.5 items-center">
+                        <span class="font-bold text-[11px] ${isYilong ? 'text-yellow-500 dark:text-yellow-400' : 'text-sky-500 dark:text-sky-400'} tracking-wide">${auth}</span>
+                        <span class="text-[9px] text-slate-500 dark:text-slate-600">NOW</span>
+                    </div>
+                    <p class="text-xs text-slate-700 dark:text-slate-200 leading-snug font-medium opacity-90">${txt}</p>
+                `;
+                skitterMessagesEl.prepend(div);
+                if (skitterMessagesEl.children.length > 15) skitterMessagesEl.lastChild.remove();
+
+                if (!skitterFeed.open) {
+                    // Bildirim efekti: Kalp atışı (Sürekli)
+                    skitterFeed.classList.add('notify-heartbeat');
+                }
             };
 
+            const updateUI = () => {
+                if (!scoreEl) return;
+                scoreEl.textContent = format(score);
+                totalWealth = score;
+                Object.keys(allAssets).forEach(k => totalWealth += allAssets[k].count * allAssets[k].price);
+                if (totalWealthEl) totalWealthEl.textContent = format(totalWealth);
 
-            // YILONG MA TWEET (postSkitt'e anahtar ve replacements gönderir)
-            const yilongMaTweet = () => {
-                 let possibleAssets = [...currentSettings.yilongPortfolio]; if (currentSettings.yilongStrategy === 'cheap') possibleAssets = possibleAssets.filter(k => ['tl', 'usd', 'eur', 'xag'].includes(k)); else if (currentSettings.yilongStrategy === 'expensive') possibleAssets = possibleAssets.filter(k => ['btc', 'dia', 'plt', 'xau'].includes(k)); else if (currentSettings.yilongStrategy === 'aggressive_expensive') { possibleAssets = possibleAssets.filter(k => ['btc', 'dia'].includes(k)); if (possibleAssets.length === 0 || Math.random() < 0.2) possibleAssets = ['plt', 'xau'];} if (possibleAssets.length === 0) possibleAssets = Object.keys(allAssets).filter(key => currentSettings.yilongPortfolio.includes(key)); if (possibleAssets.length === 0) return; let randomAssetKey = possibleAssets[Math.floor(Math.random() * possibleAssets.length)]; if (randomAssetKey === 'plt' && Math.random() < 0.50) randomAssetKey = possibleAssets[Math.floor(Math.random() * possibleAssets.length)]; if (!randomAssetKey || !allAssets[randomAssetKey]) return; const asset = allAssets[randomAssetKey]; const investmentAmount = yilongMa.wealth * currentSettings.yilongInvestmentAmount; if (investmentAmount < asset.price || yilongMa.wealth <= 0) { if (Math.random() < 0.30) { postSkitt(translate('yilongMa'), null, 'yilongBored'); } return; } const amountToBuy = Math.floor(investmentAmount / asset.price); if (amountToBuy <= 0) return; const currentInvestment = yilongMa.portfolio[randomAssetKey] * (yilongMa.avgBuyPrices[randomAssetKey] || 0); const newInvestment = amountToBuy * asset.price; const totalAmount = yilongMa.portfolio[randomAssetKey] + amountToBuy; yilongMa.avgBuyPrices[randomAssetKey] = (currentInvestment + newInvestment) / totalAmount; yilongMa.wealth -= newInvestment; yilongMa.portfolio[randomAssetKey] += amountToBuy; const assetNameKey = `asset_${randomAssetKey}`; const coloredAssetName = `<span class="${asset.colorClass} font-bold">${translate(assetNameKey)}</span>`; const showTweet = Math.random() < currentSettings.yilongPostVisibility;
-                 const replacements = { amount: formatNumber(amountToBuy), asset: coloredAssetName };
-                 const msgKey = getRandomMessageKey('yilongBuyMsgKey');
-                 if (showTweet) { postSkitt(translate('yilongMa'), null, msgKey, replacements); }
-                 updateYilongWealthUI(); const boostDelay = Math.random() * 5000 + 5000; setTimeout(() => { asset.boostTimer = currentSettings.yilongPumpDuration; const container = document.getElementById(`market-${randomAssetKey}-container`); if(container) container.classList.add('boosted');
-                 const pumpReplacements = { asset: coloredAssetName };
-                 const pumpMsgKey = getRandomMessageKey('skitterPumpMsgKey');
-                 if (showTweet) { postSkitt(translate('skitterAnalysis'), null, pumpMsgKey, pumpReplacements); } }, boostDelay);
+                Object.keys(allAssets).forEach(key => {
+                    const asset = allAssets[key];
+                    const priceEl = document.getElementById(`${key}-price`);
+                    const countEl = document.getElementById(`${key}-count`);
+                    const plEl = document.getElementById(`${key}-pl`);
+
+                    if (priceEl && countEl && plEl) {
+                        const oldP = parseFloat(priceEl.textContent);
+                        priceEl.textContent = asset.price.toFixed(2);
+                        priceEl.className = `font-mono font-bold text-base ${asset.price > oldP ? 'market-trend-up' : (asset.price < oldP ? 'market-trend-down' : 'text-slate-800 dark:text-white')}`;
+                        countEl.textContent = format(asset.count);
+                        if (asset.count > 0) {
+                            const prof = asset.price - asset.avgBuyPrice;
+                            plEl.textContent = (prof >= 0 ? '+' : '') + prof.toFixed(2);
+                            plEl.className = `text-[10px] font-mono ${prof >= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'}`;
+                        } else plEl.textContent = "0.00";
+                    }
+                    if (asset.chart && document.getElementById(`market-${key}-container`)?.open) {
+                        asset.chart.data.datasets[0].data = asset.history;
+                        asset.chart.update('none');
+                    }
+                });
+
+                let yw = 0;
+                Object.keys(yilongMa.portfolio).forEach(k => yw += yilongMa.portfolio[k] * allAssets[k].price);
+                const finalYW = yilongMa.wealth + yw;
+                const fmtYW = format(finalYW);
+
+                const miniEl = document.getElementById('yilong-ma-servet-mini');
+                if (miniEl) miniEl.textContent = fmtYW;
+
+                const dispEl = document.getElementById('yilong-ma-servet-display');
+                if (dispEl) dispEl.textContent = fmtYW;
+
+                const winEl = document.getElementById('win-condition-display');
+                if (winEl) winEl.textContent = translate('winConditionText', { multiplier: currentSettings.winMultiplier });
+
+                const upgEl = document.getElementById('upgrade-ppc');
+                if (upgEl) upgEl.disabled = score < ppcCost;
+
+                if (!gameWon && totalWealth > finalYW * currentSettings.winMultiplier) {
+                    gameWon = true;
+                    const msgEl = document.getElementById('message-text');
+                    if (msgEl) msgEl.innerHTML = translate('winMessage', { playerWealth: format(totalWealth), yilongWealth: format(finalYW) });
+                    document.getElementById('message-box')?.classList.remove('opacity-0', 'pointer-events-none');
+                }
             };
 
-            const scheduleYilongTweet = () => { /* ... */ const randomDelay = Math.random() * 60000 + 60000; setTimeout(() => { if (!gameWon) { yilongMaTweet(); scheduleYilongTweet(); } }, randomDelay); };
-            const initSkitter = () => { /* ... */ scheduleYilongTweet(); };
+            const skibidi = document.getElementById('skibidi-toilet');
+            skibidi.addEventListener('pointerdown', (e) => {
+                if (gameWon) return;
+                if (Tone.context.state !== 'running') initAudio();
+                score += pointsPerClick;
+                clicks++;
+                updateUI();
+                playClick();
+                skibidi.classList.add('clicked'); setTimeout(() => skibidi.classList.remove('clicked'), 80);
 
-            // TIKLAMA İŞLEYİCİLERİ
-            skibidi.addEventListener('pointerdown', (e) => { /* ... */ if (gameWon) return; if (Tone.context.state !== 'running') { initAudio(); } score += pointsPerClick; clicks++; updateScoreUI(); playClickSound(); skibidi.classList.add('clicked'); setTimeout(() => skibidi.classList.remove('clicked'), 100); const currentPopupTexts = popupTexts[currentLanguage] || popupTexts['en']; const randomText = currentPopupTexts[Math.floor(Math.random() * currentPopupTexts.length)]; const xPos = (e.clientX / window.innerWidth) * 100; createPopup(randomText, '#fff', xPos); });
-            document.getElementById('upgrades-frame').addEventListener('click', (e) => { /* ... */ if (gameWon) return; const button = e.target.closest('button'); if (!button) return; if (button.id === 'upgrade-ppc') { if (score >= ppcCost) { score -= ppcCost; pointsPerClick++; ppcCost = Math.floor(ppcCost * 1.5); ppcLevelEl.textContent = pointsPerClick; ppcCostEl.textContent = formatNumber(ppcCost); updateScoreUI(); createPopup(translate('popupRizz'), '#f87171', 'center'); } } });
-            document.getElementById('markets-frame').addEventListener('click', (e) => { /* ... */ if (gameWon) return; const button = e.target.closest('button'); if (e.target.closest('.drag-handle')) { return; } if (!button || !button.dataset.asset) return; const assetKey = button.dataset.asset; const action = button.dataset.action; const asset = allAssets[assetKey]; let amountChanged = 0; const assetName = translate(`asset_${assetKey}`); switch(action) { case 'buy': if (score >= asset.price) { const ci=asset.count*asset.avgBuyPrice; const ni=asset.price; const ta=asset.count+1; asset.avgBuyPrice=(ci+ni)/ta; score-=asset.price; asset.count++; amountChanged=1; createPopup(translate('popupBuy', {asset: assetName}), '#4ade80', 'center'); } break; case 'sell': if (asset.count > 0) { score+=asset.price; asset.count--; if(asset.count===0){asset.avgBuyPrice=0;} amountChanged=-1; playSellSound(); createPopup(translate('popupSell'), '#f87171', 'center'); } break; case 'buy-all': const atb=Math.floor(score/asset.price); if(atb>0){ const tc=atb*asset.price; const ci=asset.count*asset.avgBuyPrice; const ni=tc; const ta=asset.count+atb; asset.avgBuyPrice=(ci+ni)/ta; score-=tc; asset.count+=atb; amountChanged=atb; createPopup(translate('popupBuyAll', {amount: formatNumber(atb), asset: assetName}), '#4ade80', 'center'); } break; case 'sell-all': if (asset.count > 0) { const tg=asset.count*asset.price; score+=tg; amountChanged=-asset.count; asset.count=0; asset.avgBuyPrice=0; playSellSound(); createPopup(translate('popupSellAll'), '#f87171', 'center'); } break; } if (amountChanged > 0 && currentSettings.playerBoostEnabled) { asset.playerBoostTimer = currentSettings.playerBoostDuration; const container = document.getElementById(`market-${assetKey}-container`); if(container) container.classList.add('player-boosted'); } renderMarketUI(assetKey); updateScoreUI(); });
-             // YENİ: Yeniden Başlatma Butonu Dinleyicisi
-             if (restartBtn) {
-                 restartBtn.addEventListener('click', () => {
-                     window.location.reload(); // Sayfayı yenile
-                 });
-             }
+                const pop = document.createElement('div');
+                pop.className = 'click-popup text-3xl dark:text-white text-slate-900';
+                pop.textContent = ["RIZZ", "GYATT", "SKIBIDI", "SIGMA", "OHIO", "W"][Math.floor(Math.random() * 6)];
+                const cx = e.clientX || (e.touches && e.touches[0].clientX);
+                const cy = e.clientY || (e.touches && e.touches[0].clientY);
+                if (cx) { pop.style.left = `${cx}px`; pop.style.top = `${cy}px`; }
+                else { pop.style.left = '50%'; pop.style.top = '50%'; }
 
-            // OYUN DÖNGÜLERİ
-            setInterval(createFloater, 500);
-            setInterval(() => { /* CPS */ if (gameWon) return; const now = Date.now(); const delta = (now - lastCpsCheck) / 1000; const cpsValue = (clicks / delta).toFixed(1); cpsEl.textContent = cpsValue; clicks = 0; lastCpsCheck = now; }, 1000);
-            setInterval(() => { /* Piyasa */ if (gameWon) return; for (const key in allAssets) { const asset = allAssets[key]; const oldPrice = asset.price; asset.updateLogic(); const priceEl = document.getElementById(`${key}-price`); if (priceEl) { priceEl.classList.remove('price-up', 'price-down'); if (asset.price > oldPrice) { priceEl.classList.add('price-up'); } else if (asset.price < oldPrice) { priceEl.classList.add('price-down'); } } asset.history.push(asset.price); if (asset.history.length > 30) { asset.history.shift(); } if (asset.chart) { asset.chart.data.datasets[0].data = asset.history; asset.chart.update('none'); } } updateYilongWealthUI(); renderAllMarketsUI(); checkWinCondition(); }, 4000);
-            setInterval(() => { /* PLT Geliri */ if (gameWon) return; const pltAsset = allAssets['plt']; if (pltAsset.count > 0) { const payout = (pltAsset.count * pltAsset.price) * pltAsset.payoutRate; score += payout; updateScoreUI(); } }, 1000);
+                document.getElementById('popup-container').appendChild(pop);
+                setTimeout(() => pop.remove(), 600);
+            });
 
-            // Vergi Ödeme (Batma Engelli) - Çeviri Eklendi
-            const handleYilongTax = (taxAmount) => { /* ... */ if (yilongMa.wealth >= taxAmount) { yilongMa.wealth -= taxAmount; return true; } let debt = taxAmount - yilongMa.wealth; yilongMa.wealth = 0; postSkitt(translate('skitterAnalysis'), null, 'taxLiquidationWarning', {amount: formatNumber(debt)}); let assetsToSell = []; for (const key in yilongMa.portfolio) { if (yilongMa.portfolio[key] > 0 && allAssets[key]) { assetsToSell.push({ key: key, count: yilongMa.portfolio[key], price: allAssets[key].price }); } } assetsToSell.sort((a, b) => b.price - a.price); let soldAssetMessages = []; for (const asset of assetsToSell) { if (debt <= 0) break; const assetValue = asset.count * asset.price; const assetNameKey = `asset_${asset.key}`; const coloredAssetName = `<span class="${allAssets[asset.key].colorClass} font-bold">${translate(assetNameKey)}</span>`; if (assetValue <= debt) { debt -= assetValue; yilongMa.portfolio[asset.key] = 0; yilongMa.avgBuyPrices[asset.key] = 0; soldAssetMessages.push(`${formatNumber(asset.count)} ${coloredAssetName}`); } else { const amountToSell = Math.ceil(debt / asset.price); if (amountToSell >= yilongMa.portfolio[asset.key]) { yilongMa.wealth -= debt; debt = 0; yilongMa.portfolio[asset.key] = 0; yilongMa.avgBuyPrices[asset.key] = 0; soldAssetMessages.push(`${formatNumber(asset.count)} ${coloredAssetName}`); } else { yilongMa.portfolio[asset.key] -= amountToSell; soldAssetMessages.push(`${formatNumber(amountToSell)} ${coloredAssetName}`); debt = 0; } } } if (soldAssetMessages.length > 0) { postSkitt(translate('taxOffice'), null, 'taxLiquidationReport', {assets: soldAssetMessages.join(', ')}); } if (debt > 0) { yilongMa.wealth -= debt; postSkitt(translate('taxOffice'), null, 'taxLiquidationFail', {amount: formatNumber(debt)}); } return true; };
+            document.getElementById('upgrade-ppc').addEventListener('click', () => {
+                if (score >= ppcCost) {
+                    score -= ppcCost; pointsPerClick++; ppcCost = Math.floor(ppcCost * 1.5);
+                    document.getElementById('ppc-level').textContent = pointsPerClick;
+                    document.getElementById('ppc-cost').textContent = format(ppcCost);
+                    updateUI();
+                }
+            });
 
-            // Vergi Sistemi Başlatma (Çeviri ile)
-            const startTaxSystem = () => { /* ... */ if (!currentSettings.taxEnabled) return; setInterval(() => { if (gameWon) return; if (Math.random() < 0.15) { const playerTaxRate = Math.random() * (currentSettings.playerTaxRange[1] - currentSettings.playerTaxRange[0]) + currentSettings.playerTaxRange[0]; const playerTaxAmount = Math.floor(totalWealth * playerTaxRate); score = Math.max(0, score - playerTaxAmount); const playerTaxPercent = (playerTaxRate * 100).toFixed(0); postSkitt(translate('taxOffice'), null, 'taxTime', {percent: playerTaxPercent, amount: formatNumber(playerTaxAmount)}); createPopup(translate('popupTax', {percent: playerTaxPercent}), '#f87171', 'center'); let yilongPaysTax = true; if (!currentSettings.taxSymmetry) { if (Math.random() < currentSettings.yilongEvasionChance) { yilongPaysTax = false; postSkitt(translate('skitterAnalysis'), null, 'taxEvasionSuccess'); } } if (yilongPaysTax) { const yilongTaxRate = Math.random() * (currentSettings.yilongTaxRange[1] - currentSettings.yilongTaxRange[0]) + currentSettings.yilongTaxRange[0]; const yilongTaxAmount = Math.floor(yilongMaTotalWealth * yilongTaxRate); const yilongTaxPercent = (yilongTaxRate * 100).toFixed(0); postSkitt(translate('taxOffice'), null, 'taxPaymentYilong', {percent: yilongTaxPercent, amount: formatNumber(yilongTaxAmount)}); handleYilongTax(yilongTaxAmount); } updateScoreUI(); updateYilongWealthUI(); } }, 60000); };
+            marketList.addEventListener('click', (e) => {
+                const btn = e.target.closest('button');
+                if (!btn) return;
+                const k = btn.dataset.asset; const act = btn.dataset.action; const as = allAssets[k];
 
+                if (act === 'buy' && score >= as.price) {
+                    const cost = as.price; as.avgBuyPrice = ((as.count * as.avgBuyPrice) + cost) / (as.count + 1);
+                    score -= cost; as.count++;
+                } else if (act === 'buy-all') {
+                    const amt = Math.floor(score / as.price);
+                    if (amt > 0) {
+                        const cost = amt * as.price; as.avgBuyPrice = ((as.count * as.avgBuyPrice) + cost) / (as.count + amt);
+                        score -= cost; as.count += amt;
+                    }
+                } else if (act === 'sell' && as.count > 0) {
+                    score += as.price; as.count--; if (as.count === 0) as.avgBuyPrice = 0;
+                    playSell();
+                } else if (act === 'sell-all' && as.count > 0) {
+                    score += as.count * as.price; as.count = 0; as.avgBuyPrice = 0;
+                    playSell();
+                }
+                updateUI();
+            });
 
-            // HTML Pazar Listesini Oluştur
-            marketListContainer.innerHTML = '';
-            const sortedKeys = Object.keys(allAssets).sort((a, b) => allAssets[a].price - allAssets[b].price);
-            sortedKeys.forEach(key => { /* ... (öncekiyle aynı, çeviri kullanıyor) ... */
-                 const asset = allAssets[key]; const assetName = translate(`asset_${key}`); const marketBoxHTML = ` <details class="market-box" id="market-${key}-container"> <summary class="market-summary"> <div class="text-left"> <h3 class="text-xl font-bold">${assetName}</h3> <span class="text-sm text-zinc-400"><span data-translate-key="available">Mevcut</span>: <span id="${key}-count" class="font-bold text-emerald-400">0</span></span> </div> <div class="flex items-center"> <div class="text-right"> <span id="${key}-price" class="text-2xl font-bold ${asset.colorClass}">${asset.price.toFixed(2)}</span> </div> <div class="drag-handle text-zinc-500 hover:text-zinc-300" title="Taşımak için sürükle"> <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3.01" y2="6"></line><line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line></svg> </div> </div> </summary> <div class="market-content grid grid-cols-1 md:grid-cols-2 gap-4 items-center"> <div class="flex flex-col gap-3 text-left"> ${key === 'plt' ? `<div class="text-lg bg-zinc-900/50 p-3 rounded-lg"><span data-translate-key="yieldLabel">Getiri (sn)</span>: <span id="plt-payout" class="text-lime-400 font-bold">0.00</span></div>` : ''} <div class="text-lg bg-zinc-900/50 p-3 rounded-lg"> <span data-translate-key="profitLabel">Kâr/Zarar</span>: <span id="${key}-profit-loss" class="font-bold text-zinc-400">0.00</span> </div> </div> <div class="grid grid-cols-2 gap-2"> <button data-asset="${key}" data-action="buy" class="upgrade-btn bg-gradient-to-r from-emerald-500 to-cyan-600 hover:from-emerald-600 hover:to-cyan-700"><span data-translate-key="buyButton">Al (1)</span></button> <button data-asset="${key}" data-action="sell" class="upgrade-btn bg-gradient-to-r from-red-500 to-orange-600 hover:from-red-600 hover:to-orange-700"><span data-translate-key="sellButton">Sat (1)</span></button> <button data-asset="${key}" data-action="buy-all" class="upgrade-btn bg-gradient-to-r from-emerald-700 to-cyan-800 hover:from-emerald-800 hover:to-cyan-900"><span data-translate-key="buyAllButton">Hepsini Al</span> (<span id="${key}-buy-all-amount">0</span>)</button> <button data-asset="${key}" data-action="sell-all" class="upgrade-btn bg-gradient-to-r from-red-700 to-orange-800 hover:from-red-800 hover:to-orange-900"><span data-translate-key="sellAllButton">Hepsini Sat</span> (<span id="${key}-sell-all-amount">0</span>)</button> </div> </div> <div class="h-32 p-4 bg-zinc-800/50 rounded-lg"> <canvas id="${key}-chart"></canvas> </div> </details> `; marketListContainer.innerHTML += marketBoxHTML;
-             });
+            // LOOPS
+            setInterval(() => { // Market
+                if (gameWon) return;
+                Object.keys(allAssets).forEach(k => {
+                    const as = allAssets[k];
+                    const ch = (Math.random() - 0.48) * (k === 'btc' || k === 'aura' ? 0.1 : 0.05);
+                    as.price += as.price * ch;
+                    if (as.price < 1) as.price = 1;
+                    as.history.push(as.price);
+                    if (as.history.length > 30) as.history.shift();
+                });
+                if (allAssets['plt'].count > 0) score += allAssets['plt'].count * allAssets['plt'].price * currentSettings.pltPayoutRate;
+                updateUI();
+            }, 3000);
 
+            setInterval(() => { // CPS
+                const now = Date.now(); const dt = (now - lastCpsCheck) / 1000;
+                if (cpsEl) cpsEl.textContent = (clicks / dt).toFixed(1);
+                clicks = 0; lastCpsCheck = now;
+            }, 1000);
 
-            // --- GRAFİK BAŞLATMA ---
-            const initChart = (assetKey) => { /* ... */
-                 const asset = allAssets[assetKey]; const canvas = document.getElementById(`${assetKey}-chart`); if (!canvas) { console.warn(`Canvas not found: ${assetKey}-chart`); return; } const ctx = canvas.getContext('2d'); const greenGradient = ctx.createLinearGradient(0, 0, 0, 100); greenGradient.addColorStop(0, 'rgba(74, 222, 128, 0.4)'); greenGradient.addColorStop(1, 'rgba(74, 222, 128, 0)'); const redGradient = ctx.createLinearGradient(0, 0, 0, 100); redGradient.addColorStop(0, 'rgba(248, 113, 113, 0.4)'); redGradient.addColorStop(1, 'rgba(248, 113, 113, 0)'); asset.chart = new Chart(ctx, { type: 'line', data: { labels: Array(30).fill(''), datasets: [{ label: `${translate(`asset_${assetKey}`)} Price`, data: asset.history, borderWidth: 2, pointRadius: 0, fill: true, tension: 0.4, segment: { borderColor: ctx => { if (!ctx.p0 || !ctx.p1) return '#4ade80'; if (ctx.p1.parsed.y < ctx.p0.parsed.y) return '#f87171'; return '#4ade80'; }, backgroundColor: ctx => { if (!ctx.p0 || !ctx.p1) return greenGradient; if (ctx.p1.parsed.y < ctx.p0.parsed.y) return redGradient; return greenGradient; } } }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, tooltip: { enabled: false } }, scales: { x: { display: true, grid: { color: 'rgba(255, 255, 255, 0.05)' }, ticks: { display: false } }, y: { display: true, grid: { color: 'rgba(255, 255, 255, 0.1)' }, ticks: { color: '#999', maxTicksLimit: 5 } } } } });
-             };
-            Object.keys(allAssets).forEach(key => { try { initChart(key); } catch (e) { console.error(`Chart init failed: ${key}`, e); } });
+            // Yilong & Taxes
+            setInterval(() => {
+                if (gameWon) return;
+                if (Math.random() < 0.3) {
+                    const k = Object.keys(allAssets)[Math.floor(Math.random() * 9)];
+                    const inv = yilongMa.wealth * 0.08;
+                    if (inv > allAssets[k].price) {
+                        const amt = Math.floor(inv / allAssets[k].price);
+                        yilongMa.wealth -= amt * allAssets[k].price;
+                        yilongMa.portfolio[k] = (yilongMa.portfolio[k] || 0) + amt;
+                        if (Math.random() < 0.6) postSkitt(translate('yilongMa'), null, 'yilongBuyBase', { amount: format(amt), asset: allAssets[k].name });
+                    }
+                }
+                if (currentSettings.taxEnabled && Math.random() < 0.05) {
+                    const tax = Math.floor(totalWealth * 0.15);
+                    if (tax > 0) {
+                        score = Math.max(0, score - tax);
+                        postSkitt(translate('taxOffice'), null, 'taxTime', { percent: '15', amount: format(tax) });
+                    }
+                }
+            }, 5000);
 
-            // --- OYUNU BAŞLATMA ---
-            ppcCostEl.textContent = formatNumber(ppcCost);
-            initSkitter();
-            startTaxSystem();
-            setTimeout(yilongMaTweet, 10000);
+            // Floaters
+            const floats = ['💧', '🔮', '🧬', '🧿', '🫧'];
+            setInterval(() => {
+                const f = document.createElement('div'); f.className = 'absolute text-2xl opacity-10 pointer-events-none animate-float-slow blur-sm z-0';
+                f.textContent = floats[Math.floor(Math.random() * floats.length)];
+                f.style.left = Math.random() * 100 + 'vw'; f.style.bottom = '-50px';
+                f.style.animationDuration = (Math.random() * 10 + 10) + 's';
+                document.getElementById('floater-container').appendChild(f);
+                setTimeout(() => f.remove(), 20000);
+            }, 2000);
 
-            skitterFeed.addEventListener('toggle', () => { if (skitterFeed.open) { skitterFeed.classList.remove('notify-glow'); } });
+            postSkitt(translate('skitterDev'), null, 'skitterWelcome');
+            updateUI();
+        }
 
-            // Sürükle-Bırak
-            if (marketListContainer) { new Sortable(marketListContainer, { animation: 150, handle: '.drag-handle', ghostClass: 'sortable-ghost' }); }
+        document.querySelectorAll('.pill-panel[data-difficulty]').forEach(b => b.addEventListener('click', () => startGame(b.dataset.difficulty)));
+        document.querySelectorAll('.pill-panel[data-lang]').forEach(b => b.addEventListener('click', () => setLanguage(b.dataset.lang)));
+        document.getElementById('language-toggle').addEventListener('click', () => setLanguage(currentLanguage === 'en' ? 'tr' : 'en'));
+        document.getElementById('restart-game-btn').addEventListener('click', () => window.location.reload());
+        document.getElementById('message-close').addEventListener('click', () => document.getElementById('message-box').classList.add('opacity-0', 'pointer-events-none'));
 
-             updateScoreUI();
-             updateYilongWealthUI();
-
-
-        } // initializeGame sonu
-
-        // --- DİL VE ZORLUK SEÇİMİ OLAY DİNLEYİCİLERİ ---
-        document.querySelectorAll('#language-selection-initial .language-btn').forEach(button => {
-            button.addEventListener('click', () => { setLanguage(button.dataset.lang); });
-        });
-        const langToggleBtn = document.getElementById('language-toggle');
-        if(langToggleBtn) { langToggleBtn.addEventListener('click', () => { const newLang = currentLanguage === 'en' ? 'tr' : 'en'; setLanguage(newLang); }); }
-        document.querySelectorAll('#difficulty-buttons .difficulty-btn').forEach(button => {
-            button.addEventListener('click', () => { const difficulty = button.dataset.difficulty; localStorage.setItem('skibidiDifficulty', difficulty); startGame(difficulty); });
-        });
-         // YENİ: Yeniden Başlatma Butonu Dinleyicisi (sayfa yüklendiğinde bir kere eklenir)
-         const restartBtnGlobal = document.getElementById('restart-game-btn');
-         if (restartBtnGlobal) {
-             restartBtnGlobal.addEventListener('click', () => {
-                 // Kayıtlı zorluk ve dil bilgisini silerek tamamen başa dönmesini sağla (opsiyonel)
-                 // localStorage.removeItem('skibidiDifficulty');
-                 // localStorage.removeItem('skibidiLanguage');
-                 window.location.reload(); // Sayfayı yenile
-             });
-         }
-
-
-        // --- SAYFA YÜKLENİNCE ---
-        const savedLanguage = localStorage.getItem('skibidiLanguage');
-        if (savedLanguage && translations[savedLanguage]) { setLanguage(savedLanguage); }
-        else { setLanguage('en'); } // Varsayılan İngilizce
-        const savedDifficulty = localStorage.getItem('skibidiDifficulty');
-        // updateUIText(); // Seçim ekranı için ilk çeviriyi yap (setLanguage içinde zaten yapılıyor)
-
+        const savedL = localStorage.getItem('skibidiLiquidLang');
+        if (savedL) setLanguage(savedL); else setLanguage('en');
 
     </script>
 </body>
-</html>
 
+</html>
