@@ -1,9 +1,10 @@
 <!DOCTYPE html>
 <html lang="tr">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Skibidi Clicker: Ultimate Edition</title>
+    <title>Skibidi Clicker: Rivalry</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Tone.js (Sesler için) -->
@@ -14,7 +15,7 @@
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;500;700;900&display=swap" rel="stylesheet">
-    
+
     <script>
         tailwind.config = {
             theme: {
@@ -33,6 +34,8 @@
                         'gradient-xy': 'gradient-xy 15s ease infinite',
                         'spin-slow': 'spin 3s linear infinite',
                         'bounce-short': 'bounce-short 0.5s ease-in-out',
+                        'flash-green': 'flash-green 2s ease-out infinite',
+                        'glow-pulse': 'glow-pulse 1.5s ease-in-out infinite'
                     },
                     keyframes: {
                         float: {
@@ -52,6 +55,14 @@
                         'bounce-short': {
                             '0%, 100%': { transform: 'translateY(0)' },
                             '50%': { transform: 'translateY(-20%)' }
+                        },
+                        'flash-green': {
+                            '0%, 100%': { boxShadow: '0 0 0 rgba(74, 222, 128, 0)' },
+                            '50%': { boxShadow: '0 0 20px rgba(74, 222, 128, 0.6)', borderColor: '#4ade80' }
+                        },
+                        'glow-pulse': {
+                            '0%, 100%': { filter: 'drop-shadow(0 0 2px rgba(250, 204, 21, 0.5))' },
+                            '50%': { filter: 'drop-shadow(0 0 10px rgba(250, 204, 21, 1))' }
                         }
                     }
                 }
@@ -74,13 +85,16 @@
         ::-webkit-scrollbar {
             width: 6px;
         }
+
         ::-webkit-scrollbar-track {
-            background: rgba(0,0,0,0.1);
+            background: rgba(0, 0, 0, 0.1);
         }
+
         ::-webkit-scrollbar-thumb {
             background: #4c1d95;
             border-radius: 4px;
         }
+
         ::-webkit-scrollbar-thumb:hover {
             background: #6d28d9;
         }
@@ -108,7 +122,7 @@
             transform: scale(0.85) rotate(-5deg);
             filter: drop-shadow(0 0 10px rgba(139, 92, 246, 0.8));
         }
-        
+
         #skibidi-toilet:hover {
             filter: drop-shadow(0 0 30px rgba(139, 92, 246, 0.7));
             transform: scale(1.05);
@@ -120,16 +134,30 @@
             font-weight: 900;
             pointer-events: none;
             animation: popup-anim 0.8s cubic-bezier(0.22, 1, 0.36, 1) forwards;
-            text-shadow: 0 4px 15px rgba(0,0,0,0.6);
+            text-shadow: 0 4px 15px rgba(0, 0, 0, 0.6);
             z-index: 20;
             white-space: nowrap;
         }
 
         @keyframes popup-anim {
-            0% { transform: translateY(0) scale(0.5) rotate(var(--rot)); opacity: 0; }
-            20% { transform: translateY(-30px) scale(1.3) rotate(var(--rot)); opacity: 1; }
-            80% { opacity: 1; }
-            100% { transform: translateY(-120px) scale(0.8) rotate(var(--rot)); opacity: 0; }
+            0% {
+                transform: translateY(0) scale(0.5) rotate(var(--rot));
+                opacity: 0;
+            }
+
+            20% {
+                transform: translateY(-30px) scale(1.3) rotate(var(--rot));
+                opacity: 1;
+            }
+
+            80% {
+                opacity: 1;
+            }
+
+            100% {
+                transform: translateY(-120px) scale(0.8) rotate(var(--rot));
+                opacity: 0;
+            }
         }
 
         .particle {
@@ -142,8 +170,15 @@
         }
 
         @keyframes particle-anim {
-            0% { transform: translate(0, 0) scale(1); opacity: 1; }
-            100% { transform: translate(var(--tx), var(--ty)) scale(0); opacity: 0; }
+            0% {
+                transform: translate(0, 0) scale(1);
+                opacity: 1;
+            }
+
+            100% {
+                transform: translate(var(--tx), var(--ty)) scale(0);
+                opacity: 0;
+            }
         }
 
         /* Arka Plan Yüzen Objeler */
@@ -158,22 +193,35 @@
         }
 
         @keyframes float-up {
-            from { transform: translateY(110vh) rotate(0deg); opacity: 0; }
-            10% { opacity: 0.1; }
-            90% { opacity: 0.1; }
-            to { transform: translateY(-10vh) rotate(360deg); opacity: 0; }
+            from {
+                transform: translateY(110vh) rotate(0deg);
+                opacity: 0;
+            }
+
+            10% {
+                opacity: 0.1;
+            }
+
+            90% {
+                opacity: 0.1;
+            }
+
+            to {
+                transform: translateY(-10vh) rotate(360deg);
+                opacity: 0;
+            }
         }
 
         /* Skitter Feed Stilleri */
         details#skitter-feed {
             transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
         }
-        
+
         details#skitter-feed[open] {
             width: 340px;
             max-height: 500px;
         }
-        
+
         details#skitter-feed:not([open]) {
             width: 56px;
             height: 56px;
@@ -185,7 +233,10 @@
             list-style: none;
             cursor: pointer;
         }
-        details#skitter-feed summary::-webkit-details-marker { display: none; }
+
+        details#skitter-feed summary::-webkit-details-marker {
+            display: none;
+        }
 
         /* Yükseltme Butonları */
         .upgrade-btn {
@@ -193,36 +244,53 @@
             position: relative;
             overflow: hidden;
         }
+
         .upgrade-btn::after {
             content: '';
             position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
             transform: translateX(-100%);
             transition: transform 0.5s;
         }
-        .upgrade-btn:hover::after { transform: translateX(100%); }
-        .upgrade-btn:active { transform: scale(0.96); }
-        .upgrade-btn:disabled { opacity: 0.5; cursor: not-allowed; filter: grayscale(0.8); }
+
+        .upgrade-btn:hover::after {
+            transform: translateX(100%);
+        }
+
+        .upgrade-btn:active {
+            transform: scale(0.96);
+        }
+
+        .upgrade-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            filter: grayscale(0.8);
+        }
 
         /* Sortable Ghost */
         .sortable-ghost {
             opacity: 0.2;
             background: #6366f1;
         }
-        
+
         /* Slot Makinesi */
         .slot-reel {
             background: #1e1b4b;
             border-radius: 0.5rem;
             overflow: hidden;
             position: relative;
-            box-shadow: inset 0 0 20px rgba(0,0,0,0.8);
+            box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.8);
         }
+
         .reel-inner {
             transition: transform 0.1s ease-out;
             will-change: transform;
         }
+
         .slot-symbol {
             height: 80px;
             display: flex;
@@ -230,112 +298,200 @@
             justify-content: center;
             font-size: 3rem;
         }
+
         .jackpot-anim {
             animation: jackpot 0.5s ease-in-out infinite alternate;
         }
+
         @keyframes jackpot {
-            from { text-shadow: 0 0 10px #fbbf24; transform: scale(1); }
-            to { text-shadow: 0 0 30px #f59e0b, 0 0 10px white; transform: scale(1.1); }
+            from {
+                text-shadow: 0 0 10px #fbbf24;
+                transform: scale(1);
+            }
+
+            to {
+                text-shadow: 0 0 30px #f59e0b, 0 0 10px white;
+                transform: scale(1.1);
+            }
+        }
+
+        /* Yilong Ma Wealth Box */
+        .yilong-box {
+            background: linear-gradient(90deg, #1e293b, #0f172a);
+            border: 1px solid #334155;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .progress-bar {
+            transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* Yeni Efekt Sınıfları */
+        .highlight-asset {
+            animation: flash-green 2s ease-out infinite;
+            border-color: #4ade80 !important;
+        }
+
+        .new-skitt-glow {
+            background: rgba(139, 92, 246, 0.2);
+            border-color: rgba(139, 92, 246, 0.5);
+            box-shadow: 0 0 15px rgba(139, 92, 246, 0.3);
+            animation: glow-pulse 1.5s ease-in-out infinite alternate;
         }
     </style>
 </head>
+
 <body class="min-h-screen flex flex-col items-center py-4 relative text-slate-200">
 
     <!-- Arka Plan Efektleri -->
     <div id="floater-container" class="fixed inset-0 pointer-events-none overflow-hidden z-0"></div>
-    
+
+    <!-- YILONG MA SERVET KUTUSU -->
+    <div
+        class="fixed top-4 right-4 z-40 yilong-box rounded-2xl p-3 flex flex-col gap-1 w-64 animate-float border-l-4 border-yellow-500">
+        <div class="flex items-center gap-3 mb-1">
+            <div
+                class="w-10 h-10 rounded-full bg-yellow-500/20 flex items-center justify-center border border-yellow-500/30 overflow-hidden">
+                <span class="text-2xl">🤓</span>
+            </div>
+            <div>
+                <h3 class="text-xs font-bold text-slate-400 uppercase">Yilong Ma</h3>
+                <div id="realtime-yilong-wealth" class="text-lg font-mono font-black text-yellow-400 leading-none">5.00M
+                </div>
+            </div>
+        </div>
+
+        <!-- Hedef Progress Bar -->
+        <div class="w-full bg-slate-800 h-2 rounded-full overflow-hidden mt-1 relative">
+            <div id="wealth-progress" class="h-full bg-gradient-to-r from-violet-600 to-fuchsia-400 w-0 relative">
+                <div class="absolute right-0 top-0 bottom-0 w-1 bg-white/50 animate-pulse"></div>
+            </div>
+        </div>
+        <div class="flex justify-between text-[9px] text-slate-500 font-mono mt-0.5">
+            <span>Senin Paran</span>
+            <span class="text-violet-300">Hedef (2x): <span id="dynamic-target">10M</span></span>
+        </div>
+    </div>
+
     <!-- Skitter (Twitter) Widget - SOL ÜST -->
     <details id="skitter-feed" class="fixed top-4 left-4 z-40 glass-panel rounded-2xl border-opacity-20 border-white">
         <summary class="flex items-center justify-center w-full h-full p-0 m-0 focus:outline-none relative">
-            <div class="absolute inset-0 flex items-center justify-center transition-opacity duration-300 bg-sky-600 hover:bg-sky-500 text-white rounded-full" id="skitter-icon">
+            <div class="absolute inset-0 flex items-center justify-center transition-opacity duration-300 bg-sky-600 hover:bg-sky-500 text-white rounded-full"
+                id="skitter-icon">
                 <span class="text-2xl">🐦</span>
             </div>
-            <div class="w-full px-4 py-3 flex justify-between items-center opacity-0 hidden" id="skitter-expanded-header">
-                <span class="font-bold text-sky-400 flex items-center gap-2">Skitter <span class="text-[10px] bg-red-500/20 px-2 py-0.5 rounded border border-red-500/40 text-red-400 animate-pulse">LIVE</span></span>
+            <div class="w-full px-4 py-3 flex justify-between items-center opacity-0 hidden"
+                id="skitter-expanded-header">
+                <span class="font-bold text-sky-400 flex items-center gap-2">Skitter <span
+                        class="text-[10px] bg-red-500/20 px-2 py-0.5 rounded border border-red-500/40 text-red-400 animate-pulse">LIVE</span></span>
                 <div class="text-right">
-                    <span class="text-[10px] text-slate-400 uppercase tracking-wider block">Yilong Ma</span>
-                    <span id="yilong-ma-servet-display" class="font-mono text-xs text-yellow-400 font-bold">1.00T</span>
+                    <span class="text-[10px] text-slate-400 uppercase tracking-wider block">Yilong'u Geç</span>
+                    <span id="yilong-ma-servet-display" class="font-mono text-xs text-yellow-400 font-bold">5.00M</span>
                 </div>
             </div>
         </summary>
-        <div class="px-4 pb-4 pt-0 max-h-[400px] overflow-y-auto flex flex-col gap-3 mt-2 scrollbar-hide" id="skitter-messages">
+        <div class="px-4 pb-4 pt-0 max-h-[400px] overflow-y-auto flex flex-col gap-3 mt-2 scrollbar-hide"
+            id="skitter-messages">
             <!-- Mesajlar -->
         </div>
     </details>
 
     <!-- Ana Konteyner -->
-    <div class="container mx-auto px-4 max-w-7xl relative z-10 flex flex-col lg:flex-row gap-6 h-full items-start mt-2 md:mt-0">
-        
+    <div
+        class="container mx-auto px-4 max-w-7xl relative z-10 flex flex-col lg:flex-row gap-6 h-full items-start mt-16 md:mt-4">
+
         <!-- SOL PANEL: Slot Makinesi & Mini Oyunlar -->
         <div class="hidden lg:flex flex-col gap-4 w-1/4 sticky top-4">
-             <div class="glass-panel p-5 rounded-3xl border-t-4 border-yellow-500 relative overflow-hidden group">
-                 <!-- Parlama Efekti -->
-                 <div class="absolute inset-0 bg-yellow-500/5 group-hover:bg-yellow-500/10 transition-colors duration-500"></div>
-                 
-                 <h2 class="text-xl font-black italic mb-4 text-yellow-400 flex items-center gap-2 relative z-10">
-                     🎰 SKIBIDI SLOTS
-                 </h2>
-                 
-                 <!-- Slot Ekranı -->
-                 <div class="grid grid-cols-3 gap-2 mb-4 bg-black/40 p-2 rounded-xl border border-white/10 relative z-10">
-                     <div class="slot-reel h-20" id="reel-1"><div class="reel-inner" id="reel-inner-1"><div class="slot-symbol">🍒</div></div></div>
-                     <div class="slot-reel h-20" id="reel-2"><div class="reel-inner" id="reel-inner-2"><div class="slot-symbol">🍒</div></div></div>
-                     <div class="slot-reel h-20" id="reel-3"><div class="reel-inner" id="reel-inner-3"><div class="slot-symbol">🍒</div></div></div>
-                 </div>
+            <div class="glass-panel p-5 rounded-3xl border-t-4 border-yellow-500 relative overflow-hidden group">
+                <!-- Parlama Efekti -->
+                <div
+                    class="absolute inset-0 bg-yellow-500/5 group-hover:bg-yellow-500/10 transition-colors duration-500">
+                </div>
 
-                 <div class="flex justify-between items-center mb-2 relative z-10">
-                     <span class="text-xs text-slate-400">Bedel: <span class="text-violet-400 font-bold" id="slot-cost">500</span> Gyatt</span>
-                     <span class="text-xs text-yellow-400 font-bold" id="slot-status">Şansını Dene!</span>
-                 </div>
+                <h2 class="text-xl font-black italic mb-4 text-yellow-400 flex items-center gap-2 relative z-10">
+                    🎰 SKIBIDI SLOTS
+                </h2>
 
-                 <button id="spin-btn" class="w-full bg-gradient-to-r from-yellow-600 to-orange-600 hover:from-yellow-500 hover:to-orange-500 text-white font-bold py-3 rounded-xl shadow-lg transform active:scale-95 transition-all relative z-10 border border-yellow-400/30">
-                     ÇEVİR! (SPIN)
-                 </button>
-             </div>
+                <!-- Slot Ekranı -->
+                <div
+                    class="grid grid-cols-3 gap-2 mb-4 bg-black/40 p-2 rounded-xl border border-white/10 relative z-10">
+                    <div class="slot-reel h-20" id="reel-1">
+                        <div class="reel-inner" id="reel-inner-1">
+                            <div class="slot-symbol">🍒</div>
+                        </div>
+                    </div>
+                    <div class="slot-reel h-20" id="reel-2">
+                        <div class="reel-inner" id="reel-inner-2">
+                            <div class="slot-symbol">🍒</div>
+                        </div>
+                    </div>
+                    <div class="slot-reel h-20" id="reel-3">
+                        <div class="reel-inner" id="reel-inner-3">
+                            <div class="slot-symbol">🍒</div>
+                        </div>
+                    </div>
+                </div>
 
-             <!-- Ekstra İstatistikler -->
-             <div class="glass-panel p-5 rounded-3xl">
-                 <h3 class="text-sm font-bold text-slate-400 uppercase tracking-widest mb-3">İstatistikler</h3>
-                 <div class="space-y-2 text-sm">
-                     <div class="flex justify-between">
-                         <span class="text-slate-500">Toplam Tık</span>
-                         <span class="font-mono" id="stat-clicks">0</span>
-                     </div>
-                     <div class="flex justify-between">
-                         <span class="text-slate-500">Slot Kazancı</span>
-                         <span class="font-mono text-emerald-400" id="stat-slot-win">0</span>
-                     </div>
-                     <div class="flex justify-between">
-                         <span class="text-slate-500">Oyun Süresi</span>
-                         <span class="font-mono" id="stat-time">00:00</span>
-                     </div>
-                 </div>
-             </div>
+                <!-- Bilgi Notu (SÜRPRİZ) -->
+
+                <div class="flex justify-between items-center mb-2 relative z-10">
+                    <span class="text-xs text-slate-400">Bedel: <span class="text-violet-400 font-bold"
+                            id="slot-cost">500</span> Gyatt</span>
+                    <span class="text-xs text-yellow-400 font-bold" id="slot-status">Şansını Dene!</span>
+                </div>
+
+                <button id="spin-btn"
+                    class="w-full bg-gradient-to-r from-yellow-600 to-orange-600 hover:from-yellow-500 hover:to-orange-500 text-white font-bold py-3 rounded-xl shadow-lg transform active:scale-95 transition-all relative z-10 border border-yellow-400/30">
+                    ÇEVİR! (SPIN)
+                </button>
+            </div>
+
+            <!-- Ekstra İstatistikler -->
+            <div class="glass-panel p-5 rounded-3xl">
+                <h3 class="text-sm font-bold text-slate-400 uppercase tracking-widest mb-3">İstatistikler</h3>
+                <div class="space-y-2 text-sm">
+                    <div class="flex justify-between">
+                        <span class="text-slate-500">Toplam Tık</span>
+                        <span class="font-mono" id="stat-clicks">0</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-slate-500">Slot Kazancı</span>
+                        <span class="font-mono text-emerald-400" id="stat-slot-win">0</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-slate-500">Oyun Süresi</span>
+                        <span class="font-mono" id="stat-time">00:00</span>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <!-- ORTA PANEL: Ana Oyun -->
         <div class="w-full lg:w-2/4 flex flex-col items-center gap-6">
-            
+
             <!-- Başlık -->
             <div class="text-center space-y-1 animate-float z-20">
-                <h1 class="text-4xl md:text-6xl font-black tracking-tighter bg-clip-text text-transparent bg-gradient-to-r from-violet-400 via-fuchsia-400 to-white drop-shadow-[0_0_25px_rgba(139,92,246,0.6)]">
+                <h1
+                    class="text-4xl md:text-6xl font-black tracking-tighter bg-clip-text text-transparent bg-gradient-to-r from-violet-400 via-fuchsia-400 to-white drop-shadow-[0_0_25px_rgba(139,92,246,0.6)]">
                     SKIBIDI CLICKER
                 </h1>
-                <p class="text-slate-400 font-medium tracking-[0.3em] text-[10px] uppercase">Ultimate Brainrot Edition</p>
+                <p class="text-slate-400 font-medium tracking-[0.3em] text-[10px] uppercase">Rivalry Edition: Beat
+                    Yilong</p>
             </div>
 
             <!-- Skor Kartları -->
             <div class="grid grid-cols-3 gap-3 w-full">
                 <div class="glass-panel p-3 md:p-4 rounded-2xl flex flex-col items-center text-center">
                     <span class="text-[10px] md:text-xs font-bold text-slate-400 uppercase">Gyatt Points</span>
-                    <div class="text-2xl md:text-4xl font-black text-violet-400 break-all leading-tight mt-1" id="score">0</div>
+                    <div class="text-2xl md:text-4xl font-black text-violet-400 break-all leading-tight mt-1"
+                        id="score">0</div>
                 </div>
                 <div class="glass-panel p-3 md:p-4 rounded-2xl flex flex-col items-center text-center">
                     <span class="text-[10px] md:text-xs font-bold text-slate-400 uppercase">CPS (Saniye)</span>
                     <div class="text-xl md:text-3xl font-bold text-cyan-400 mt-1" id="cps">0.0</div>
                 </div>
                 <div class="glass-panel p-3 md:p-4 rounded-2xl flex flex-col items-center text-center">
-                    <span class="text-[10px] md:text-xs font-bold text-slate-400 uppercase">Toplam Servet</span>
+                    <span class="text-[10px] md:text-xs font-bold text-slate-400 uppercase">Senin Servetin</span>
                     <div class="text-xl md:text-3xl font-bold text-emerald-400 mt-1" id="total-wealth">0</div>
                 </div>
             </div>
@@ -343,26 +499,29 @@
             <!-- Tıklama Alanı -->
             <div class="relative flex justify-center items-center py-6 md:py-12 w-full select-none">
                 <div id="popup-container" class="absolute inset-0 pointer-events-none overflow-visible"></div>
-                
+
                 <div class="relative group cursor-pointer">
                     <!-- Glow -->
-                    <div class="absolute inset-0 bg-violet-600 blur-[80px] opacity-20 group-hover:opacity-50 transition-opacity duration-500 rounded-full animate-pulse-slow"></div>
+                    <div
+                        class="absolute inset-0 bg-violet-600 blur-[80px] opacity-20 group-hover:opacity-50 transition-opacity duration-500 rounded-full animate-pulse-slow">
+                    </div>
                     <div id="skibidi-toilet" class="relative">🚽</div>
                 </div>
             </div>
 
             <!-- Mobil İçin Slot Butonu (Sadece mobilde görünür) -->
             <div class="lg:hidden w-full">
-                <button onclick="toggleMobileSlot()" class="w-full bg-yellow-600/20 border border-yellow-500/50 text-yellow-400 font-bold py-3 rounded-xl">
+                <button onclick="toggleMobileSlot()"
+                    class="w-full bg-yellow-600/20 border border-yellow-500/50 text-yellow-400 font-bold py-3 rounded-xl">
                     🎰 Mini Game: Slots Oyna
                 </button>
             </div>
-            
+
             <!-- Piyasalar (Market) -->
             <div class="w-full glass-panel rounded-2xl p-4 md:p-6 border-t-4 border-emerald-500 flex-grow">
                 <h2 class="text-lg font-bold mb-4 flex items-center justify-between">
                     <div class="flex items-center gap-2">
-                        <span class="bg-emerald-500/20 p-1.5 rounded-lg text-emerald-300">📈</span> 
+                        <span class="bg-emerald-500/20 p-1.5 rounded-lg text-emerald-300">📈</span>
                         <span>Borsa (Stock Market)</span>
                     </div>
                     <span class="text-[10px] text-slate-500 font-normal hidden md:block">Drag & Drop Aktif</span>
@@ -378,20 +537,23 @@
         <div class="w-full lg:w-1/4 flex flex-col gap-4 sticky top-4 h-fit">
             <div class="glass-panel rounded-3xl p-5 border-t-4 border-violet-500">
                 <h2 class="text-xl font-bold mb-4 flex items-center gap-2">
-                    <span class="bg-violet-500/20 p-2 rounded-lg text-violet-300">⚡</span> 
+                    <span class="bg-violet-500/20 p-2 rounded-lg text-violet-300">⚡</span>
                     Yükseltmeler
                 </h2>
-                
+
                 <div class="space-y-3" id="upgrades-list">
                     <!-- Rizz Upgrade -->
-                    <button id="upgrade-ppc" class="upgrade-btn w-full bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl p-3 flex flex-col gap-1 text-left group">
+                    <button id="upgrade-ppc"
+                        class="upgrade-btn w-full bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl p-3 flex flex-col gap-1 text-left group">
                         <div class="flex justify-between items-start w-full">
                             <div>
                                 <span class="font-bold text-slate-200 group-hover:text-white block">More Rizz</span>
                                 <span class="text-[10px] text-slate-400">+1 Tık Gücü</span>
                             </div>
                             <div class="text-right">
-                                <span class="bg-violet-500/20 text-violet-300 text-[10px] px-1.5 py-0.5 rounded font-mono block mb-1">LVL <span id="lvl-ppc">1</span></span>
+                                <span
+                                    class="bg-violet-500/20 text-violet-300 text-[10px] px-1.5 py-0.5 rounded font-mono block mb-1">LVL
+                                    <span id="lvl-ppc">1</span></span>
                             </div>
                         </div>
                         <div class="mt-1 pt-2 border-t border-white/5 flex justify-between items-center w-full">
@@ -401,14 +563,17 @@
                     </button>
 
                     <!-- Auto Clicker -->
-                    <button id="upgrade-auto" class="upgrade-btn w-full bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl p-3 flex flex-col gap-1 text-left group">
+                    <button id="upgrade-auto"
+                        class="upgrade-btn w-full bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl p-3 flex flex-col gap-1 text-left group">
                         <div class="flex justify-between items-start w-full">
                             <div>
                                 <span class="font-bold text-slate-200 group-hover:text-white block">Auto Rizzler</span>
                                 <span class="text-[10px] text-slate-400">+1 Oto Tık/Sn</span>
                             </div>
                             <div class="text-right">
-                                <span class="bg-cyan-500/20 text-cyan-300 text-[10px] px-1.5 py-0.5 rounded font-mono block mb-1">LVL <span id="lvl-auto">0</span></span>
+                                <span
+                                    class="bg-cyan-500/20 text-cyan-300 text-[10px] px-1.5 py-0.5 rounded font-mono block mb-1">LVL
+                                    <span id="lvl-auto">0</span></span>
                             </div>
                         </div>
                         <div class="mt-1 pt-2 border-t border-white/5 flex justify-between items-center w-full">
@@ -418,14 +583,18 @@
                     </button>
 
                     <!-- Multiplier -->
-                    <button id="upgrade-multi" class="upgrade-btn w-full bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl p-3 flex flex-col gap-1 text-left group">
+                    <button id="upgrade-multi"
+                        class="upgrade-btn w-full bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl p-3 flex flex-col gap-1 text-left group">
                         <div class="flex justify-between items-start w-full">
                             <div>
-                                <span class="font-bold text-slate-200 group-hover:text-white block">Sigma Grindset</span>
+                                <span class="font-bold text-slate-200 group-hover:text-white block">Sigma
+                                    Grindset</span>
                                 <span class="text-[10px] text-slate-400">Tüm Gelir x1.5</span>
                             </div>
                             <div class="text-right">
-                                <span class="bg-pink-500/20 text-pink-300 text-[10px] px-1.5 py-0.5 rounded font-mono block mb-1">LVL <span id="lvl-multi">0</span></span>
+                                <span
+                                    class="bg-pink-500/20 text-pink-300 text-[10px] px-1.5 py-0.5 rounded font-mono block mb-1">LVL
+                                    <span id="lvl-multi">0</span></span>
                             </div>
                         </div>
                         <div class="mt-1 pt-2 border-t border-white/5 flex justify-between items-center w-full">
@@ -433,16 +602,19 @@
                             <span id="cost-multi" class="text-pink-400 font-bold font-mono text-sm">2,500</span>
                         </div>
                     </button>
-                    
-                     <!-- Fanum Tax -->
-                    <button id="upgrade-tax" class="upgrade-btn w-full bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl p-3 flex flex-col gap-1 text-left group">
+
+                    <!-- Fanum Tax -->
+                    <button id="upgrade-tax"
+                        class="upgrade-btn w-full bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl p-3 flex flex-col gap-1 text-left group">
                         <div class="flex justify-between items-start w-full">
                             <div>
                                 <span class="font-bold text-slate-200 group-hover:text-white block">Fanum Tax</span>
                                 <span class="text-[10px] text-slate-400">Piyasa Pasif Gelir %</span>
                             </div>
                             <div class="text-right">
-                                <span class="bg-emerald-500/20 text-emerald-300 text-[10px] px-1.5 py-0.5 rounded font-mono block mb-1">LVL <span id="lvl-tax">0</span></span>
+                                <span
+                                    class="bg-emerald-500/20 text-emerald-300 text-[10px] px-1.5 py-0.5 rounded font-mono block mb-1">LVL
+                                    <span id="lvl-tax">0</span></span>
                             </div>
                         </div>
                         <div class="mt-1 pt-2 border-t border-white/5 flex justify-between items-center w-full">
@@ -457,39 +629,61 @@
     </div>
 
     <!-- Mesaj Modal -->
-    <div id="message-box" class="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 opacity-0 pointer-events-none transition-opacity duration-300 px-4">
-        <div class="glass-panel p-8 rounded-3xl max-w-md w-full text-center transform scale-90 transition-transform duration-300 border-2 border-violet-500/30 shadow-[0_0_50px_rgba(139,92,246,0.3)]" id="message-content-box">
+    <div id="message-box"
+        class="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 opacity-0 pointer-events-none transition-opacity duration-300 px-4">
+        <div class="glass-panel p-8 rounded-3xl max-w-md w-full text-center transform scale-90 transition-transform duration-300 border-2 border-violet-500/30 shadow-[0_0_50px_rgba(139,92,246,0.3)]"
+            id="message-content-box">
             <div class="mb-6" id="message-text"></div>
-            <button id="message-close" class="w-full bg-gradient-to-r from-violet-600 to-fuchsia-600 hover:from-violet-500 hover:to-fuchsia-500 text-white font-bold py-3 px-8 rounded-xl shadow-lg shadow-violet-500/30 transition-all transform hover:-translate-y-1 hover:shadow-violet-500/50 active:translate-y-0">
+            <button id="message-close"
+                class="w-full bg-gradient-to-r from-violet-600 to-fuchsia-600 hover:from-violet-500 hover:to-fuchsia-500 text-white font-bold py-3 px-8 rounded-xl shadow-lg shadow-violet-500/30 transition-all transform hover:-translate-y-1 hover:shadow-violet-500/50 active:translate-y-0">
                 DEVAM ET 🔥
             </button>
         </div>
     </div>
 
     <!-- Mobile Slot Modal -->
-    <div id="mobile-slot-modal" class="fixed inset-0 z-50 bg-black/90 hidden flex flex-col items-center justify-center p-4">
+    <div id="mobile-slot-modal"
+        class="fixed inset-0 z-50 bg-black/90 hidden flex flex-col items-center justify-center p-4">
         <div class="w-full max-w-sm glass-panel p-6 rounded-2xl relative">
-            <button onclick="toggleMobileSlot()" class="absolute top-2 right-2 text-white/50 hover:text-white text-2xl">&times;</button>
+            <button onclick="toggleMobileSlot()"
+                class="absolute top-2 right-2 text-white/50 hover:text-white text-2xl">&times;</button>
             <h2 class="text-2xl font-black text-center text-yellow-400 mb-6">🎰 MOBILE SLOTS</h2>
-            
-             <div class="grid grid-cols-3 gap-2 mb-6 bg-black/40 p-2 rounded-xl border border-white/10">
-                 <div class="slot-reel h-20" id="m-reel-1"><div class="reel-inner" id="m-reel-inner-1"><div class="slot-symbol">🍒</div></div></div>
-                 <div class="slot-reel h-20" id="m-reel-2"><div class="reel-inner" id="m-reel-inner-2"><div class="slot-symbol">🍒</div></div></div>
-                 <div class="slot-reel h-20" id="m-reel-3"><div class="reel-inner" id="m-reel-inner-3"><div class="slot-symbol">🍒</div></div></div>
-             </div>
-             
-             <div class="text-center mb-4">
-                 <p class="text-sm text-slate-400">Bedel: <span class="text-violet-400 font-bold" id="m-slot-cost">500</span></p>
-                 <p class="text-lg font-bold text-yellow-500" id="m-slot-status">Şansını Dene!</p>
-             </div>
 
-             <button id="m-spin-btn" class="w-full bg-yellow-600 hover:bg-yellow-500 text-white font-bold py-4 rounded-xl">ÇEVİR!</button>
+            <div class="grid grid-cols-3 gap-2 mb-6 bg-black/40 p-2 rounded-xl border border-white/10">
+                <div class="slot-reel h-20" id="m-reel-1">
+                    <div class="reel-inner" id="m-reel-inner-1">
+                        <div class="slot-symbol">🍒</div>
+                    </div>
+                </div>
+                <div class="slot-reel h-20" id="m-reel-2">
+                    <div class="reel-inner" id="m-reel-inner-2">
+                        <div class="slot-symbol">🍒</div>
+                    </div>
+                </div>
+                <div class="slot-reel h-20" id="m-reel-3">
+                    <div class="reel-inner" id="m-reel-inner-3">
+                        <div class="slot-symbol">🍒</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="text-center mb-4">
+                <p class="text-sm text-slate-400">Bedel: <span class="text-violet-400 font-bold"
+                        id="m-slot-cost">500</span></p>
+                <p class="text-lg font-bold text-yellow-500" id="m-slot-status">Şansını Dene!</p>
+            </div>
+
+            <button id="m-spin-btn"
+                class="w-full bg-yellow-600 hover:bg-yellow-500 text-white font-bold py-4 rounded-xl">ÇEVİR!</button>
         </div>
     </div>
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             // --- OYUN DEĞİŞKENLERİ ---
+            let YilongBaseWealth = 5000000; // Yilong Ma'nın NAKİT serveti (Dinamik artıyor)
+            let hasWonGame = false;
+
             let gameState = {
                 score: 0,
                 totalWealth: 0,
@@ -497,10 +691,10 @@
                 autoClicksPerSecond: 0,
                 clickPower: 1,
                 multiplier: 1,
-                marketPassiveRate: 0, // Fanum Tax
+                marketPassiveRate: 0,
                 gameStartTime: Date.now(),
                 slotWins: 0,
-                
+
                 // Yükseltme Seviyeleri
                 lvlPpc: 1,
                 lvlAuto: 0,
@@ -519,6 +713,10 @@
                 score: document.getElementById('score'),
                 cps: document.getElementById('cps'),
                 wealth: document.getElementById('total-wealth'),
+                yilongWealth: document.getElementById('realtime-yilong-wealth'),
+                yilongWealthDisplaySmall: document.getElementById('yilong-ma-servet-display'),
+                wealthProgress: document.getElementById('wealth-progress'),
+                dynamicTargetText: document.getElementById('dynamic-target'),
                 skibidi: document.getElementById('skibidi-toilet'),
                 popupCont: document.getElementById('popup-container'),
                 floaterCont: document.getElementById('floater-container'),
@@ -526,7 +724,7 @@
                 msgContent: document.getElementById('message-content-box'),
                 msgText: document.getElementById('message-text'),
                 msgClose: document.getElementById('message-close'),
-                
+
                 // İstatistikler
                 statClicks: document.getElementById('stat-clicks'),
                 statSlotWin: document.getElementById('stat-slot-win'),
@@ -537,7 +735,7 @@
                 btnAuto: document.getElementById('upgrade-auto'),
                 btnMulti: document.getElementById('upgrade-multi'),
                 btnTax: document.getElementById('upgrade-tax'),
-                
+
                 txtLvlPpc: document.getElementById('lvl-ppc'),
                 txtCostPpc: document.getElementById('cost-ppc'),
                 txtLvlAuto: document.getElementById('lvl-auto'),
@@ -546,7 +744,7 @@
                 txtCostMulti: document.getElementById('cost-multi'),
                 txtLvlTax: document.getElementById('lvl-tax'),
                 txtCostTax: document.getElementById('cost-tax'),
-                
+
                 // Slot
                 spinBtn: document.getElementById('spin-btn'),
                 slotCost: document.getElementById('slot-cost'),
@@ -567,31 +765,38 @@
                 ]
             };
 
-            // Varlıklar
+            // Varlıklar - TİPLERE AYRILDI
             let assets = {
-                'tl':   { name: "TL", color: "#f472b6", price: 1.0, count: 0, history: Array(20).fill(1.0) },
-                'usd':  { name: "USD", color: "#4ade80", price: 35.0, count: 0, history: Array(20).fill(35.0) },
-                'eur':  { name: "EUR", color: "#fb923c", price: 38.0, count: 0, history: Array(20).fill(38.0) },
-                'xag':  { name: "Gümüş", color: "#cbd5e1", price: 150.0, count: 0, history: Array(20).fill(150.0) },
-                'aura': { name: "AURA", color: "#c084fc", price: 500.0, count: 0, history: Array(20).fill(500.0) },
-                'xau':  { name: "Altın", color: "#facc15", price: 2500.0, count: 0, history: Array(20).fill(2500.0) },
-                'plt':  { name: "Platin", color: "#f1f5f9", price: 5000.0, count: 0, history: Array(20).fill(5000.0) },
-                'btc':  { name: "BTC", color: "#ef4444", price: 65000.0, count: 0, history: Array(20).fill(65000.0) },
-                'nvda': { name: "NVDA", color: "#76b900", price: 120000.0, count: 0, history: Array(20).fill(120000.0) }
+                // FIAT (Para Birimleri)
+                'tl': { name: "TL", type: "fiat", color: "#f472b6", price: 1.0, count: 0, history: Array(20).fill(1.0) },
+                'usd': { name: "USD", type: "fiat", color: "#4ade80", price: 35.0, count: 0, history: Array(20).fill(35.0) },
+                'eur': { name: "EUR", type: "fiat", color: "#fb923c", price: 38.0, count: 0, history: Array(20).fill(38.0) },
+
+                // TECH (Teknoloji Hisseleri)
+                'nvda': { name: "NVDA", type: "tech", color: "#76b900", price: 130.0, count: 0, history: Array(20).fill(130.0) },
+                'googl': { name: "GOOGL", type: "tech", color: "#ea4335", price: 175.0, count: 0, history: Array(20).fill(175.0) },
+                'aapl': { name: "AAPL", type: "tech", color: "#a3a3a3", price: 220.0, count: 0, history: Array(20).fill(220.0) },
+                'tsla': { name: "TSLA", type: "tech", color: "#e11d48", price: 240.0, count: 0, history: Array(20).fill(240.0) },
+                'msft': { name: "MSFT", type: "tech", color: "#0ea5e9", price: 420.0, count: 0, history: Array(20).fill(420.0) },
+
+                // CRYPTO & METALS
+                'btc': { name: "BTC", type: "crypto", color: "#ef4444", price: 65000.0, count: 0, history: Array(20).fill(65000.0) },
+                'aura': { name: "AURA", type: "crypto", color: "#c084fc", price: 500.0, count: 0, history: Array(20).fill(500.0) },
+                'xau': { name: "Altın", type: "metal", color: "#facc15", price: 2500.0, count: 0, history: Array(20).fill(2500.0) },
             };
 
             // Ses Motoru
             let synth, sellSynth, slotSynth;
             const initAudio = async () => {
-                if(Tone.context.state !== 'running') await Tone.start();
-                if(!synth) {
+                if (Tone.context.state !== 'running') await Tone.start();
+                if (!synth) {
                     synth = new Tone.PolySynth(Tone.Synth, {
                         oscillator: { type: "triangle" },
                         envelope: { attack: 0.005, decay: 0.1, sustain: 0, release: 0.1 }
                     }).toDestination();
-                    
+
                     sellSynth = new Tone.MembraneSynth().toDestination();
-                    
+
                     slotSynth = new Tone.Synth({
                         oscillator: { type: "square" },
                         envelope: { attack: 0.01, decay: 0.2, sustain: 0, release: 0.2 }
@@ -601,12 +806,26 @@
 
             // Formatlama
             const formatNumber = (num) => {
-                if (num < 1_000) return Math.floor(num).toString(); 
+                if (num < 1_000) return Math.floor(num).toString();
                 if (num < 1_000_000) return (num / 1_000).toFixed(2) + "K";
                 if (num < 1_000_000_000) return (num / 1_000_000).toFixed(2) + "M";
                 if (num < 1_000_000_000_000) return (num / 1_000_000_000).toFixed(2) + "B";
                 return (num / 1_000_000_000_000).toFixed(2) + "T";
             };
+
+            // Mesaj Kutusu Göster
+            const showMessage = (htmlContent) => {
+                els.msgText.innerHTML = htmlContent;
+                els.msgBox.style.opacity = 1;
+                els.msgBox.style.pointerEvents = 'auto';
+                els.msgContent.style.transform = 'scale(1)';
+            };
+
+            els.msgClose.addEventListener('click', () => {
+                els.msgBox.style.opacity = 0;
+                els.msgBox.style.pointerEvents = 'none';
+                els.msgContent.style.transform = 'scale(0.9)';
+            });
 
             // --- GÖRSEL EFEKTLER ---
             const createPopup = (text, color = '#fff', x, y) => {
@@ -614,12 +833,10 @@
                 popup.className = 'click-popup text-2xl md:text-4xl';
                 popup.textContent = text;
                 popup.style.color = color;
-                
-                // Rastgele konum (eğer verilmezse) veya mouse konumu
+
                 const finalX = x || (Math.random() * 80 + 10) + "%";
                 const finalY = y || (Math.random() * 40 + 30) + "%";
-                
-                // Eğer pixel değeri geldiyse
+
                 if (typeof x === 'number') {
                     popup.style.left = `${x}px`;
                     popup.style.top = `${y}px`;
@@ -633,25 +850,25 @@
                 setTimeout(() => popup.remove(), 800);
             };
 
-            const createParticles = (x, y, count=8, colorSet=['#8b5cf6', '#fff']) => {
+            const createParticles = (x, y, count = 8, colorSet = ['#8b5cf6', '#fff']) => {
                 for (let i = 0; i < count; i++) {
                     const particle = document.createElement('div');
                     particle.classList.add('particle');
-                    
+
                     const size = Math.random() * 8 + 4;
                     particle.style.width = `${size}px`;
                     particle.style.height = `${size}px`;
                     particle.style.backgroundColor = colorSet[Math.floor(Math.random() * colorSet.length)];
-                    
+
                     particle.style.left = `${x}px`;
                     particle.style.top = `${y}px`;
-                    
+
                     const angle = Math.random() * Math.PI * 2;
                     const velocity = Math.random() * 100 + 50;
-                    
+
                     particle.style.setProperty('--tx', `${Math.cos(angle) * velocity}px`);
                     particle.style.setProperty('--ty', `${Math.sin(angle) * velocity}px`);
-                    
+
                     document.body.appendChild(particle);
                     setTimeout(() => particle.remove(), 800);
                 }
@@ -670,38 +887,33 @@
 
             // --- OYUN MANTIĞI ---
 
-            // Tıklama Fonksiyonu
             const handleClick = (e) => {
                 initAudio();
-                
-                // Kritik vuruş şansı (%5)
+
                 let isCrit = Math.random() < 0.05;
                 let gain = gameState.clickPower * gameState.multiplier;
-                if(isCrit) gain *= 3;
-                
+                if (isCrit) gain *= 3;
+
                 gameState.score += gain;
                 gameState.clicks++;
-                
-                if(synth) {
+
+                if (synth) {
                     const notes = ["C5", "E5", "G5", "B5", "C6"];
-                    synth.triggerAttackRelease(notes[Math.floor(Math.random()*notes.length)], "32n");
+                    synth.triggerAttackRelease(notes[Math.floor(Math.random() * notes.length)], "32n");
                 }
 
-                // Efektler
                 const rect = els.skibidi.getBoundingClientRect();
-                const x = e ? e.clientX : (rect.left + rect.width/2);
-                const y = e ? e.clientY : (rect.top + rect.height/2);
+                const x = e ? e.clientX : (rect.left + rect.width / 2);
+                const y = e ? e.clientY : (rect.top + rect.height / 2);
 
-                if(isCrit) {
+                if (isCrit) {
                     createPopup("CRITICAL GYATT!", "#facc15", x, y);
                     createParticles(x, y, 15, ['#facc15', '#f87171']);
                 } else {
-                    const texts = ["RIZZ", "+1", "SIGMA", "OHIO", "MOG", "BASED"];
                     createPopup(`+${formatNumber(gain)}`, "#c084fc", x, y);
                     createParticles(x, y);
                 }
 
-                // Shake Efekti
                 els.skibidi.style.transform = `scale(0.95) rotate(${Math.random() * 10 - 5}deg)`;
                 setTimeout(() => els.skibidi.style.transform = 'scale(1) rotate(0deg)', 80);
 
@@ -711,24 +923,20 @@
             els.skibidi.addEventListener('pointerdown', handleClick);
 
             // --- YÜKSELTMELER (LOGIC) ---
-            
-            // Satın Alma Yardımcısı
             const buyUpgrade = (costKey, lvlKey, type) => {
-                if(gameState.score >= gameState[costKey]) {
+                if (gameState.score >= gameState[costKey]) {
                     gameState.score -= gameState[costKey];
                     gameState[lvlKey]++;
                     gameState[costKey] = Math.floor(gameState[costKey] * 1.6);
-                    
-                    // Efekt uygula
-                    if(type === 'ppc') gameState.clickPower += 1;
-                    if(type === 'auto') gameState.autoClicksPerSecond += 1;
-                    if(type === 'multi') gameState.multiplier *= 1.5;
-                    if(type === 'tax') gameState.marketPassiveRate += 0.005; // %0.5 artış
 
-                    // Ses ve Popup
-                    if(synth) synth.triggerAttackRelease("C6", "16n");
-                    createPopup("LEVEL UP!", "#4ade80", window.innerWidth/2, window.innerHeight/2);
-                    
+                    if (type === 'ppc') gameState.clickPower += 1;
+                    if (type === 'auto') gameState.autoClicksPerSecond += 1;
+                    if (type === 'multi') gameState.multiplier *= 1.5;
+                    if (type === 'tax') gameState.marketPassiveRate += 0.005;
+
+                    if (synth) synth.triggerAttackRelease("C6", "16n");
+                    createPopup("LEVEL UP!", "#4ade80", window.innerWidth / 2, window.innerHeight / 2);
+
                     updateUI();
                 }
             };
@@ -740,48 +948,46 @@
 
             // --- OTO TIKLAYICI ---
             setInterval(() => {
-                if(gameState.autoClicksPerSecond > 0) {
-                    const gain = (gameState.autoClicksPerSecond * gameState.multiplier) / 10; // Her 100ms'de
+                if (gameState.autoClicksPerSecond > 0) {
+                    const gain = (gameState.autoClicksPerSecond * gameState.multiplier) / 10;
                     gameState.score += gain;
-                    // Küçük görsel geribildirim yok, performans için
                 }
-                
-                // Fanum Tax (Market Pasif Gelir)
-                if(gameState.marketPassiveRate > 0) {
-                     let marketValue = 0;
-                     for(let key in assets) {
-                         marketValue += assets[key].count * assets[key].price;
-                     }
-                     if(marketValue > 0) {
-                         gameState.score += (marketValue * gameState.marketPassiveRate) / 10;
-                     }
+
+                if (gameState.marketPassiveRate > 0) {
+                    let marketValue = 0;
+                    for (let key in assets) {
+                        marketValue += assets[key].count * assets[key].price;
+                    }
+                    if (marketValue > 0) {
+                        gameState.score += (marketValue * gameState.marketPassiveRate) / 10;
+                    }
                 }
 
                 updateUI();
             }, 100);
 
             // --- SLOT MAKİNESİ ---
-            const slotSymbols = ['🍒', '🍋', '🍇', '💎', '7️⃣', '🚽'];
-            const slotWeights = [30, 25, 20, 15, 8, 2]; // Olasılık ağırlıkları
+            const slotSymbols = ['🍒', '🍋', '🍇', '💎', '7️⃣', '🚽', '6️⃣', '8️⃣', '9️⃣'];
+            const slotWeights = [25, 20, 15, 10, 8, 2, 8, 6, 6];
             let isSpinning = false;
             let slotCost = 500;
 
             const getRandomSymbol = () => {
                 const rand = Math.random() * 100;
                 let sum = 0;
-                for(let i=0; i<slotWeights.length; i++) {
+                for (let i = 0; i < slotWeights.length; i++) {
                     sum += slotWeights[i];
-                    if(rand <= sum) return slotSymbols[i];
+                    if (rand <= sum) return slotSymbols[i];
                 }
                 return slotSymbols[0];
             };
 
             const spinSlots = (isMobile = false) => {
-                if(isSpinning || gameState.score < slotCost) return;
-                
+                if (isSpinning || gameState.score < slotCost) return;
+
                 gameState.score -= slotCost;
                 isSpinning = true;
-                
+
                 const btn = isMobile ? els.mSpinBtn : els.spinBtn;
                 const status = isMobile ? els.mSlotStatus : els.slotStatus;
                 const currentReels = isMobile ? els.mReels : els.reels;
@@ -791,51 +997,77 @@
                 status.textContent = "Çeviriliyor...";
                 status.className = "text-yellow-200 animate-pulse";
 
-                // Animasyon Döngüsü
                 let spins = 0;
                 const spinInterval = setInterval(() => {
                     currentReels.forEach(reel => {
-                        reel.innerHTML = `<div class="slot-symbol">${slotSymbols[Math.floor(Math.random()*slotSymbols.length)]}</div>`;
+                        reel.innerHTML = `<div class="slot-symbol">${slotSymbols[Math.floor(Math.random() * slotSymbols.length)]}</div>`;
                     });
-                    if(slotSynth) slotSynth.triggerAttackRelease("C4", "32n");
+                    if (slotSynth) slotSynth.triggerAttackRelease("C4", "32n");
                     spins++;
                 }, 100);
 
-                // Sonuç Belirleme
                 setTimeout(() => {
                     clearInterval(spinInterval);
                     const results = [getRandomSymbol(), getRandomSymbol(), getRandomSymbol()];
-                    
+
                     currentReels.forEach((reel, i) => {
                         reel.innerHTML = `<div class="slot-symbol text-4xl">${results[i]}</div>`;
                     });
 
-                    // Kazanma Kontrolü
                     let winMult = 0;
-                    if(results[0] === results[1] && results[1] === results[2]) {
-                        // 3'lü eşleşme
-                        if(results[0] === '🚽') winMult = 500; // JACKPOT
-                        else if(results[0] === '7️⃣') winMult = 100;
-                        else if(results[0] === '💎') winMult = 50;
+                    let winText = "";
+                    let winColor = "text-slate-400";
+                    let isSpecialWin = false;
+
+                    // 1. ÖZEL KURAL: 7 - 8 - 9
+                    if (results[0] === '7️⃣' && results[1] === '8️⃣' && results[2] === '9️⃣') {
+                        const specialPrize = 200000;
+                        gameState.score += specialPrize;
+                        gameState.slotWins += specialPrize;
+                        status.textContent = "BÜYÜK İKRAMİYE! 7-8-9";
+                        status.className = "text-fuchsia-400 font-bold jackpot-anim";
+                        createPopup(`+200K`, "#f0abfc", window.innerWidth / 2, window.innerHeight / 2);
+                        if (synth) synth.triggerAttackRelease(["C4", "E4", "G4", "C5", "E5", "G5"], "2n");
+                        isSpecialWin = true;
+                    }
+                    // 2. ÖZEL KURAL: 6 ve 7 Yanyana
+                    else if ((results[0] === '6️⃣' && results[1] === '7️⃣') || (results[1] === '6️⃣' && results[2] === '7️⃣')) {
+                        const specialPrize = 30000;
+                        gameState.score += specialPrize;
+                        gameState.slotWins += specialPrize;
+                        status.textContent = "YAN YANA 6 & 7! 🔥";
+                        status.className = "text-orange-400 font-bold jackpot-anim";
+                        createPopup(`+30K`, "#fb923c", window.innerWidth / 2, window.innerHeight / 2);
+                        if (synth) synth.triggerAttackRelease(["C5", "G5"], "4n");
+                        isSpecialWin = true;
+                    }
+                    // Standart Kurallar
+                    else if (results[0] === results[1] && results[1] === results[2]) {
+                        if (results[0] === '🚽') winMult = 500;
+                        else if (results[0] === '7️⃣') winMult = 100;
+                        else if (results[0] === '💎') winMult = 50;
                         else winMult = 20;
-                        status.textContent = "JACKPOT! 🔥";
-                        status.className = "text-green-400 font-bold jackpot-anim";
-                        if(synth) synth.triggerAttackRelease(["C5", "E5", "G5", "C6"], "4n");
-                    } else if(results[0] === results[1] || results[1] === results[2] || results[0] === results[2]) {
-                        // 2'li eşleşme
+                        winText = "JACKPOT! 🔥";
+                        winColor = "text-green-400 font-bold jackpot-anim";
+                        if (synth) synth.triggerAttackRelease(["C5", "E5", "G5", "C6"], "4n");
+                    } else if (results[0] === results[1] || results[1] === results[2] || results[0] === results[2]) {
                         winMult = 3;
-                        status.textContent = "Güzel! 👍";
-                        status.className = "text-cyan-400 font-bold";
+                        winText = "Güzel! 👍";
+                        winColor = "text-cyan-400 font-bold";
                     } else {
-                        status.textContent = "Tekrar dene 💀";
-                        status.className = "text-slate-400";
+                        winText = "Tekrar dene 💀";
+                        winColor = "text-slate-400";
                     }
 
-                    if(winMult > 0) {
-                        const winAmount = slotCost * winMult;
-                        gameState.score += winAmount;
-                        gameState.slotWins += winAmount;
-                        createPopup(`+${formatNumber(winAmount)}`, "#facc15", window.innerWidth/2, window.innerHeight/2);
+                    if (!isSpecialWin) {
+                        status.textContent = winText;
+                        status.className = winColor;
+                        if (winMult > 0) {
+                            const winAmount = slotCost * winMult;
+                            gameState.score += winAmount;
+                            gameState.slotWins += winAmount;
+                            createPopup(`+${formatNumber(winAmount)}`, "#facc15", window.innerWidth / 2, window.innerHeight / 2);
+                        }
                     }
 
                     isSpinning = false;
@@ -851,20 +1083,23 @@
 
             // --- MARKET SİSTEMİ ---
             const marketListContainer = document.getElementById('market-list-container');
-            
+
             const createMarketItemHTML = (key, asset) => {
                 const div = document.createElement('details');
                 div.className = "market-box glass-panel rounded-xl border border-white/5 overflow-hidden group transition-all duration-300";
                 div.id = `market-${key}-container`;
-                
+
                 div.innerHTML = `
                     <summary class="p-4 cursor-pointer flex items-center justify-between hover:bg-white/5 transition-colors select-none">
                         <div class="flex items-center gap-3">
                             <div class="w-10 h-10 rounded-lg bg-slate-800 flex items-center justify-center font-bold text-lg shadow-lg" style="color: ${asset.color}; text-shadow: 0 0 10px ${asset.color}40;">
-                                ${asset.name.substring(0,1)}
+                                ${asset.name.substring(0, 1)}
                             </div>
                             <div class="text-left">
-                                <h3 class="font-bold text-slate-200 leading-tight">${asset.name}</h3>
+                                <h3 class="font-bold text-slate-200 leading-tight flex items-center gap-2">
+                                    ${asset.name}
+                                    <span class="text-[9px] px-1.5 py-0.5 rounded ${asset.type === 'tech' ? 'bg-blue-500/20 text-blue-300' : asset.type === 'fiat' ? 'bg-green-500/20 text-green-300' : 'bg-purple-500/20 text-purple-300'} uppercase border border-white/10">${asset.type}</span>
+                                </h3>
                                 <div class="text-xs text-slate-500">Adet: <span id="count-${key}" class="text-slate-300 font-mono">0</span></div>
                             </div>
                         </div>
@@ -872,7 +1107,6 @@
                             <div class="text-right">
                                 <div id="price-${key}" class="font-mono font-bold text-slate-300 transition-colors duration-500">${asset.price.toFixed(2)}</div>
                             </div>
-                            <!-- Sürükleme İkonu -->
                             <div class="drag-handle opacity-50 hover:opacity-100 cursor-grab active:cursor-grabbing p-1 hidden md:block">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="12" r="1"></circle><circle cx="9" cy="5" r="1"></circle><circle cx="9" cy="19" r="1"></circle><circle cx="15" cy="12" r="1"></circle><circle cx="15" cy="5" r="1"></circle><circle cx="15" cy="19" r="1"></circle></svg>
                             </div>
@@ -891,13 +1125,12 @@
                         </div>
                     </div>
                 `;
-                
+
                 marketListContainer.appendChild(div);
 
-                // Grafik Başlat
                 const ctx = document.getElementById(`chart-${key}`).getContext('2d');
                 const gradient = ctx.createLinearGradient(0, 0, 0, 100);
-                gradient.addColorStop(0, `${asset.color}80`); // Alpha ekle
+                gradient.addColorStop(0, `${asset.color}80`);
                 gradient.addColorStop(1, 'transparent');
 
                 asset.chart = new Chart(ctx, {
@@ -924,10 +1157,8 @@
                 });
             };
 
-            // Market Oluştur
             Object.keys(assets).forEach(key => createMarketItemHTML(key, assets[key]));
 
-            // SortableJS
             new Sortable(marketListContainer, {
                 animation: 200,
                 handle: '.drag-handle',
@@ -935,11 +1166,10 @@
                 easing: "cubic-bezier(1, 0, 0, 1)"
             });
 
-            // Market İşlemleri Listener
             marketListContainer.addEventListener('click', (e) => {
                 const btn = e.target.closest('button');
                 if (!btn) return;
-                
+
                 const action = btn.dataset.action;
                 const key = btn.dataset.asset;
                 const asset = assets[key];
@@ -958,25 +1188,28 @@
                 } else if (action === 'sell' && asset.count > 0) {
                     gameState.score += asset.price;
                     asset.count--;
-                    if(sellSynth) sellSynth.triggerAttackRelease("F2", "32n");
+                    if (sellSynth) sellSynth.triggerAttackRelease("F2", "32n");
                 } else if (action === 'sell-all' && asset.count > 0) {
                     gameState.score += asset.count * asset.price;
                     asset.count = 0;
-                    if(sellSynth) sellSynth.triggerAttackRelease("F2", "32n");
+                    if (sellSynth) sellSynth.triggerAttackRelease("F2", "32n");
                 }
-                
+
                 updateUI();
             });
 
-            // Fiyat Dalgalanması
+            // --- FİYAT DALGALANMASI & VOLATİLİTE ---
             setInterval(() => {
                 for (let key in assets) {
                     const asset = assets[key];
-                    const volatility = (key === 'btc' || key === 'aura' || key === 'nvda') ? 0.08 : 0.02;
-                    const change = (Math.random() - 0.48) * volatility; 
+                    let volatility = 0.02;
+                    if (asset.type === 'crypto') volatility = 0.08;
+                    if (asset.type === 'tech') volatility = 0.04;
+
+                    const change = (Math.random() - 0.48) * volatility;
                     asset.price += asset.price * change;
                     if (asset.price < 0.1) asset.price = 0.1;
-                    
+
                     asset.history.push(asset.price);
                     if (asset.history.length > 20) asset.history.shift();
 
@@ -988,7 +1221,7 @@
                     const priceEl = document.getElementById(`price-${key}`);
                     if (priceEl) {
                         priceEl.textContent = asset.price.toFixed(2);
-                        const prev = asset.history[asset.history.length-2] || asset.price;
+                        const prev = asset.history[asset.history.length - 2] || asset.price;
                         priceEl.className = `font-mono font-bold transition-colors duration-500 ${asset.price >= prev ? 'text-emerald-400' : 'text-rose-400'}`;
                     }
                 }
@@ -1000,27 +1233,62 @@
                 els.cps.textContent = (gameState.autoClicksPerSecond * gameState.multiplier).toFixed(1);
                 els.statClicks.textContent = formatNumber(gameState.clicks);
                 els.statSlotWin.textContent = formatNumber(gameState.slotWins);
-                
-                // Servet Hesapla
+
                 let tw = gameState.score;
-                for(let k in assets) {
+                for (let k in assets) {
                     tw += assets[k].count * assets[k].price;
                     document.getElementById(`count-${k}`).textContent = formatNumber(assets[k].count);
                 }
-                els.wealth.textContent = formatNumber(tw);
 
-                // Buton Durumları (Görsel Engelleme)
-                const checkBtn = (btn, cost, txt, lvl) => {
-                    if(gameState.score < cost) {
-                        btn.disabled = true;
-                    } else {
-                        btn.disabled = false;
+                gameState.totalWealth = tw;
+                els.wealth.textContent = formatNumber(gameState.totalWealth);
+
+                // --- YILONG vs PLAYER (RIVALRY LOGIC) ---
+
+                // Yilong'un Kendi Serveti (Sadece YilongBaseWealth)
+                const currentYilongWealth = YilongBaseWealth;
+                const displayYilong = formatNumber(currentYilongWealth);
+
+                // Senin Hedefin: Yilong'un servetinin 2 katı
+                const currentTarget = currentYilongWealth * 2;
+                const displayTarget = formatNumber(currentTarget);
+
+                // UI Güncelleme
+                els.yilongWealth.textContent = displayYilong;
+                els.yilongWealthDisplaySmall.textContent = displayYilong;
+                els.dynamicTargetText.textContent = displayTarget; // Yeni element
+
+                // Progress Bar: Senin Servetin / Hedef
+                let progress = (gameState.totalWealth / currentTarget) * 100;
+                if (progress < 0) progress = 0;
+                if (progress > 100) progress = 100;
+                els.wealthProgress.style.width = `${progress}%`;
+
+                // KAZANMA KONTROLÜ
+                if (!hasWonGame && gameState.totalWealth >= currentTarget) {
+                    hasWonGame = true;
+                    showMessage(`
+                        <h2 class="text-4xl font-black text-yellow-400 mb-4">🏆 YILONG'U YENDİN! 🏆</h2>
+                        <p class="text-lg text-slate-300 mb-4">
+                            Yilong Ma'nın servetini <strong class="text-green-400">2'YE KATLAYARAK</strong> geçtin!
+                        </p>
+                        <p class="text-sm text-slate-400 mb-6">
+                            Yilong: <span class="text-slate-200">${displayYilong}</span> <br>
+                            Sen: <span class="text-yellow-400 font-bold">${formatNumber(gameState.totalWealth)}</span>
+                        </p>
+                        <div class="text-6xl animate-bounce">👑</div>
+                        <p class="text-[10px] text-slate-500 mt-4">Artık piyasanın yeni kralı sensin!</p>
+                    `);
+
+                    if (synth) synth.triggerAttackRelease(["C4", "E4", "G4", "C5", "E5", "G5", "C6"], "2n");
+                    for (let i = 0; i < 5; i++) {
+                        setTimeout(() => {
+                            createParticles(window.innerWidth / 2, window.innerHeight / 2, 20, ['#facc15', '#fff', '#4ade80']);
+                        }, i * 200);
                     }
-                    txt.textContent = formatNumber(cost);
-                    lvl.textContent = gameState[lvl === 'lvlTax' ? 'lvlTax' : lvl]; // Fix for dynamic access
-                };
+                }
 
-                // Manually updating texts because passing refs is tricky with dynamic objects
+                // Buton Durumları
                 els.txtLvlPpc.textContent = gameState.lvlPpc;
                 els.txtCostPpc.textContent = formatNumber(gameState.costPpc);
                 els.btnPpc.disabled = gameState.score < gameState.costPpc;
@@ -1032,15 +1300,14 @@
                 els.txtLvlMulti.textContent = gameState.lvlMulti;
                 els.txtCostMulti.textContent = formatNumber(gameState.costMulti);
                 els.btnMulti.disabled = gameState.score < gameState.costMulti;
-                
+
                 els.txtLvlTax.textContent = gameState.lvlTax;
                 els.txtCostTax.textContent = formatNumber(gameState.costTax);
                 els.btnTax.disabled = gameState.score < gameState.costTax;
 
-                // Slot Butonları
                 els.slotCost.textContent = formatNumber(slotCost);
                 els.mSlotCost.textContent = formatNumber(slotCost);
-                if(gameState.score < slotCost) {
+                if (gameState.score < slotCost) {
                     els.spinBtn.disabled = true;
                     els.mSpinBtn.disabled = true;
                     els.spinBtn.classList.add('opacity-50');
@@ -1053,7 +1320,6 @@
                 }
             };
 
-            // Süre Sayacı
             setInterval(() => {
                 const seconds = Math.floor((Date.now() - gameState.gameStartTime) / 1000);
                 const m = Math.floor(seconds / 60).toString().padStart(2, '0');
@@ -1061,63 +1327,108 @@
                 els.statTime.textContent = `${m}:${s}`;
             }, 1000);
 
-            // Arka Plan Floating
             setInterval(createFloater, 2000);
 
-            // --- SKITTER SİSTEMİ ---
+            // --- SKITTER SİSTEMİ (MANİPÜLASYON) ---
             const skitterMessagesEl = document.getElementById('skitter-messages');
-            const postSkitt = (msg, author="Yilong Ma") => {
+
+            // Tweet Atma Fonksiyonu
+            const postSkitt = (msg, author = "Yilong Ma", isNew = false) => {
                 const div = document.createElement('div');
-                div.className = "bg-white/5 p-3 rounded-xl border border-white/10 mb-2 flex flex-col gap-1";
+                // Eğer yeni bir manipülasyon tweeti ise parlama efekti ekle
+                const extraClass = isNew ? "new-skitt-glow" : "bg-white/5 border-white/10";
+
+                div.className = `${extraClass} p-3 rounded-xl border mb-2 flex flex-col gap-1 transition-all duration-500`;
                 div.innerHTML = `
                     <div class="flex justify-between items-center">
-                        <span class="font-bold text-xs ${author==="Yilong Ma" ? 'text-yellow-400' : 'text-sky-400'}">${author}</span>
+                        <span class="font-bold text-xs ${author === "Yilong Ma" ? 'text-yellow-400' : 'text-sky-400'}">${author}</span>
                         <span class="text-[8px] text-slate-500">Şimdi</span>
                     </div>
                     <p class="text-xs text-slate-300 leading-snug">${msg}</p>
                 `;
                 skitterMessagesEl.prepend(div);
-                if(skitterMessagesEl.children.length > 20) skitterMessagesEl.lastChild.remove();
-                
-                // Bildirim efekti
+                if (skitterMessagesEl.children.length > 20) skitterMessagesEl.lastChild.remove();
+
+                // İKON ZIPLATMA (Sadece burada çağırılıyor artık)
                 const skitterFeed = document.getElementById('skitter-feed');
-                if(!skitterFeed.open) {
+                if (!skitterFeed.open) {
                     const icon = document.getElementById('skitter-icon');
+                    // Önce varsa sil, sonra tekrar ekle ki animasyon resetlensin
+                    icon.classList.remove('animate-bounce');
+                    void icon.offsetWidth; // Trigger reflow
                     icon.classList.add('animate-bounce');
-                    setTimeout(() => icon.classList.remove('animate-bounce'), 1000);
+
+                    // 3 saniye sonra zıplamayı durdur
+                    setTimeout(() => icon.classList.remove('animate-bounce'), 3000);
+                }
+
+                // 5 Saniye sonra mesajın parlamasını kaldır
+                if (isNew) {
+                    setTimeout(() => {
+                        div.classList.remove("new-skitt-glow");
+                        div.classList.add("bg-white/5", "border-white/10");
+                    }, 5000);
                 }
             };
 
-            // Rastgele Tweetler
+            // Yilong Ma Piyasayı Manipüle Ediyor
             setInterval(() => {
-                if(Math.random() < 0.4) {
+                if (Math.random() < 0.5) { // %50 şansla tweet
                     const keys = Object.keys(assets);
-                    const pick = assets[keys[Math.floor(Math.random() * keys.length)]];
-                    
-                    const phrases = [
-                        `Az önce 1 milyon ${pick.name} aldım. Piyasayı bozucam. 😂`,
-                        `Mars'a ${pick.name} ile gideceğiz. #doge #skibidi`,
-                        `Bana rizz öğretin, karşılığında ${pick.name} veririm.`,
-                        `Ohio'daki fabrikam ${pick.name} üretiyor artık.`,
-                        `Kimse benim kadar sigma olamaz.`,
-                        `Fanum Tax ödemeyenler banlansın mı?`,
-                        `Gyatt Coin ne zaman çıkıyor?`,
-                        `${pick.name} fiyatı çok düşük, L + Ratio.`
-                    ];
-                    postSkitt(phrases[Math.floor(Math.random() * phrases.length)]);
-                }
-            }, 10000);
+                    const targetKey = keys[Math.floor(Math.random() * keys.length)];
+                    const target = assets[targetKey];
+                    let phrase = "";
 
-            // Başlangıç
-            postSkitt("Skibidi Clicker Ultimate Edition'a hoşgeldin. Bol şans!");
+                    // PARLAMA EFEKTİ İÇİN ELEMENTİ BUL
+                    const marketItem = document.getElementById(`market-${targetKey}-container`);
+
+                    // 1. MANİPÜLASYON MANTIĞI
+                    if (target.type === 'fiat') {
+                        phrase = `Bütün paramı ${target.name}'ye yatırdım. Diğer kağıt paralar çöp! 🚮`;
+
+                        for (let k in assets) {
+                            if (k === targetKey) {
+                                assets[k].price *= (1 + (Math.random() * 0.15 + 0.05)); // %5-%20 Artış
+                            } else if (assets[k].type === 'fiat') {
+                                assets[k].price *= (1 - (Math.random() * 0.05 + 0.02)); // %2-%7 Düşüş (Rakipler)
+                            }
+                        }
+                    }
+                    else if (target.type === 'tech') {
+                        phrase = `${target.name} geleceği inşa ediyor. Yapay zeka, roketler, her şey! 🚀`;
+                        assets[targetKey].price *= 1.10; // %10 net artış
+                    }
+                    else {
+                        phrase = `${target.name} aya çıkıyor! Hold hold hold! 💎🙌`;
+                        assets[targetKey].price *= 1.20; // %20 artış
+                    }
+
+                    // YILONG MA KAZANIYOR! (Servetine ekle)
+                    const profit = Math.floor(Math.random() * 50000) + 10000;
+                    YilongBaseWealth += profit; // Kendi serveti artıyor
+                    createPopup(`Yilong: +${formatNumber(profit)}`, "#facc15", 90, 10); // Sağ üstte popup
+
+                    // VARLIĞI PARLAT (Piyasa Listesinde)
+                    if (marketItem) {
+                        marketItem.classList.add('highlight-asset');
+                        setTimeout(() => marketItem.classList.remove('highlight-asset'), 3000);
+                    }
+
+                    // TWEET AT (isNew = true ile parlamasını sağla)
+                    postSkitt(phrase, "Yilong Ma", true);
+                    updateUI();
+                }
+            }, 12000); // 12 saniyede bir
+
+            postSkitt("5 Milyon dolarım var. Sizi geçeceğim! 😎");
             updateUI();
         });
 
-        // Mobil Modal Fonksiyonları (Global Scope)
         function toggleMobileSlot() {
             const modal = document.getElementById('mobile-slot-modal');
             modal.classList.toggle('hidden');
         }
     </script>
 </body>
+
 </html>
