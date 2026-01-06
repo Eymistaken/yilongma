@@ -101,11 +101,9 @@
 
         /* Glassmorphism Ortak Sınıfı */
         .glass-panel {
-            background: rgba(15, 15, 20, 0.65);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
+            background: rgba(15, 15, 20, 0.95);
             border: 1px solid rgba(255, 255, 255, 0.08);
-            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.4);
+            box-shadow: 0 4px 16px 0 rgba(0, 0, 0, 0.4);
         }
 
         /* Skibidi Buton Animasyonları */
@@ -850,7 +848,7 @@
                 setTimeout(() => popup.remove(), 800);
             };
 
-            const createParticles = (x, y, count = 8, colorSet = ['#8b5cf6', '#fff']) => {
+            const createParticles = (x, y, count = 3, colorSet = ['#8b5cf6', '#fff']) => {
                 for (let i = 0; i < count; i++) {
                     const particle = document.createElement('div');
                     particle.classList.add('particle');
@@ -908,7 +906,7 @@
 
                 if (isCrit) {
                     createPopup("CRITICAL GYATT!", "#facc15", x, y);
-                    createParticles(x, y, 15, ['#facc15', '#f87171']);
+                    createParticles(x, y, 6, ['#facc15', '#f87171']);
                 } else {
                     createPopup(`+${formatNumber(gain)}`, "#c084fc", x, y);
                     createParticles(x, y);
