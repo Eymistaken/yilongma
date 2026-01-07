@@ -1576,6 +1576,10 @@
                      els.yilongAvatar.parentElement.classList.remove('bg-stone-500/20', 'border-stone-500/30');
                      els.yilongAvatar.parentElement.classList.add('bg-red-500/20', 'border-red-500/30');
 
+                     // Background Change (King Theme)
+                     document.body.style.background = "linear-gradient(-45deg, #fcd34d, #059669, #fbbf24, #10b981)";
+                     document.body.style.backgroundSize = "400% 400%";
+
                      // Update Names
                      const nameLabel = els.yilongAvatar.parentElement.nextElementSibling.querySelector('h3');
                      if(nameLabel) nameLabel.textContent = "BROKE YILONG";
@@ -1716,25 +1720,25 @@
                     const target = assets[targetKey];
                     const marketItem = document.getElementById(`market-${targetKey}-container`);
 
-                    if (isPhase2 && Math.random() < 0.4) {
-                        // PHASE 2 TOXICITY
+                    if (isPhase2) {
+                        // PHASE 2 TOXICITY (100% Rate)
                         const toxic = [
                             "Babanın şirketini de satın alacağım.",
+                            "Ağlama duvarı sağ tarafta ->",
+                            "Tuvalet kağıdı bile alamayacaksın.",
                             "Fakirler ağlamasın.",
                             "Borsa benim oyun alanım.",
-                            "Tuvalet kağıdı bile alamayacaksın.",
-                            "Senin servetin benim bahşişim.",
-                            "Ağlama duvarı sağ tarafta ->"
+                            "Senin servetin benim bahşişim."
                         ];
                         phrase = toxic[Math.floor(Math.random() * toxic.length)];
 
                         // Phase 2 extra annoying buff
-                        if(Math.random() < 0.5) {
+                        if(Math.random() < 0.3) {
                             YilongBaseWealth += 500000;
                             createPopup(`Yilong: +500K`, "#ef4444", 90, 10);
                         }
                     } else {
-                        // STANDARD LOGIC
+                        // STANDARD LOGIC (Phase 1)
                         if (target.type === 'fiat') {
                         phrase = `Bütün paramı ${target.name}'ye yatırdım. Diğer kağıt paralar çöp! 🚮`;
 
