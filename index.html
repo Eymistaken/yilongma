@@ -362,7 +362,7 @@
         <!-- Hedef Progress Bar -->
         <div class="w-full bg-slate-800 h-2 rounded-full overflow-hidden mt-1 relative">
             <div id="wealth-progress" class="h-full bg-gradient-to-r from-violet-600 to-fuchsia-400 w-0 relative">
-                <div class="absolute right-0 top-0 bottom-0 w-1 bg-white/50 animate-pulse"></div>
+                <div class="absolute right-0 top-0 bottom-0 w-1 bg-white/5 animate-pulse"></div>
             </div>
         </div>
         <div class="flex justify-between text-[9px] text-slate-500 font-mono mt-0.5">
@@ -682,7 +682,8 @@
             let YilongBaseWealth = 5000000; // Yilong Ma'nın NAKİT serveti (Dinamik artıyor)
             let hasWonGame = false;
 
-            let gameState = {
+            // Global erişim için window'a ata
+            window.gameState = {
                 score: 0,
                 totalWealth: 0,
                 clicks: 0,
@@ -692,6 +693,8 @@
                 marketPassiveRate: 0,
                 gameStartTime: Date.now(),
                 slotWins: 0,
+                manualClicksLastSecond: 0,
+                currentManualCPS: 0,
 
                 // Yükseltme Seviyeleri
                 lvlPpc: 1,
@@ -705,6 +708,9 @@
                 costMulti: 2500,
                 costTax: 10000
             };
+
+            // Kolay erişim için yerel değişken referansı
+            let gameState = window.gameState;
 
             // Elementler
             const els = {
@@ -764,23 +770,24 @@
             };
 
             // Varlıklar - TİPLERE AYRILDI
+            // OPTIMIZATION: Reduced initial history array size from 20 to 10
             let assets = {
                 // FIAT (Para Birimleri)
-                'tl': { name: "TL", type: "fiat", color: "#f472b6", price: 1.0, count: 0, history: Array(20).fill(1.0) },
-                'usd': { name: "USD", type: "fiat", color: "#4ade80", price: 35.0, count: 0, history: Array(20).fill(35.0) },
-                'eur': { name: "EUR", type: "fiat", color: "#fb923c", price: 38.0, count: 0, history: Array(20).fill(38.0) },
+                'tl': { name: "TL", type: "fiat", color: "#f472b6", price: 1.0, count: 0, history: Array(10).fill(1.0) },
+                'usd': { name: "USD", type: "fiat", color: "#4ade80", price: 35.0, count: 0, history: Array(10).fill(35.0) },
+                'eur': { name: "EUR", type: "fiat", color: "#fb923c", price: 38.0, count: 0, history: Array(10).fill(38.0) },
 
                 // TECH (Teknoloji Hisseleri)
-                'nvda': { name: "NVDA", type: "tech", color: "#76b900", price: 130.0, count: 0, history: Array(20).fill(130.0) },
-                'googl': { name: "GOOGL", type: "tech", color: "#ea4335", price: 175.0, count: 0, history: Array(20).fill(175.0) },
-                'aapl': { name: "AAPL", type: "tech", color: "#a3a3a3", price: 220.0, count: 0, history: Array(20).fill(220.0) },
-                'tsla': { name: "TSLA", type: "tech", color: "#e11d48", price: 240.0, count: 0, history: Array(20).fill(240.0) },
-                'msft': { name: "MSFT", type: "tech", color: "#0ea5e9", price: 420.0, count: 0, history: Array(20).fill(420.0) },
+                'nvda': { name: "NVDA", type: "tech", color: "#76b900", price: 130.0, count: 0, history: Array(10).fill(130.0) },
+                'googl': { name: "GOOGL", type: "tech", color: "#ea4335", price: 175.0, count: 0, history: Array(10).fill(175.0) },
+                'aapl': { name: "AAPL", type: "tech", color: "#a3a3a3", price: 220.0, count: 0, history: Array(10).fill(220.0) },
+                'tsla': { name: "TSLA", type: "tech", color: "#e11d48", price: 240.0, count: 0, history: Array(10).fill(240.0) },
+                'msft': { name: "MSFT", type: "tech", color: "#0ea5e9", price: 420.0, count: 0, history: Array(10).fill(420.0) },
 
                 // CRYPTO & METALS
-                'btc': { name: "BTC", type: "crypto", color: "#ef4444", price: 65000.0, count: 0, history: Array(20).fill(65000.0) },
-                'aura': { name: "AURA", type: "crypto", color: "#c084fc", price: 500.0, count: 0, history: Array(20).fill(500.0) },
-                'xau': { name: "Altın", type: "metal", color: "#facc15", price: 2500.0, count: 0, history: Array(20).fill(2500.0) },
+                'btc': { name: "BTC", type: "crypto", color: "#ef4444", price: 65000.0, count: 0, history: Array(10).fill(65000.0) },
+                'aura': { name: "AURA", type: "crypto", color: "#c084fc", price: 500.0, count: 0, history: Array(10).fill(500.0) },
+                'xau': { name: "Altın", type: "metal", color: "#facc15", price: 2500.0, count: 0, history: Array(10).fill(2500.0) },
             };
 
             // Ses Motoru
@@ -788,7 +795,9 @@
             const initAudio = async () => {
                 if (Tone.context.state !== 'running') await Tone.start();
                 if (!synth) {
+                    // OPTIMIZATION: Limit polyphony to 4 voices
                     synth = new Tone.PolySynth(Tone.Synth, {
+                        maxPolyphony: 4,
                         oscillator: { type: "triangle" },
                         envelope: { attack: 0.005, decay: 0.1, sustain: 0, release: 0.1 }
                     }).toDestination();
@@ -894,6 +903,7 @@
 
                 gameState.score += gain;
                 gameState.clicks++;
+                gameState.manualClicksLastSecond++;
 
                 if (synth) {
                     const notes = ["C5", "E5", "G5", "B5", "C6"];
@@ -980,8 +990,11 @@
                 return slotSymbols[0];
             };
 
-            const spinSlots = (isMobile = false) => {
+            const spinSlots = async (isMobile = false) => {
                 if (isSpinning || gameState.score < slotCost) return;
+
+                // Initialize audio to prevent freeze
+                await initAudio();
 
                 gameState.score -= slotCost;
                 isSpinning = true;
@@ -998,8 +1011,19 @@
                 let spins = 0;
                 const spinInterval = setInterval(() => {
                     currentReels.forEach(reel => {
-                        reel.innerHTML = `<div class="slot-symbol">${slotSymbols[Math.floor(Math.random() * slotSymbols.length)]}</div>`;
+                        // OPTIMIZATION: Use textContent instead of innerHTML to reduce layout thrashing
+                        // We assume the .slot-symbol div already exists inside the reel
+                        const symbolDiv = reel.querySelector('.slot-symbol');
+                        const randomSymbol = slotSymbols[Math.floor(Math.random() * slotSymbols.length)];
+
+                        if (symbolDiv) {
+                            symbolDiv.textContent = randomSymbol;
+                        } else {
+                            // Fallback if structure is missing
+                             reel.innerHTML = `<div class="slot-symbol">${randomSymbol}</div>`;
+                        }
                     });
+
                     if (slotSynth) slotSynth.triggerAttackRelease("C4", "32n");
                     spins++;
                 }, 100);
@@ -1009,7 +1033,18 @@
                     const results = [getRandomSymbol(), getRandomSymbol(), getRandomSymbol()];
 
                     currentReels.forEach((reel, i) => {
-                        reel.innerHTML = `<div class="slot-symbol text-4xl">${results[i]}</div>`;
+                        const symbolDiv = reel.querySelector('.slot-symbol');
+                        if (symbolDiv) {
+                            symbolDiv.textContent = results[i];
+                             // Ensure text size is correct for result
+                            if(!symbolDiv.classList.contains('text-4xl')) {
+                                // Add if needed, though default CSS might handle it.
+                                // The original code added text-4xl only on result.
+                                symbolDiv.classList.add('text-4xl');
+                            }
+                        } else {
+                             reel.innerHTML = `<div class="slot-symbol text-4xl">${results[i]}</div>`;
+                        }
                     });
 
                     let winMult = 0;
@@ -1110,7 +1145,7 @@
                             </div>
                         </div>
                     </summary>
-                    
+
                     <div class="p-4 bg-black/20 border-t border-white/5 space-y-4">
                         <div class="h-24 w-full rounded-lg overflow-hidden bg-slate-900/50 relative border border-white/5">
                              <canvas id="chart-${key}"></canvas>
@@ -1150,7 +1185,12 @@
                         maintainAspectRatio: false,
                         plugins: { legend: { display: false }, tooltip: { enabled: false } },
                         scales: { x: { display: false }, y: { display: false } },
-                        animation: false
+                        animation: false,
+                        elements: {
+                            point: {
+                                radius: 0 // Disable points for performance
+                            }
+                        }
                     }
                 });
             };
@@ -1197,6 +1237,7 @@
             });
 
             // --- FİYAT DALGALANMASI & VOLATİLİTE ---
+            // OPTIMIZATION: Increased interval from 3000ms to 6000ms
             setInterval(() => {
                 for (let key in assets) {
                     const asset = assets[key];
@@ -1209,7 +1250,8 @@
                     if (asset.price < 0.1) asset.price = 0.1;
 
                     asset.history.push(asset.price);
-                    if (asset.history.length > 20) asset.history.shift();
+                    // OPTIMIZATION: Reduced history length from 20 to 10
+                    if (asset.history.length > 10) asset.history.shift();
 
                     if (asset.chart) {
                         asset.chart.data.datasets[0].data = asset.history;
@@ -1223,12 +1265,13 @@
                         priceEl.className = `font-mono font-bold transition-colors duration-500 ${asset.price >= prev ? 'text-emerald-400' : 'text-rose-400'}`;
                     }
                 }
-            }, 3000);
+            }, 6000);
 
             // --- UI GÜNCELLEME ---
-            const updateUI = () => {
+            window.updateUI = () => {
                 els.score.textContent = formatNumber(gameState.score);
-                els.cps.textContent = (gameState.autoClicksPerSecond * gameState.multiplier).toFixed(1);
+                const totalCPS = (gameState.autoClicksPerSecond * gameState.multiplier) + gameState.currentManualCPS;
+                els.cps.textContent = totalCPS.toFixed(1);
                 els.statClicks.textContent = formatNumber(gameState.clicks);
                 els.statSlotWin.textContent = formatNumber(gameState.slotWins);
 
@@ -1318,14 +1361,21 @@
                 }
             };
 
+            const updateUI = window.updateUI;
+
             setInterval(() => {
                 const seconds = Math.floor((Date.now() - gameState.gameStartTime) / 1000);
                 const m = Math.floor(seconds / 60).toString().padStart(2, '0');
                 const s = (seconds % 60).toString().padStart(2, '0');
                 els.statTime.textContent = `${m}:${s}`;
+
+                // Manual CPS Update
+                gameState.currentManualCPS = gameState.manualClicksLastSecond;
+                gameState.manualClicksLastSecond = 0;
             }, 1000);
 
-            setInterval(createFloater, 2000);
+            // OPTIMIZATION: Reduced floater generation from 2000ms to 4000ms
+            setInterval(createFloater, 4000);
 
             // --- SKITTER SİSTEMİ (MANİPÜLASYON) ---
             const skitterMessagesEl = document.getElementById('skitter-messages');
