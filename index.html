@@ -350,7 +350,7 @@
         <div class="flex items-center gap-3 mb-1">
             <div
                 class="w-10 h-10 rounded-full bg-yellow-500/20 flex items-center justify-center border border-yellow-500/30 overflow-hidden">
-                <span class="text-2xl">🤓</span>
+                <span class="text-2xl" id="yilong-avatar">🤓</span>
             </div>
             <div>
                 <h3 class="text-xs font-bold text-slate-400 uppercase">Yilong Ma</h3>
@@ -362,12 +362,12 @@
         <!-- Hedef Progress Bar -->
         <div class="w-full bg-slate-800 h-2 rounded-full overflow-hidden mt-1 relative">
             <div id="wealth-progress" class="h-full bg-gradient-to-r from-violet-600 to-fuchsia-400 w-0 relative">
-                <div class="absolute right-0 top-0 bottom-0 w-1 bg-white/5 animate-pulse"></div>
+                <div class="absolute right-0 top-0 bottom-0 w-1 bg-white/50 animate-pulse"></div>
             </div>
         </div>
         <div class="flex justify-between text-[9px] text-slate-500 font-mono mt-0.5">
             <span>Senin Paran</span>
-            <span class="text-violet-300">Hedef (2x): <span id="dynamic-target">10M</span></span>
+            <span class="text-violet-300">Hedef: <span id="dynamic-target">10M</span></span>
         </div>
     </div>
 
@@ -433,8 +433,15 @@
                 <!-- Bilgi Notu (SÜRPRİZ) -->
 
                 <div class="flex justify-between items-center mb-2 relative z-10">
-                    <span class="text-xs text-slate-400">Bedel: <span class="text-violet-400 font-bold"
-                            id="slot-cost">500</span> Gyatt</span>
+                    <div id="slot-cost-container" class="text-xs text-slate-400">
+                        Bedel: <span class="text-violet-400 font-bold" id="slot-cost">500</span> Gyatt
+                    </div>
+                    <!-- Phase 2 Bet Input (Initially Hidden) -->
+                    <div id="slot-bet-input-container" class="hidden flex items-center gap-2">
+                        <span class="text-[10px] text-slate-400">BET:</span>
+                        <input type="number" id="slot-bet-input" value="1000" min="100" class="w-20 bg-black/50 border border-white/20 rounded px-2 py-1 text-xs text-right font-mono text-yellow-400 focus:outline-none focus:border-yellow-500">
+                    </div>
+
                     <span class="text-xs text-yellow-400 font-bold" id="slot-status">Şansını Dene!</span>
                 </div>
 
@@ -477,16 +484,12 @@
                     Yilong</p>
             </div>
 
-            <!-- Skor Kartları -->
-            <div class="grid grid-cols-3 gap-3 w-full">
+            <!-- Skor Kartları - Updated Grid to 2 cols (removed CPS) -->
+            <div class="grid grid-cols-2 gap-3 w-full">
                 <div class="glass-panel p-3 md:p-4 rounded-2xl flex flex-col items-center text-center">
                     <span class="text-[10px] md:text-xs font-bold text-slate-400 uppercase">Gyatt Points</span>
                     <div class="text-2xl md:text-4xl font-black text-violet-400 break-all leading-tight mt-1"
                         id="score">0</div>
-                </div>
-                <div class="glass-panel p-3 md:p-4 rounded-2xl flex flex-col items-center text-center">
-                    <span class="text-[10px] md:text-xs font-bold text-slate-400 uppercase">CPS (Saniye)</span>
-                    <div class="text-xl md:text-3xl font-bold text-cyan-400 mt-1" id="cps">0.0</div>
                 </div>
                 <div class="glass-panel p-3 md:p-4 rounded-2xl flex flex-col items-center text-center">
                     <span class="text-[10px] md:text-xs font-bold text-slate-400 uppercase">Senin Servetin</span>
@@ -532,7 +535,7 @@
         </div>
 
         <!-- SAĞ PANEL: Yükseltmeler -->
-        <div class="w-full lg:w-1/4 flex flex-col gap-4 sticky top-4 h-fit">
+        <div id="right-panel" class="w-full lg:w-1/4 flex flex-col gap-4 sticky top-4 h-fit">
             <div class="glass-panel rounded-3xl p-5 border-t-4 border-violet-500">
                 <h2 class="text-xl font-bold mb-4 flex items-center gap-2">
                     <span class="bg-violet-500/20 p-2 rounded-lg text-violet-300">⚡</span>
@@ -560,25 +563,7 @@
                         </div>
                     </button>
 
-                    <!-- Auto Clicker -->
-                    <button id="upgrade-auto"
-                        class="upgrade-btn w-full bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl p-3 flex flex-col gap-1 text-left group">
-                        <div class="flex justify-between items-start w-full">
-                            <div>
-                                <span class="font-bold text-slate-200 group-hover:text-white block">Auto Rizzler</span>
-                                <span class="text-[10px] text-slate-400">+1 Oto Tık/Sn</span>
-                            </div>
-                            <div class="text-right">
-                                <span
-                                    class="bg-cyan-500/20 text-cyan-300 text-[10px] px-1.5 py-0.5 rounded font-mono block mb-1">LVL
-                                    <span id="lvl-auto">0</span></span>
-                            </div>
-                        </div>
-                        <div class="mt-1 pt-2 border-t border-white/5 flex justify-between items-center w-full">
-                            <span class="text-[10px] text-slate-500 uppercase">Bedel</span>
-                            <span id="cost-auto" class="text-cyan-400 font-bold font-mono text-sm">100</span>
-                        </div>
-                    </button>
+                    <!-- Auto Clicker REMOVED -->
 
                     <!-- Multiplier -->
                     <button id="upgrade-multi"
@@ -676,35 +661,52 @@
         </div>
     </div>
 
+    <!-- Gacha Modal -->
+    <div id="gacha-modal" class="fixed inset-0 z-[100] bg-black/95 flex flex-col items-center justify-center opacity-0 pointer-events-none transition-opacity duration-300 backdrop-blur-md">
+        <h2 class="text-3xl md:text-5xl font-black text-red-500 mb-8 animate-pulse tracking-widest uppercase">GİZLİ KASA</h2>
+        <p class="text-slate-400 mb-8 animate-bounce">Bir kart seç...</p>
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-8 w-full max-w-5xl px-4" id="gacha-cards">
+            <!-- Cards injected by JS -->
+        </div>
+    </div>
+
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             // --- OYUN DEĞİŞKENLERİ ---
             let YilongBaseWealth = 5000000; // Yilong Ma'nın NAKİT serveti (Dinamik artıyor)
             let hasWonGame = false;
 
+            // Phase 2 Gacha Items (Black Market)
+            const blackMarketItems = [
+                { id: 'bm_gold_toilet', name: 'Golden Toilet', mult: 2.0, rarity: 'LEGENDARY', color: '#fbbf24' },
+                { id: 'bm_diamond_flush', name: 'Diamond Flush', mult: 1.5, rarity: 'EPIC', color: '#38bdf8' },
+                { id: 'bm_skibidi_crown', name: 'Skibidi Crown', mult: 1.25, rarity: 'RARE', color: '#c084fc' },
+                { id: 'bm_fanum_shield', name: 'Fanum Shield', mult: 1.1, rarity: 'COMMON', color: '#94a3b8' }
+            ];
+
             // Global erişim için window'a ata
             window.gameState = {
+                phase: 1, // Phase 1 or 2
                 score: 0,
                 totalWealth: 0,
                 clicks: 0,
-                autoClicksPerSecond: 0,
                 clickPower: 1,
                 multiplier: 1,
                 marketPassiveRate: 0,
                 gameStartTime: Date.now(),
                 slotWins: 0,
-                manualClicksLastSecond: 0,
-                currentManualCPS: 0,
+
+                // Black Market
+                blackMarketCost: 100000,
+                blackMarketBuffs: [], // Array of collected item IDs
 
                 // Yükseltme Seviyeleri
                 lvlPpc: 1,
-                lvlAuto: 0,
                 lvlMulti: 0,
                 lvlTax: 0,
 
                 // Yükseltme Maliyetleri
                 costPpc: 15,
-                costAuto: 100,
                 costMulti: 2500,
                 costTax: 10000
             };
@@ -715,12 +717,12 @@
             // Elementler
             const els = {
                 score: document.getElementById('score'),
-                cps: document.getElementById('cps'),
                 wealth: document.getElementById('total-wealth'),
                 yilongWealth: document.getElementById('realtime-yilong-wealth'),
                 yilongWealthDisplaySmall: document.getElementById('yilong-ma-servet-display'),
                 wealthProgress: document.getElementById('wealth-progress'),
                 dynamicTargetText: document.getElementById('dynamic-target'),
+                yilongAvatar: document.getElementById('yilong-avatar'),
                 skibidi: document.getElementById('skibidi-toilet'),
                 popupCont: document.getElementById('popup-container'),
                 floaterCont: document.getElementById('floater-container'),
@@ -736,14 +738,11 @@
 
                 // Yükseltme Butonları & Textler
                 btnPpc: document.getElementById('upgrade-ppc'),
-                btnAuto: document.getElementById('upgrade-auto'),
                 btnMulti: document.getElementById('upgrade-multi'),
                 btnTax: document.getElementById('upgrade-tax'),
 
                 txtLvlPpc: document.getElementById('lvl-ppc'),
                 txtCostPpc: document.getElementById('cost-ppc'),
-                txtLvlAuto: document.getElementById('lvl-auto'),
-                txtCostAuto: document.getElementById('cost-auto'),
                 txtLvlMulti: document.getElementById('lvl-multi'),
                 txtCostMulti: document.getElementById('cost-multi'),
                 txtLvlTax: document.getElementById('lvl-tax'),
@@ -752,6 +751,9 @@
                 // Slot
                 spinBtn: document.getElementById('spin-btn'),
                 slotCost: document.getElementById('slot-cost'),
+                slotCostContainer: document.getElementById('slot-cost-container'),
+                slotBetInputContainer: document.getElementById('slot-bet-input-container'),
+                slotBetInput: document.getElementById('slot-bet-input'),
                 slotStatus: document.getElementById('slot-status'),
                 reels: [
                     document.getElementById('reel-inner-1'),
@@ -903,7 +905,6 @@
 
                 gameState.score += gain;
                 gameState.clicks++;
-                gameState.manualClicksLastSecond++;
 
                 if (synth) {
                     const notes = ["C5", "E5", "G5", "B5", "C6"];
@@ -938,7 +939,7 @@
                     gameState[costKey] = Math.floor(gameState[costKey] * 1.6);
 
                     if (type === 'ppc') gameState.clickPower += 1;
-                    if (type === 'auto') gameState.autoClicksPerSecond += 1;
+                    // Auto Clicker Logic Removed
                     if (type === 'multi') gameState.multiplier *= 1.5;
                     if (type === 'tax') gameState.marketPassiveRate += 0.005;
 
@@ -950,16 +951,12 @@
             };
 
             els.btnPpc.addEventListener('click', () => buyUpgrade('costPpc', 'lvlPpc', 'ppc'));
-            els.btnAuto.addEventListener('click', () => buyUpgrade('costAuto', 'lvlAuto', 'auto'));
             els.btnMulti.addEventListener('click', () => buyUpgrade('costMulti', 'lvlMulti', 'multi'));
             els.btnTax.addEventListener('click', () => buyUpgrade('costTax', 'lvlTax', 'tax'));
 
-            // --- OTO TIKLAYICI ---
+            // --- OTO TIKLAYICI REMOVED ---
             setInterval(() => {
-                if (gameState.autoClicksPerSecond > 0) {
-                    const gain = (gameState.autoClicksPerSecond * gameState.multiplier) / 10;
-                    gameState.score += gain;
-                }
+                // Removed Auto Clicker Gain Logic
 
                 if (gameState.marketPassiveRate > 0) {
                     let marketValue = 0;
@@ -974,11 +971,232 @@
                 updateUI();
             }, 100);
 
+            // --- PHASE 2 TRANSITION LOGIC ---
+            const triggerPhase2 = () => {
+                gameState.phase = 2;
+
+                // 1. HARD RESET (Assets & Basic Upgrades)
+                gameState.score = 0;
+                gameState.clicks = 0;
+                gameState.clickPower = 10; // Start slightly stronger
+                gameState.multiplier = 1;
+                gameState.marketPassiveRate = 0;
+                gameState.slotWins = 0;
+
+                // Reset Upgrades
+                gameState.lvlPpc = 1; gameState.costPpc = 15;
+                gameState.lvlMulti = 0; gameState.costMulti = 2500;
+                gameState.lvlTax = 0; gameState.costTax = 10000;
+
+                // Reset Assets
+                for(let k in assets) {
+                    assets[k].count = 0;
+                    assets[k].price = assets[k].history[0]; // Reset price roughly to base
+                }
+
+                // Apply Black Market Buffs (Permanent Multipliers)
+                recalculateMultipliers();
+
+                // 2. YILONG EVOLUTION -> SIGMA STATUE
+                YilongBaseWealth = 50000000; // New Base: 50M
+                els.yilongAvatar.innerHTML = '🗿'; // Sigma Statue
+                els.yilongAvatar.parentElement.classList.remove('bg-yellow-500/20', 'border-yellow-500/30');
+                els.yilongAvatar.parentElement.classList.add('bg-stone-500/20', 'border-stone-500/30');
+
+                // Change UI Colors to reflect Phase 2
+                document.body.style.background = "linear-gradient(-45deg, #2a0a10, #450a1f, #1a0505, #000000)";
+
+                // 3. SHOW TRANSITION MESSAGE
+                showMessage(`
+                    <h2 class="text-4xl font-black text-red-500 mb-4 animate-pulse">⚠️ PHASE 2 BAŞLADI ⚠️</h2>
+                    <div class="text-6xl mb-4">🗿</div>
+                    <p class="text-lg text-slate-300 mb-4">
+                        Yilong Ma, nihai formuna ulaştı: <strong class="text-stone-400">SIGMA STATUE</strong>.
+                    </p>
+                    <p class="text-sm text-slate-400 mb-6">
+                        Piyasa çöktü. Her şey sıfırlandı.<br>
+                        Ama artık <strong>KARA BORSA (Black Market)</strong> açık.
+                    </p>
+                    <button class="bg-red-600 text-white px-4 py-2 rounded font-bold" disabled>Hedef: 500M</button>
+                `);
+
+                // Update UI visibility for Phase 2 elements
+                renderBlackMarketUI();
+
+                // Enable Phase 2 Slot Betting
+                els.slotCostContainer.classList.add('hidden');
+                els.slotBetInputContainer.classList.remove('hidden');
+                els.slotBetInputContainer.classList.add('flex');
+
+                updateUI();
+            };
+
+            const recalculateMultipliers = () => {
+                let bmMult = 1;
+                gameState.blackMarketBuffs.forEach(buffId => {
+                    const item = blackMarketItems.find(i => i.id === buffId);
+                    if(item) bmMult *= item.mult;
+                });
+                gameState.multiplier *= bmMult;
+            };
+
+            const renderBlackMarketUI = () => {
+                let bmContainer = document.getElementById('black-market-panel');
+                if (!bmContainer) {
+                    const upgradesCol = document.getElementById('right-panel');
+                    bmContainer = document.createElement('div');
+                    bmContainer.id = 'black-market-panel';
+                    bmContainer.className = 'glass-panel rounded-3xl p-5 border-t-4 border-red-600 mt-4';
+                    bmContainer.innerHTML = `
+                        <h2 class="text-xl font-bold mb-4 flex items-center gap-2 text-red-500">
+                            <span class="bg-red-500/20 p-2 rounded-lg text-red-500">🏴‍☠️</span>
+                            Kara Borsa
+                        </h2>
+                        <div class="text-xs text-slate-400 mb-3">
+                            Kalıcı güçlendirmeler satın al. Resetten etkilenmez.
+                        </div>
+                        <button id="btn-black-market-buy" class="w-full bg-gradient-to-r from-red-900 to-slate-900 hover:from-red-800 hover:to-slate-800 border border-red-500/30 text-white font-bold py-3 rounded-xl shadow-lg relative overflow-hidden group">
+                            <span class="relative z-10 flex flex-col items-center">
+                                <span>GİZLİ KASA AÇ</span>
+                                <span class="text-xs font-mono text-red-300" id="bm-cost-display">100.00K</span>
+                            </span>
+                            <div class="absolute inset-0 bg-red-500/10 transform scale-x-0 group-hover:scale-x-100 transition-transform origin-left"></div>
+                        </button>
+                        <div id="bm-inventory" class="grid grid-cols-4 gap-2 mt-4"></div>
+                    `;
+                    upgradesCol.appendChild(bmContainer);
+                    document.getElementById('btn-black-market-buy').addEventListener('click', buyBlackMarketItem);
+                }
+                updateBlackMarketUI();
+            };
+
+            const updateBlackMarketUI = () => {
+                const btn = document.getElementById('btn-black-market-buy');
+                const costDisplay = document.getElementById('bm-cost-display');
+                if(!btn) return;
+
+                costDisplay.textContent = formatNumber(gameState.blackMarketCost);
+
+                if(gameState.score < gameState.blackMarketCost) {
+                    btn.disabled = true;
+                    btn.classList.add('opacity-50', 'grayscale');
+                } else {
+                    btn.disabled = false;
+                    btn.classList.remove('opacity-50', 'grayscale');
+                }
+
+                const inv = document.getElementById('bm-inventory');
+                inv.innerHTML = '';
+                gameState.blackMarketBuffs.forEach(buffId => {
+                    const item = blackMarketItems.find(i => i.id === buffId);
+                    if(item) {
+                        const el = document.createElement('div');
+                        el.className = 'aspect-square rounded-lg bg-slate-800 border flex items-center justify-center text-xl relative group cursor-help';
+                        el.style.borderColor = item.color;
+                        el.textContent = '📦';
+                        el.innerHTML = `
+                            <div class="absolute inset-0 flex items-center justify-center text-2xl">🎁</div>
+                            <div class="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 w-32 bg-black/90 border border-white/10 p-2 rounded text-[10px] text-center pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity z-50">
+                                <strong style="color:${item.color}">${item.name}</strong><br>
+                                x${item.mult} Mult
+                            </div>
+                        `;
+                        inv.appendChild(el);
+                    }
+                });
+            };
+
+            const buyBlackMarketItem = () => {
+                if(gameState.score >= gameState.blackMarketCost) {
+                    gameState.score -= gameState.blackMarketCost;
+
+                    // Update Cost: 10x
+                    gameState.blackMarketCost = gameState.blackMarketCost * 10;
+                    updateUI();
+
+                    openGachaModal();
+                }
+            };
+
+            const openGachaModal = () => {
+                const modal = document.getElementById('gacha-modal');
+                const container = document.getElementById('gacha-cards');
+
+                modal.style.opacity = 1;
+                modal.style.pointerEvents = 'auto';
+                container.innerHTML = '';
+
+                let hasPicked = false;
+
+                // Create 4 Cards
+                for(let i=0; i<4; i++) {
+                    const card = document.createElement('div');
+                    card.className = "aspect-[3/4] bg-gradient-to-br from-slate-800 to-black border-2 border-red-900/50 rounded-xl cursor-pointer transform hover:scale-105 transition-all duration-300 relative overflow-hidden group shadow-[0_0_30px_rgba(220,38,38,0.2)]";
+                    card.innerHTML = `
+                        <div class="absolute inset-0 flex items-center justify-center text-6xl opacity-20 group-hover:opacity-100 transition-opacity">❓</div>
+                        <div class="absolute inset-0 bg-red-500/10 opacity-0 group-hover:opacity-20 transition-opacity"></div>
+                    `;
+
+                    card.addEventListener('click', () => {
+                        if(hasPicked) return;
+                        hasPicked = true;
+
+                        // Select Item
+                        const roll = Math.random();
+                        let item;
+                        if(roll < 0.05) item = blackMarketItems[0]; // Legendary
+                        else if(roll < 0.20) item = blackMarketItems[1]; // Epic
+                        else if(roll < 0.50) item = blackMarketItems[2]; // Rare
+                        else item = blackMarketItems[3]; // Common
+
+                        // Reveal Animation for Selected Card
+                        card.style.transform = "rotateY(180deg)";
+                        card.style.transition = "transform 0.6s";
+
+                        setTimeout(() => {
+                            card.style.transform = "rotateY(0deg)";
+                            card.className = "aspect-[3/4] bg-slate-900 border-4 rounded-xl flex flex-col items-center justify-center gap-4 shadow-[0_0_50px_currentColor] scale-110 z-50";
+                            card.style.borderColor = item.color;
+                            card.style.color = item.color;
+                            card.innerHTML = `
+                                <div class="text-6xl animate-bounce">🎁</div>
+                                <div class="text-center px-2">
+                                    <h3 class="font-bold text-xl leading-tight">${item.name}</h3>
+                                    <p class="text-xs text-white mt-2 font-mono">x${item.mult} Mult</p>
+                                    <p class="text-[10px] mt-1 opacity-70">${item.rarity}</p>
+                                </div>
+                            `;
+
+                            if(synth) synth.triggerAttackRelease(["C4", "G4", "C5"], "4n");
+
+                            // Process Reward
+                            gameState.blackMarketBuffs.push(item.id);
+                            recalculateMultipliers();
+                            updateUI();
+
+                            // Close Modal after delay
+                            setTimeout(() => {
+                                modal.style.opacity = 0;
+                                modal.style.pointerEvents = 'none';
+                            }, 2500);
+
+                        }, 300);
+
+                        // Fade out other cards
+                        Array.from(container.children).forEach(c => {
+                            if(c !== card) c.style.opacity = 0.2;
+                        });
+                    });
+
+                    container.appendChild(card);
+                }
+            };
+
             // --- SLOT MAKİNESİ ---
             const slotSymbols = ['🍒', '🍋', '🍇', '💎', '7️⃣', '🚽', '6️⃣', '8️⃣', '9️⃣'];
             const slotWeights = [25, 20, 15, 10, 8, 2, 8, 6, 6];
             let isSpinning = false;
-            let slotCost = 500;
+            let slotCost = 500; // Phase 1 Fixed Cost
 
             const getRandomSymbol = () => {
                 const rand = Math.random() * 100;
@@ -991,12 +1209,31 @@
             };
 
             const spinSlots = async (isMobile = false) => {
-                if (isSpinning || gameState.score < slotCost) return;
+                let currentBet = slotCost;
+
+                // Phase 2: Use custom bet
+                if (gameState.phase === 2) {
+                    const val = parseInt(els.slotBetInput.value);
+                    if (isNaN(val) || val < 100) {
+                        els.slotStatus.textContent = "Min Bet: 100";
+                        return;
+                    }
+                    if (val > gameState.score) {
+                        els.slotStatus.textContent = "Yetersiz Bakiye";
+                        return;
+                    }
+                    currentBet = val;
+                } else {
+                    // Phase 1 check
+                    if (gameState.score < slotCost) return;
+                }
+
+                if (isSpinning) return;
 
                 // Initialize audio to prevent freeze
                 await initAudio();
 
-                gameState.score -= slotCost;
+                gameState.score -= currentBet;
                 isSpinning = true;
 
                 const btn = isMobile ? els.mSpinBtn : els.spinBtn;
@@ -1054,23 +1291,25 @@
 
                     // 1. ÖZEL KURAL: 7 - 8 - 9
                     if (results[0] === '7️⃣' && results[1] === '8️⃣' && results[2] === '9️⃣') {
-                        const specialPrize = 200000;
-                        gameState.score += specialPrize;
-                        gameState.slotWins += specialPrize;
-                        status.textContent = "BÜYÜK İKRAMİYE! 7-8-9";
+                        winMult = 50;
+                        const winAmount = currentBet * winMult;
+                        gameState.score += winAmount;
+                        gameState.slotWins += winAmount;
+                        status.textContent = "BÜYÜK İKRAMİYE! x50";
                         status.className = "text-fuchsia-400 font-bold jackpot-anim";
-                        createPopup(`+200K`, "#f0abfc", window.innerWidth / 2, window.innerHeight / 2);
+                        createPopup(`+${formatNumber(winAmount)}`, "#f0abfc", window.innerWidth / 2, window.innerHeight / 2);
                         if (synth) synth.triggerAttackRelease(["C4", "E4", "G4", "C5", "E5", "G5"], "2n");
                         isSpecialWin = true;
                     }
                     // 2. ÖZEL KURAL: 6 ve 7 Yanyana
                     else if ((results[0] === '6️⃣' && results[1] === '7️⃣') || (results[1] === '6️⃣' && results[2] === '7️⃣')) {
-                        const specialPrize = 30000;
-                        gameState.score += specialPrize;
-                        gameState.slotWins += specialPrize;
-                        status.textContent = "YAN YANA 6 & 7! 🔥";
+                        winMult = 10;
+                        const winAmount = currentBet * winMult;
+                        gameState.score += winAmount;
+                        gameState.slotWins += winAmount;
+                        status.textContent = "YAN YANA 6 & 7! x10";
                         status.className = "text-orange-400 font-bold jackpot-anim";
-                        createPopup(`+30K`, "#fb923c", window.innerWidth / 2, window.innerHeight / 2);
+                        createPopup(`+${formatNumber(winAmount)}`, "#fb923c", window.innerWidth / 2, window.innerHeight / 2);
                         if (synth) synth.triggerAttackRelease(["C5", "G5"], "4n");
                         isSpecialWin = true;
                     }
@@ -1096,7 +1335,7 @@
                         status.textContent = winText;
                         status.className = winColor;
                         if (winMult > 0) {
-                            const winAmount = slotCost * winMult;
+                            const winAmount = currentBet * winMult;
                             gameState.score += winAmount;
                             gameState.slotWins += winAmount;
                             createPopup(`+${formatNumber(winAmount)}`, "#facc15", window.innerWidth / 2, window.innerHeight / 2);
@@ -1270,8 +1509,7 @@
             // --- UI GÜNCELLEME ---
             window.updateUI = () => {
                 els.score.textContent = formatNumber(gameState.score);
-                const totalCPS = (gameState.autoClicksPerSecond * gameState.multiplier) + gameState.currentManualCPS;
-                els.cps.textContent = totalCPS.toFixed(1);
+                // CPS Logic Removed
                 els.statClicks.textContent = formatNumber(gameState.clicks);
                 els.statSlotWin.textContent = formatNumber(gameState.slotWins);
 
@@ -1290,8 +1528,9 @@
                 const currentYilongWealth = YilongBaseWealth;
                 const displayYilong = formatNumber(currentYilongWealth);
 
-                // Senin Hedefin: Yilong'un servetinin 2 katı
-                const currentTarget = currentYilongWealth * 2;
+                // Senin Hedefin: Phase 1 -> 2x, Phase 2 -> 10x
+                const targetMult = gameState.phase === 2 ? 10 : 2;
+                const currentTarget = currentYilongWealth * targetMult;
                 const displayTarget = formatNumber(currentTarget);
 
                 // UI Güncelleme
@@ -1305,28 +1544,14 @@
                 if (progress > 100) progress = 100;
                 els.wealthProgress.style.width = `${progress}%`;
 
-                // KAZANMA KONTROLÜ
-                if (!hasWonGame && gameState.totalWealth >= currentTarget) {
-                    hasWonGame = true;
-                    showMessage(`
-                        <h2 class="text-4xl font-black text-yellow-400 mb-4">🏆 YILONG'U YENDİN! 🏆</h2>
-                        <p class="text-lg text-slate-300 mb-4">
-                            Yilong Ma'nın servetini <strong class="text-green-400">2'YE KATLAYARAK</strong> geçtin!
-                        </p>
-                        <p class="text-sm text-slate-400 mb-6">
-                            Yilong: <span class="text-slate-200">${displayYilong}</span> <br>
-                            Sen: <span class="text-yellow-400 font-bold">${formatNumber(gameState.totalWealth)}</span>
-                        </p>
-                        <div class="text-6xl animate-bounce">👑</div>
-                        <p class="text-[10px] text-slate-500 mt-4">Artık piyasanın yeni kralı sensin!</p>
-                    `);
+                // KAZANMA KONTROLÜ (Phase 1 -> Phase 2 Transition)
+                if (gameState.phase === 1 && gameState.totalWealth >= currentTarget) {
+                    triggerPhase2();
+                }
 
-                    if (synth) synth.triggerAttackRelease(["C4", "E4", "G4", "C5", "E5", "G5", "C6"], "2n");
-                    for (let i = 0; i < 5; i++) {
-                        setTimeout(() => {
-                            createParticles(window.innerWidth / 2, window.innerHeight / 2, 20, ['#facc15', '#fff', '#4ade80']);
-                        }, i * 200);
-                    }
+                // Phase 2 UI Update
+                if (gameState.phase === 2) {
+                    if (typeof updateBlackMarketUI === 'function') updateBlackMarketUI();
                 }
 
                 // Buton Durumları
@@ -1334,9 +1559,7 @@
                 els.txtCostPpc.textContent = formatNumber(gameState.costPpc);
                 els.btnPpc.disabled = gameState.score < gameState.costPpc;
 
-                els.txtLvlAuto.textContent = gameState.lvlAuto;
-                els.txtCostAuto.textContent = formatNumber(gameState.costAuto);
-                els.btnAuto.disabled = gameState.score < gameState.costAuto;
+                // Auto Button Logic Removed
 
                 els.txtLvlMulti.textContent = gameState.lvlMulti;
                 els.txtCostMulti.textContent = formatNumber(gameState.costMulti);
@@ -1369,9 +1592,7 @@
                 const s = (seconds % 60).toString().padStart(2, '0');
                 els.statTime.textContent = `${m}:${s}`;
 
-                // Manual CPS Update
-                gameState.currentManualCPS = gameState.manualClicksLastSecond;
-                gameState.manualClicksLastSecond = 0;
+                // Manual CPS Logic Removed
             }, 1000);
 
             // OPTIMIZATION: Reduced floater generation from 2000ms to 4000ms
