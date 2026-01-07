@@ -976,7 +976,7 @@
                 gameState.phase = 2;
 
                 // 1. HARD RESET (Assets & Basic Upgrades)
-                gameState.score = 0;
+                gameState.score = 10000; // Small fighting chance
                 gameState.clicks = 0;
                 gameState.clickPower = 10; // Start slightly stronger
                 gameState.multiplier = 1;
@@ -1006,18 +1006,26 @@
                 // Change UI Colors to reflect Phase 2
                 document.body.style.background = "linear-gradient(-45deg, #2a0a10, #450a1f, #1a0505, #000000)";
 
-                // 3. SHOW TRANSITION MESSAGE
+                // Audio Atmosphere
+                if (synth) synth.triggerAttackRelease("A1", "2n");
+
+                // 3. SHOW TRANSITION MESSAGE (DEVLET VERGİSİ / TAX EVENT)
+                els.msgContent.className += " border-red-600 shadow-[0_0_50px_red] animate-bounce-short";
                 showMessage(`
-                    <h2 class="text-4xl font-black text-red-500 mb-4 animate-pulse">⚠️ PHASE 2 BAŞLADI ⚠️</h2>
-                    <div class="text-6xl mb-4">🗿</div>
-                    <p class="text-lg text-slate-300 mb-4">
-                        Yilong Ma, nihai formuna ulaştı: <strong class="text-stone-400">SIGMA STATUE</strong>.
+                    <h2 class="text-5xl font-black text-red-600 mb-6 tracking-tighter animate-pulse">⚠️ DEVLET VERGİSİ ⚠️</h2>
+                    <div class="text-8xl mb-6 animate-bounce">🏛️</div>
+                    <p class="text-xl text-slate-300 mb-6 italic border-l-4 border-red-500 pl-4 py-2 bg-red-900/20">
+                        "Sen kiminle dans ettiğini bilmiyorsun..." <br>
+                        <span class="text-sm not-italic text-stone-400 mt-2 block">- Sigma Yilong</span>
                     </p>
-                    <p class="text-sm text-slate-400 mb-6">
-                        Piyasa çöktü. Her şey sıfırlandı.<br>
-                        Ama artık <strong>KARA BORSA (Black Market)</strong> açık.
+                    <p class="text-sm text-slate-400 mb-8">
+                        Devlet ve Yilong işbirliği yaptı. Tüm varlıklarına el konuldu.<br>
+                        Geriye sadece <strong>10,000 Gyatt</strong> ve <strong>Kara Borsa</strong> erişimi kaldı.
                     </p>
-                    <button class="bg-red-600 text-white px-4 py-2 rounded font-bold" disabled>Hedef: 500M</button>
+                    <div class="bg-black/50 p-4 rounded-xl border border-red-500/30">
+                         <span class="text-red-400 font-mono text-xs">YENİ HEDEF:</span>
+                         <span class="text-2xl font-black text-white block">500.00M</span>
+                    </div>
                 `);
 
                 // Update UI visibility for Phase 2 elements
@@ -1195,14 +1203,16 @@
             // --- SLOT MAKİNESİ ---
             const slotSymbols = ['🍒', '🍋', '🍇', '💎', '7️⃣', '🚽', '6️⃣', '8️⃣', '9️⃣'];
             const slotWeights = [25, 20, 15, 10, 8, 2, 8, 6, 6];
+            const slotWeightsP2 = [20, 15, 12, 10, 12, 5, 10, 8, 8]; // Phase 2 Boosted Odds
             let isSpinning = false;
             let slotCost = 500; // Phase 1 Fixed Cost
 
             const getRandomSymbol = () => {
+                const weights = gameState.phase === 2 ? slotWeightsP2 : slotWeights;
                 const rand = Math.random() * 100;
                 let sum = 0;
-                for (let i = 0; i < slotWeights.length; i++) {
-                    sum += slotWeights[i];
+                for (let i = 0; i < weights.length; i++) {
+                    sum += weights[i];
                     if (rand <= sum) return slotSymbols[i];
                 }
                 return slotSymbols[0];
@@ -1289,13 +1299,15 @@
                     let winColor = "text-slate-400";
                     let isSpecialWin = false;
 
+                    const isPhase2 = gameState.phase === 2;
+
                     // 1. ÖZEL KURAL: 7 - 8 - 9
                     if (results[0] === '7️⃣' && results[1] === '8️⃣' && results[2] === '9️⃣') {
-                        winMult = 50;
+                        winMult = isPhase2 ? 60 : 50;
                         const winAmount = currentBet * winMult;
                         gameState.score += winAmount;
                         gameState.slotWins += winAmount;
-                        status.textContent = "BÜYÜK İKRAMİYE! x50";
+                        status.textContent = isPhase2 ? "SIGMA GRINDSET! x60" : "BÜYÜK İKRAMİYE! x50";
                         status.className = "text-fuchsia-400 font-bold jackpot-anim";
                         createPopup(`+${formatNumber(winAmount)}`, "#f0abfc", window.innerWidth / 2, window.innerHeight / 2);
                         if (synth) synth.triggerAttackRelease(["C4", "E4", "G4", "C5", "E5", "G5"], "2n");
@@ -1303,11 +1315,11 @@
                     }
                     // 2. ÖZEL KURAL: 6 ve 7 Yanyana
                     else if ((results[0] === '6️⃣' && results[1] === '7️⃣') || (results[1] === '6️⃣' && results[2] === '7️⃣')) {
-                        winMult = 10;
+                        winMult = isPhase2 ? 50 : 10;
                         const winAmount = currentBet * winMult;
                         gameState.score += winAmount;
                         gameState.slotWins += winAmount;
-                        status.textContent = "YAN YANA 6 & 7! x10";
+                        status.textContent = isPhase2 ? "YAN YANA 6 & 7! x50" : "YAN YANA 6 & 7! x10";
                         status.className = "text-orange-400 font-bold jackpot-anim";
                         createPopup(`+${formatNumber(winAmount)}`, "#fb923c", window.innerWidth / 2, window.innerHeight / 2);
                         if (synth) synth.triggerAttackRelease(["C5", "G5"], "4n");
@@ -1315,15 +1327,21 @@
                     }
                     // Standart Kurallar
                     else if (results[0] === results[1] && results[1] === results[2]) {
-                        if (results[0] === '🚽') winMult = 500;
-                        else if (results[0] === '7️⃣') winMult = 100;
-                        else if (results[0] === '💎') winMult = 50;
-                        else winMult = 20;
+                        const mToilet = isPhase2 ? 1000 : 500;
+                        const m7 = isPhase2 ? 200 : 100;
+                        const mDiamond = isPhase2 ? 100 : 50;
+                        const mBase = isPhase2 ? 40 : 20;
+
+                        if (results[0] === '🚽') winMult = mToilet;
+                        else if (results[0] === '7️⃣') winMult = m7;
+                        else if (results[0] === '💎') winMult = mDiamond;
+                        else winMult = mBase;
+
                         winText = "JACKPOT! 🔥";
                         winColor = "text-green-400 font-bold jackpot-anim";
                         if (synth) synth.triggerAttackRelease(["C5", "E5", "G5", "C6"], "4n");
                     } else if (results[0] === results[1] || results[1] === results[2] || results[0] === results[2]) {
-                        winMult = 3;
+                        winMult = isPhase2 ? 5 : 3;
                         winText = "Güzel! 👍";
                         winColor = "text-cyan-400 font-bold";
                     } else {
@@ -1549,6 +1567,54 @@
                     triggerPhase2();
                 }
 
+                // NEW: Phase 2 Victory (True Ending)
+                if (gameState.phase === 2 && gameState.totalWealth >= currentTarget && !gameState.gameWon) {
+                     gameState.gameWon = true;
+
+                     // 1. Visual Changes
+                     els.yilongAvatar.innerHTML = '😭';
+                     els.yilongAvatar.parentElement.classList.remove('bg-stone-500/20', 'border-stone-500/30');
+                     els.yilongAvatar.parentElement.classList.add('bg-red-500/20', 'border-red-500/30');
+
+                     // Update Names
+                     const nameLabel = els.yilongAvatar.parentElement.nextElementSibling.querySelector('h3');
+                     if(nameLabel) nameLabel.textContent = "BROKE YILONG";
+                     els.yilongWealthDisplaySmall.previousElementSibling.textContent = "BROKE YILONG";
+
+                     // Player Ascension
+                     els.skibidi.textContent = '👑';
+
+                     // 2. Market Manipulation (Force Green)
+                     for(let k in assets) {
+                         assets[k].price *= 5; // Pump it
+                     }
+
+                     // 3. Victory Modal
+                     showMessage(`
+                        <h2 class="text-5xl font-black text-yellow-400 mb-6 tracking-tighter animate-pulse">👑 PIYASANIN YENİ SAHİBİ SENSİN! 👑</h2>
+                        <p class="text-xl text-slate-300 mb-6">
+                            "Yilong Ma diz çöktü. Artık kuralları sen koyuyorsun."
+                        </p>
+                        <div class="text-8xl mb-6 animate-bounce">🗿</div>
+                        <p class="text-sm text-slate-400 mb-8">
+                            Sonsuz servet ve güç senin elinde.
+                        </p>
+                        <button id="victory-continue" class="bg-yellow-500 hover:bg-yellow-400 text-black px-8 py-4 rounded-xl font-black text-xl shadow-[0_0_30px_rgba(234,179,8,0.5)] transition-all transform hover:scale-105">
+                            SONSUZ MODDA DEVAM ET
+                        </button>
+                     `);
+
+                     setTimeout(() => {
+                        const btn = document.getElementById('victory-continue');
+                        if(btn) btn.addEventListener('click', () => {
+                             els.msgBox.style.opacity = 0;
+                             els.msgBox.style.pointerEvents = 'none';
+                        });
+                     }, 100);
+
+                     if (synth) synth.triggerAttackRelease(["C4", "E4", "G4", "C5", "E5", "G5", "C6", "E6"], "1n");
+                }
+
                 // Phase 2 UI Update
                 if (gameState.phase === 2) {
                     if (typeof updateBlackMarketUI === 'function') updateBlackMarketUI();
@@ -1640,19 +1706,36 @@
                 }
             };
 
-            // Yilong Ma Piyasayı Manipüle Ediyor
+            // Yilong Ma Piyasayı Manipüle Ediyor (Phase 2 Toxic Updates included)
             setInterval(() => {
                 if (Math.random() < 0.5) { // %50 şansla tweet
+                    const isPhase2 = gameState.phase === 2;
+                    let phrase = "";
                     const keys = Object.keys(assets);
                     const targetKey = keys[Math.floor(Math.random() * keys.length)];
                     const target = assets[targetKey];
-                    let phrase = "";
-
-                    // PARLAMA EFEKTİ İÇİN ELEMENTİ BUL
                     const marketItem = document.getElementById(`market-${targetKey}-container`);
 
-                    // 1. MANİPÜLASYON MANTIĞI
-                    if (target.type === 'fiat') {
+                    if (isPhase2 && Math.random() < 0.4) {
+                        // PHASE 2 TOXICITY
+                        const toxic = [
+                            "Babanın şirketini de satın alacağım.",
+                            "Fakirler ağlamasın.",
+                            "Borsa benim oyun alanım.",
+                            "Tuvalet kağıdı bile alamayacaksın.",
+                            "Senin servetin benim bahşişim.",
+                            "Ağlama duvarı sağ tarafta ->"
+                        ];
+                        phrase = toxic[Math.floor(Math.random() * toxic.length)];
+
+                        // Phase 2 extra annoying buff
+                        if(Math.random() < 0.5) {
+                            YilongBaseWealth += 500000;
+                            createPopup(`Yilong: +500K`, "#ef4444", 90, 10);
+                        }
+                    } else {
+                        // STANDARD LOGIC
+                        if (target.type === 'fiat') {
                         phrase = `Bütün paramı ${target.name}'ye yatırdım. Diğer kağıt paralar çöp! 🚮`;
 
                         for (let k in assets) {
@@ -1687,6 +1770,7 @@
                     postSkitt(phrase, "Yilong Ma", true);
                     updateUI();
                 }
+                } // Close outer if
             }, 12000); // 12 saniyede bir
 
             postSkitt("5 Milyon dolarım var. Sizi geçeceğim! 😎");
