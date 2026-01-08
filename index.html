@@ -496,10 +496,16 @@
                     <span class="text-xs text-yellow-400 font-bold" id="slot-status">Şansını Dene!</span>
                 </div>
 
-                <button id="spin-btn"
-                    class="w-full bg-gradient-to-r from-yellow-600 to-orange-600 hover:from-yellow-500 hover:to-orange-500 text-white font-bold py-3 rounded-xl shadow-lg transform active:scale-95 transition-all relative z-10 border border-yellow-400/30">
-                    ÇEVİR! (SPIN)
-                </button>
+                <div class="flex gap-2 relative z-10">
+                    <button id="spin-btn"
+                        class="flex-1 bg-gradient-to-r from-yellow-600 to-orange-600 hover:from-yellow-500 hover:to-orange-500 text-white font-bold py-3 rounded-xl shadow-lg transform active:scale-95 transition-all border border-yellow-400/30">
+                        ÇEVİR!
+                    </button>
+                    <button id="spin-all-in-btn"
+                        class="hidden flex-1 bg-gradient-to-r from-red-600 to-purple-600 hover:from-red-500 hover:to-purple-500 text-white font-bold py-3 rounded-xl shadow-lg transform active:scale-95 transition-all border border-purple-400/30">
+                        ALL IN!
+                    </button>
+                </div>
             </div>
 
             <!-- Ekstra İstatistikler -->
@@ -709,8 +715,12 @@
                 <p class="text-lg font-bold text-yellow-500" id="m-slot-status">Şansını Dene!</p>
             </div>
 
-            <button id="m-spin-btn"
-                class="w-full bg-yellow-600 hover:bg-yellow-500 text-white font-bold py-4 rounded-xl">ÇEVİR!</button>
+            <div class="flex gap-2 w-full">
+                <button id="m-spin-btn"
+                    class="flex-1 bg-yellow-600 hover:bg-yellow-500 text-white font-bold py-4 rounded-xl">ÇEVİR!</button>
+                <button id="m-spin-all-in-btn"
+                    class="hidden flex-1 bg-purple-600 hover:bg-purple-500 text-white font-bold py-4 rounded-xl">ALL IN!</button>
+            </div>
         </div>
     </div>
 
@@ -1016,6 +1026,7 @@
 
                 // Slot
                 spinBtn: document.getElementById('spin-btn'),
+                spinAllInBtn: document.getElementById('spin-all-in-btn'),
                 slotCost: document.getElementById('slot-cost'),
                 slotCostContainer: document.getElementById('slot-cost-container'),
                 slotBetInputContainer: document.getElementById('slot-bet-input-container'),
@@ -1028,6 +1039,7 @@
                 ],
                 // Mobile Slot
                 mSpinBtn: document.getElementById('m-spin-btn'),
+                mSpinAllInBtn: document.getElementById('m-spin-all-in-btn'),
                 mSlotCost: document.getElementById('m-slot-cost'),
                 mSlotStatus: document.getElementById('m-slot-status'),
                 mReels: [
@@ -1499,11 +1511,13 @@
                 return slotSymbols[0];
             };
 
-            const spinSlots = async (isMobile = false) => {
+            const spinSlots = async (isMobile = false, overrideBet = -1) => {
                 let currentBet = slotCost;
 
-                // Phase 2: Use custom bet
-                if (gameState.phase === 2) {
+                // Phase 2+: Use custom bet or override
+                if (overrideBet > 0) {
+                    currentBet = overrideBet;
+                } else if (gameState.phase >= 2) {
                     const val = parseInt(els.slotBetInput.value);
                     if (isNaN(val) || val < 100) {
                         els.slotStatus.textContent = "Min Bet: 100";
@@ -1520,6 +1534,7 @@
                 }
 
                 if (isSpinning) return;
+                if (gameState.score < currentBet) return; // Safety check
 
                 // Initialize audio to prevent freeze
                 await initAudio();
@@ -1528,11 +1543,16 @@
                 isSpinning = true;
 
                 const btn = isMobile ? els.mSpinBtn : els.spinBtn;
+                const allInBtn = isMobile ? els.mSpinAllInBtn : els.spinAllInBtn;
                 const status = isMobile ? els.mSlotStatus : els.slotStatus;
                 const currentReels = isMobile ? els.mReels : els.reels;
 
                 btn.disabled = true;
                 btn.classList.add('opacity-50');
+                if(allInBtn) {
+                    allInBtn.disabled = true;
+                    allInBtn.classList.add('opacity-50');
+                }
                 status.textContent = "Çeviriliyor...";
                 status.className = "text-yellow-200 animate-pulse";
 
@@ -1644,12 +1664,18 @@
                     isSpinning = false;
                     btn.disabled = false;
                     btn.classList.remove('opacity-50');
+                    if(allInBtn) {
+                        allInBtn.disabled = false;
+                        allInBtn.classList.remove('opacity-50');
+                    }
                     updateUI();
                 }, 2000);
             };
 
             els.spinBtn.addEventListener('click', () => spinSlots(false));
             els.mSpinBtn.addEventListener('click', () => spinSlots(true));
+            if(els.spinAllInBtn) els.spinAllInBtn.addEventListener('click', () => spinSlots(false, gameState.score));
+            if(els.mSpinAllInBtn) els.mSpinAllInBtn.addEventListener('click', () => spinSlots(true, gameState.score));
 
 
             // --- MARKET SİSTEMİ ---
@@ -1969,16 +1995,36 @@
 
                 els.slotCost.textContent = formatNumber(slotCost);
                 els.mSlotCost.textContent = formatNumber(slotCost);
+
+                // Toggle All In Visibility
+                if (gameState.phase >= 2) {
+                    if (els.spinAllInBtn) els.spinAllInBtn.classList.remove('hidden');
+                    if (els.mSpinAllInBtn) els.mSpinAllInBtn.classList.remove('hidden');
+                } else {
+                    if (els.spinAllInBtn) els.spinAllInBtn.classList.add('hidden');
+                    if (els.mSpinAllInBtn) els.mSpinAllInBtn.classList.add('hidden');
+                }
+
                 if (gameState.score < slotCost) {
                     els.spinBtn.disabled = true;
                     els.mSpinBtn.disabled = true;
                     els.spinBtn.classList.add('opacity-50');
                     els.mSpinBtn.classList.add('opacity-50');
+                    if(els.spinAllInBtn) els.spinAllInBtn.disabled = true;
+                    if(els.mSpinAllInBtn) els.mSpinAllInBtn.disabled = true;
                 } else if (!isSpinning) {
                     els.spinBtn.disabled = false;
                     els.mSpinBtn.disabled = false;
                     els.spinBtn.classList.remove('opacity-50');
                     els.mSpinBtn.classList.remove('opacity-50');
+                    if(els.spinAllInBtn) {
+                        els.spinAllInBtn.disabled = false;
+                        els.spinAllInBtn.classList.remove('opacity-50');
+                    }
+                    if(els.mSpinAllInBtn) {
+                        els.mSpinAllInBtn.disabled = false;
+                        els.mSpinAllInBtn.classList.remove('opacity-50');
+                    }
                 }
             };
 
