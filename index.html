@@ -361,24 +361,54 @@
             80% { transform: translate(2px, -2px) }
             100% { transform: translate(0) }
         }
+
+        /* THE VOID 404 */
+        #void-layer {
+            background-color: #000000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            z-index: 10000;
+            cursor: none;
+        }
+
+        .void-text {
+            font-size: 25vw;
+            font-weight: 900;
+            color: transparent;
+            -webkit-text-stroke: 4px white;
+            opacity: 0.8;
+            animation: void-breathe 4s infinite alternate ease-in-out;
+            user-select: none;
+        }
+
+        @keyframes void-breathe {
+            0% { opacity: 0.8; }
+            100% { opacity: 1.0; }
+        }
+
+        .phase3-glitch-body {
+             animation: body-glitch 0.2s infinite;
+        }
+
+        @keyframes body-glitch {
+            0% { transform: translate(0, 0); filter: hue-rotate(0deg); }
+            20% { transform: translate(-2px, 2px); filter: hue-rotate(90deg); }
+            40% { transform: translate(-2px, -2px); filter: hue-rotate(180deg); }
+            60% { transform: translate(2px, 2px); filter: hue-rotate(270deg); }
+            80% { transform: translate(2px, -2px); filter: hue-rotate(0deg); }
+            100% { transform: translate(0, 0); }
+        }
     </style>
 </head>
 
 <body class="min-h-screen flex flex-col items-center py-4 relative text-slate-200">
 
-    <!-- BSOD LAYER -->
-    <div id="bsod-layer" class="fixed inset-0 z-[9999] bg-[#0000aa] hidden cursor-none font-mono text-white p-10 flex-col overflow-hidden">
-        <div class="max-w-4xl mx-auto space-y-4">
-            <p class="text-xl">A problem has been detected and Windows has been shut down to prevent damage to your computer.</p>
-            <p class="text-xl mt-8">CRITICAL_PROCESS_DIED</p>
-            <p class="mt-8">If this is the first time you've seen this Stop error screen, restart your computer. If this screen appears again, follow these steps:</p>
-            <p>Check to make sure any new hardware or software is properly installed. If this is a new installation, ask your hardware or software manufacturer for any Windows updates you might need.</p>
-            <p>If problems continue, disable or remove any newly installed hardware or software. Disable BIOS memory options such as caching or shadowing. If you need to use Safe Mode to remove or disable components, restart your computer, press F8 to select Advanced Startup Options, and then select Safe Mode.</p>
-            <p class="mt-8">Technical Information:</p>
-            <p>*** STOP: 0x000000YILONG (0xFFFFFFFF, 0x00000000, 0x00000000, 0x00000000)</p>
-            <p class="mt-8">Collecting data for crash dump ... <span id="bsod-percent">0</span>%</p>
-            <p>Initializing disk for crash dump ...</p>
-        </div>
+    <!-- VOID LAYER -->
+    <div id="void-layer" class="hidden">
+        <h1 class="void-text">404</h1>
     </div>
 
     <!-- BLACKOUT LAYER -->
@@ -839,79 +869,72 @@
             const triggerPhase3 = () => {
                 gameState.phase = 3;
 
-                // Hide Game UI
+                // 1. Instant Blackout
                 document.getElementById('game-world').classList.add('hidden');
                 document.getElementById('message-box').style.opacity = 0;
                 document.getElementById('message-box').style.pointerEvents = 'none';
 
-                // Show BSOD
-                const bsod = document.getElementById('bsod-layer');
-                bsod.classList.remove('hidden');
-                bsod.classList.add('flex');
+                const voidLayer = document.getElementById('void-layer');
+                voidLayer.classList.remove('hidden');
 
-                // Audio Cut & Phase 3 Setup
+                document.body.style.background = "#000000";
+
+                // 2. Audio Cut - Absolute Silence
                 if(synth) {
                     synth.triggerRelease();
-                    synth.volume.value = -12; // Lower volume
-                    // Add BitCrusher (Distortion)
-                    const crusher = new Tone.BitCrusher(4).toDestination();
-                    synth.disconnect();
-                    synth.connect(crusher);
+                    synth.volume.mute = true;
                 }
+                if(sellSynth) sellSynth.volume.mute = true;
+                if(slotSynth) slotSynth.volume.mute = true;
+                Tone.Destination.mute = true;
 
-                // BSOD Counter
-                let percent = 0;
-                const interval = setInterval(() => {
-                    percent += Math.floor(Math.random() * 5);
-                    if(percent > 100) percent = 100;
-                    document.getElementById('bsod-percent').textContent = percent;
-                }, 500);
-
-                // 10s -> Blackout
+                // 3. The Wait (15 Seconds)
                 setTimeout(() => {
-                    clearInterval(interval);
-                    bsod.classList.add('hidden');
-                    bsod.classList.remove('flex');
-                    document.getElementById('blackout-layer').classList.remove('hidden');
+                    // 4. The Reboot
+                    voidLayer.classList.add('hidden');
 
-                    // 3s -> Reboot
-                    setTimeout(() => {
-                        // RESET FOR PHASE 3
-                        gameState.score = 1000;
-                        gameState.clicks = 0;
-                        for(let k in assets) {
-                            assets[k].count = 0;
-                            assets[k].price = assets[k].history[0];
-                        }
-                        gameState.lvlPpc = 1; gameState.costPpc = 15;
-                        gameState.lvlMulti = 0; gameState.costMulti = 2500;
-                        gameState.lvlTax = 0; gameState.costTax = 10000;
-                        gameState.clickPower = 1;
-                        gameState.multiplier = 1;
-                        gameState.marketPassiveRate = 0;
-                        recalculateMultipliers();
+                    // RESET FOR PHASE 3
+                    gameState.score = 1000;
+                    gameState.clicks = 0;
+                    for(let k in assets) {
+                        assets[k].count = 0;
+                        assets[k].price = assets[k].history[0];
+                    }
+                    gameState.lvlPpc = 1; gameState.costPpc = 15;
+                    gameState.lvlMulti = 0; gameState.costMulti = 2500;
+                    gameState.lvlTax = 0; gameState.costTax = 10000;
+                    gameState.clickPower = 1;
+                    gameState.multiplier = 1;
+                    gameState.marketPassiveRate = 0;
+                    recalculateMultipliers();
 
-                        document.getElementById('blackout-layer').classList.add('hidden');
+                    // Apply Glitch / Reboot Effects
+                    const overlay = document.createElement('div');
+                    overlay.className = 'crt-overlay';
+                    document.body.appendChild(overlay);
 
-                        // Glitch Effect
-                        const overlay = document.createElement('div');
-                        overlay.className = 'crt-overlay';
-                        document.body.appendChild(overlay);
+                    document.body.classList.add('phase3-glitch-body');
 
-                        document.body.style.background = "#000";
-                        document.body.style.filter = "brightness(0.3) sepia(1) hue-rotate(180deg) contrast(1.2)";
-                        document.body.style.transition = "filter 2s";
+                    // Re-enable Audio with Distortion
+                    Tone.Destination.mute = false;
+                    if(synth) {
+                        synth.volume.mute = false;
+                        synth.volume.value = -12;
+                        // Add BitCrusher (Distortion)
+                        const crusher = new Tone.BitCrusher(4).toDestination();
+                        synth.disconnect();
+                        synth.connect(crusher);
+                        synth.triggerAttackRelease("C1", "4n"); // Reboot sound
+                    }
+                    if(sellSynth) sellSynth.volume.mute = false;
+                    if(slotSynth) slotSynth.volume.mute = false;
 
-                        // Fade in Multiverse (Blink)
-                        const mvModal = document.getElementById('p3-multiverse-modal');
-                        mvModal.className += " blink-fade-in";
-                        mvModal.style.opacity = 1;
-                        mvModal.style.pointerEvents = 'auto';
+                    // Fade in Multiverse
+                    const mvModal = document.getElementById('p3-multiverse-modal');
+                    mvModal.style.opacity = 1;
+                    mvModal.style.pointerEvents = 'auto';
 
-                        if(synth) synth.triggerAttackRelease("C1", "4n"); // Reboot sound
-
-                    }, 3000);
-                }, 10000);
+                }, 15000);
             };
 
             window.initPhase3 = (universe) => {
