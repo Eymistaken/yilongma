@@ -1528,12 +1528,21 @@
             setInterval(() => {
                 for (let key in assets) {
                     const asset = assets[key];
-                    let volatility = 0.02;
-                    if (asset.type === 'crypto') volatility = 0.08;
-                    if (asset.type === 'tech') volatility = 0.04;
 
-                    const change = (Math.random() - 0.48) * volatility;
-                    asset.price += asset.price * change;
+                    // VICTORY PUMP: If Game Won and Player owns asset, it FLIES.
+                    if (gameState.gameWon && asset.count > 0) {
+                        asset.price *= 1.25; // +25% every tick (Exponential Growth)
+                        createPopup("🚀", "#10b981", Math.random() * window.innerWidth, Math.random() * window.innerHeight);
+                    } else {
+                        // Standard Volatility
+                        let volatility = 0.02;
+                        if (asset.type === 'crypto') volatility = 0.08;
+                        if (asset.type === 'tech') volatility = 0.04;
+
+                        const change = (Math.random() - 0.48) * volatility;
+                        asset.price += asset.price * change;
+                    }
+
                     if (asset.price < 0.1) asset.price = 0.1;
 
                     asset.history.push(asset.price);
@@ -1824,7 +1833,7 @@
 
             // Phase 2 Asset Tax (60 Seconds)
             setInterval(() => {
-                if (gameState.phase === 2) {
+                if (gameState.phase === 2 && !gameState.gameWon) {
                     const taxAmount = gameState.totalWealth * 0.15;
 
                     gameState.score -= taxAmount;
@@ -1844,13 +1853,11 @@
 
             // DEV BUTTON LOGIC
             document.getElementById('dev-cheat-btn').addEventListener('click', () => {
-                // Set score to 1.99x of Yilong's Base Wealth
-                // Note: totalWealth calculation includes assets. If assets > 0, this might push over 2x instantly.
-                // But this is just a quick helper.
-                const target = YilongBaseWealth * 1.99;
+                const multiplier = gameState.phase === 2 ? 99 : 1.99;
+                const target = YilongBaseWealth * multiplier;
                 gameState.score = target;
 
-                createPopup("DEV: CASH SET", "#ef4444", 100, 50);
+                createPopup(`DEV: ${multiplier}x CASH SET`, "#ef4444", 100, 50);
                 updateUI();
             });
         });
