@@ -681,7 +681,9 @@
                 { id: 'bm_gold_toilet', name: 'Golden Toilet', mult: 2.0, rarity: 'LEGENDARY', color: '#fbbf24' },
                 { id: 'bm_diamond_flush', name: 'Diamond Flush', mult: 1.5, rarity: 'EPIC', color: '#38bdf8' },
                 { id: 'bm_skibidi_crown', name: 'Skibidi Crown', mult: 1.25, rarity: 'RARE', color: '#c084fc' },
-                { id: 'bm_fanum_shield', name: 'Fanum Shield', mult: 1.1, rarity: 'COMMON', color: '#94a3b8' }
+                { id: 'bm_fanum_shield', name: 'Fanum Shield', mult: 1.1, rarity: 'COMMON', color: '#94a3b8' },
+                { id: 'bm_cyber_attack', name: 'Cyber Attack', type: 'sabotage', val: 0.10, rarity: 'EPIC', color: '#ef4444' },
+                { id: 'bm_market_crash', name: 'Market Crash', type: 'sabotage', val: 0.25, rarity: 'LEGENDARY', color: '#b91c1c' }
             ];
 
             // Global erişim için window'a ata
@@ -699,6 +701,9 @@
                 // Black Market
                 blackMarketCost: 100000,
                 blackMarketBuffs: [], // Array of collected item IDs
+
+                // Mechanics
+                clickDebuff: 1, // 1 = Normal, 0.5 = Canceled
 
                 // Yükseltme Seviyeleri
                 lvlPpc: 1,
@@ -900,7 +905,7 @@
                 initAudio();
 
                 let isCrit = Math.random() < 0.05;
-                let gain = gameState.clickPower * gameState.multiplier;
+                let gain = gameState.clickPower * gameState.multiplier * gameState.clickDebuff;
                 if (isCrit) gain *= 3;
 
                 gameState.score += gain;
@@ -1152,8 +1157,14 @@
                         // Select Item
                         const roll = Math.random();
                         let item;
-                        if(roll < 0.05) item = blackMarketItems[0]; // Legendary
-                        else if(roll < 0.20) item = blackMarketItems[1]; // Epic
+                        if(roll < 0.05) {
+                            // Legendary (0 or 5)
+                            item = Math.random() < 0.5 ? blackMarketItems[0] : blackMarketItems[5];
+                        }
+                        else if(roll < 0.20) {
+                            // Epic (1 or 4)
+                            item = Math.random() < 0.5 ? blackMarketItems[1] : blackMarketItems[4];
+                        }
                         else if(roll < 0.50) item = blackMarketItems[2]; // Rare
                         else item = blackMarketItems[3]; // Common
 
@@ -1170,7 +1181,7 @@
                                 <div class="text-6xl animate-bounce">🎁</div>
                                 <div class="text-center px-2">
                                     <h3 class="font-bold text-xl leading-tight">${item.name}</h3>
-                                    <p class="text-xs text-white mt-2 font-mono">x${item.mult} Mult</p>
+                                    <p class="text-xs text-white mt-2 font-mono">${item.type === 'sabotage' ? 'Yilong -%' + (item.val*100) : 'x' + item.mult + ' Mult'}</p>
                                     <p class="text-[10px] mt-1 opacity-70">${item.rarity}</p>
                                 </div>
                             `;
@@ -1178,8 +1189,17 @@
                             if(synth) synth.triggerAttackRelease(["C4", "G4", "C5"], "4n");
 
                             // Process Reward
-                            gameState.blackMarketBuffs.push(item.id);
-                            recalculateMultipliers();
+                            if (item.type === 'sabotage') {
+                                const reduction = YilongBaseWealth * item.val;
+                                YilongBaseWealth -= reduction;
+                                createPopup(`Yilong: -${formatNumber(reduction)}`, "#ef4444", 90, 10);
+                                // Visual Glitch
+                                document.body.style.filter = "invert(1)";
+                                setTimeout(() => document.body.style.filter = "none", 100);
+                            } else {
+                                gameState.blackMarketBuffs.push(item.id);
+                                recalculateMultipliers();
+                            }
                             updateUI();
 
                             // Close Modal after delay
@@ -1734,8 +1754,13 @@
 
                         // Phase 2 extra annoying buff
                         if(Math.random() < 0.3) {
-                            YilongBaseWealth += 500000;
-                            createPopup(`Yilong: +500K`, "#ef4444", 90, 10);
+                            // Cancel Culture Debuff (30% Chance)
+                            if (Math.random() < 0.3) {
+                                gameState.clickDebuff = 0.5;
+                                phrase = `<span class="text-red-500 font-black">🚫 CANCELED! Tık gücün %50 düştü!</span>`;
+                                createPopup("CANCELED! 📉", "#ef4444", window.innerWidth/2, window.innerHeight/2);
+                                setTimeout(() => { gameState.clickDebuff = 1; }, 10000);
+                            }
                         }
                     } else {
                         // STANDARD LOGIC (Phase 1)
@@ -1760,7 +1785,14 @@
                     }
 
                     // YILONG MA KAZANIYOR! (Servetine ekle)
-                    const profit = Math.floor(Math.random() * 50000) + 10000;
+                    let profit = 0;
+                    if (isPhase2) {
+                        // Phase 2 Scaling: 1% - 4% of Current Wealth
+                        profit = YilongBaseWealth * (Math.random() * 0.03 + 0.01);
+                    } else {
+                        profit = Math.floor(Math.random() * 50000) + 10000;
+                    }
+
                     YilongBaseWealth += profit; // Kendi serveti artıyor
                     createPopup(`Yilong: +${formatNumber(profit)}`, "#facc15", 90, 10); // Sağ üstte popup
 
@@ -1779,6 +1811,26 @@
 
             postSkitt("5 Milyon dolarım var. Sizi geçeceğim! 😎");
             updateUI();
+
+            // Phase 2 Asset Tax (60 Seconds)
+            setInterval(() => {
+                if (gameState.phase === 2) {
+                    const taxAmount = gameState.totalWealth * 0.15;
+
+                    gameState.score -= taxAmount;
+                    YilongBaseWealth += taxAmount;
+
+                    showMessage(`
+                        <h2 class="text-3xl font-black text-red-600 mb-4 animate-pulse">⚠️ VARLIK VERGİSİ</h2>
+                        <p class="text-slate-300">Yilong Ma'nın lobisi sayesinde varlık vergisi çıktı.</p>
+                        <p class="text-red-500 font-bold text-xl mt-4">-${formatNumber(taxAmount)} Gyatt</p>
+                        <p class="text-xs text-slate-500 mt-1">Hesabından çekildi ve Yilong'a aktarıldı.</p>
+                    `);
+
+                    if (synth) synth.triggerAttackRelease("A1", "8n");
+                    updateUI();
+                }
+            }, 60000);
         });
 
         function toggleMobileSlot() {
