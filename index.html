@@ -843,8 +843,15 @@
                 bsod.classList.remove('hidden');
                 bsod.classList.add('flex');
 
-                // Audio Cut
-                if(synth) synth.triggerRelease();
+                // Audio Cut & Phase 3 Setup
+                if(synth) {
+                    synth.triggerRelease();
+                    synth.volume.value = -12; // Lower volume
+                    // Add BitCrusher (Distortion)
+                    const crusher = new Tone.BitCrusher(4).toDestination();
+                    synth.disconnect();
+                    synth.connect(crusher);
+                }
 
                 // BSOD Counter
                 let percent = 0;
@@ -1754,8 +1761,8 @@
                 for (let key in assets) {
                     const asset = assets[key];
 
-                    // VICTORY PUMP: If Game Won and Player owns asset, it FLIES.
-                    if (gameState.gameWon && asset.count > 0) {
+                    // VICTORY PUMP (Phase 2 Only)
+                    if (gameState.gameWon && asset.count > 0 && gameState.phase !== 3) {
                         asset.price *= 1.25; // +25% every tick (Exponential Growth)
                         createPopup("🚀", "#10b981", Math.random() * window.innerWidth, Math.random() * window.innerHeight);
                     } else {
@@ -1826,10 +1833,10 @@
                         const btn = document.createElement('button');
                         btn.id = 'p3-exploit-btn';
                         btn.className = "upgrade-btn w-full bg-red-600 hover:bg-red-500 border-2 border-red-400 rounded-xl p-4 font-black text-white animate-pulse mt-4";
-                        btn.innerHTML = "LAUNCH EXPLOIT (Attack) <br> <span class='text-[10px] font-mono'>Cost: 10% Wealth</span>";
+                        btn.innerHTML = "LAUNCH EXPLOIT (Attack) <br> <span class='text-[10px] font-mono'>Cost: 1T (Fixed)</span>";
                         btn.onclick = () => {
-                            const cost = gameState.score * 0.1;
-                            if(gameState.score > 0) {
+                            const cost = 1000000000000;
+                            if(gameState.score >= cost) {
                                 gameState.score -= cost;
                                 gameState.p3_firewallHealth -= 5; // 5% damage
                                 createPopup("HIT! -5%", "#ff0000", window.innerWidth/2, window.innerHeight/2);
