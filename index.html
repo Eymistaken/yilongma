@@ -336,10 +336,56 @@
             box-shadow: 0 0 15px rgba(139, 92, 246, 0.3);
             animation: glow-pulse 1.5s ease-in-out infinite alternate;
         }
+
+        /* PHASE 3 EFFECTS */
+        .crt-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+            background-size: 100% 2px, 3px 100%;
+            pointer-events: none;
+            z-index: 99999;
+            opacity: 0.7;
+        }
+
+        .glitch-text {
+            text-shadow: 2px 2px #ff0000, -2px -2px #0000ff;
+            animation: glitch-anim 0.3s infinite;
+        }
+
+        @keyframes glitch-anim {
+            0% { transform: translate(0) }
+            20% { transform: translate(-2px, 2px) }
+            40% { transform: translate(-2px, -2px) }
+            60% { transform: translate(2px, 2px) }
+            80% { transform: translate(2px, -2px) }
+            100% { transform: translate(0) }
+        }
     </style>
 </head>
 
 <body class="min-h-screen flex flex-col items-center py-4 relative text-slate-200">
+
+    <!-- BSOD LAYER -->
+    <div id="bsod-layer" class="fixed inset-0 z-[9999] bg-[#0000aa] hidden cursor-none font-mono text-white p-10 flex-col overflow-hidden">
+        <div class="max-w-4xl mx-auto space-y-4">
+            <p class="text-xl">A problem has been detected and Windows has been shut down to prevent damage to your computer.</p>
+            <p class="text-xl mt-8">CRITICAL_PROCESS_DIED</p>
+            <p class="mt-8">If this is the first time you've seen this Stop error screen, restart your computer. If this screen appears again, follow these steps:</p>
+            <p>Check to make sure any new hardware or software is properly installed. If this is a new installation, ask your hardware or software manufacturer for any Windows updates you might need.</p>
+            <p>If problems continue, disable or remove any newly installed hardware or software. Disable BIOS memory options such as caching or shadowing. If you need to use Safe Mode to remove or disable components, restart your computer, press F8 to select Advanced Startup Options, and then select Safe Mode.</p>
+            <p class="mt-8">Technical Information:</p>
+            <p>*** STOP: 0x000000YILONG (0xFFFFFFFF, 0x00000000, 0x00000000, 0x00000000)</p>
+            <p class="mt-8">Collecting data for crash dump ... <span id="bsod-percent">0</span>%</p>
+            <p>Initializing disk for crash dump ...</p>
+        </div>
+    </div>
+
+    <!-- BLACKOUT LAYER -->
+    <div id="blackout-layer" class="fixed inset-0 z-[9998] bg-black hidden"></div>
+
+    <!-- GAME WORLD WRAPPER -->
+    <div id="game-world" class="contents">
 
     <!-- Arka Plan Efektleri -->
     <div id="floater-container" class="fixed inset-0 pointer-events-none overflow-hidden z-0"></div>
@@ -450,10 +496,16 @@
                     <span class="text-xs text-yellow-400 font-bold" id="slot-status">Şansını Dene!</span>
                 </div>
 
-                <button id="spin-btn"
-                    class="w-full bg-gradient-to-r from-yellow-600 to-orange-600 hover:from-yellow-500 hover:to-orange-500 text-white font-bold py-3 rounded-xl shadow-lg transform active:scale-95 transition-all relative z-10 border border-yellow-400/30">
-                    ÇEVİR! (SPIN)
-                </button>
+                <div class="flex gap-2 relative z-10">
+                    <button id="spin-btn"
+                        class="flex-1 bg-gradient-to-r from-yellow-600 to-orange-600 hover:from-yellow-500 hover:to-orange-500 text-white font-bold py-3 rounded-xl shadow-lg transform active:scale-95 transition-all border border-yellow-400/30">
+                        ÇEVİR!
+                    </button>
+                    <button id="spin-all-in-btn"
+                        class="hidden flex-1 bg-gradient-to-r from-red-600 to-purple-600 hover:from-red-500 hover:to-purple-500 text-white font-bold py-3 rounded-xl shadow-lg transform active:scale-95 transition-all border border-purple-400/30">
+                        ALL IN!
+                    </button>
+                </div>
             </div>
 
             <!-- Ekstra İstatistikler -->
@@ -616,6 +668,8 @@
 
     </div>
 
+    </div> <!-- END GAME WORLD WRAPPER -->
+
     <!-- Mesaj Modal -->
     <div id="message-box"
         class="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 opacity-0 pointer-events-none transition-opacity duration-300 px-4">
@@ -661,8 +715,12 @@
                 <p class="text-lg font-bold text-yellow-500" id="m-slot-status">Şansını Dene!</p>
             </div>
 
-            <button id="m-spin-btn"
-                class="w-full bg-yellow-600 hover:bg-yellow-500 text-white font-bold py-4 rounded-xl">ÇEVİR!</button>
+            <div class="flex gap-2 w-full">
+                <button id="m-spin-btn"
+                    class="flex-1 bg-yellow-600 hover:bg-yellow-500 text-white font-bold py-4 rounded-xl">ÇEVİR!</button>
+                <button id="m-spin-all-in-btn"
+                    class="hidden flex-1 bg-purple-600 hover:bg-purple-500 text-white font-bold py-4 rounded-xl">ALL IN!</button>
+            </div>
         </div>
     </div>
 
@@ -678,6 +736,53 @@
     <!-- VERSION BADGE -->
     <div class="fixed bottom-2 left-2 z-50 text-[10px] font-mono text-slate-500 opacity-50 pointer-events-none">
         V3.2
+    </div>
+
+    <!-- PHASE 3 MULTIVERSE MODAL -->
+    <div id="p3-multiverse-modal" class="fixed inset-0 z-[100] bg-black flex flex-col items-center justify-center opacity-0 pointer-events-none transition-opacity duration-1000">
+        <h1 class="text-4xl md:text-6xl font-black text-white mb-2 glitch-text tracking-widest">SYSTEM REBOOT</h1>
+        <p class="text-slate-400 mb-10 font-mono">Select timeline initialization...</p>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-6xl w-full px-4">
+            <!-- RED ROT -->
+            <button onclick="initPhase3('red_rot')" class="group relative bg-black border-2 border-red-900 hover:border-red-500 p-6 rounded-xl flex flex-col items-center gap-4 transition-all hover:scale-105 overflow-hidden">
+                <div class="absolute inset-0 bg-red-900/10 group-hover:bg-red-900/30 animate-pulse"></div>
+                <div class="text-5xl">🩸</div>
+                <h3 class="text-2xl font-black text-red-500">THE RED ROT</h3>
+                <p class="text-xs text-red-300 text-center font-mono">
+                    HYPER-INFLATION DETECTED.<br>
+                    Prices double every 30s.<br>
+                    Cash rots 1%/sec.
+                </p>
+                <div class="bg-red-900/50 px-3 py-1 rounded text-xs text-white">HARDCORE SURVIVAL</div>
+            </button>
+
+            <!-- THE MATRIX -->
+            <button onclick="initPhase3('matrix')" class="group relative bg-black border-2 border-green-900 hover:border-green-500 p-6 rounded-xl flex flex-col items-center gap-4 transition-all hover:scale-105 overflow-hidden">
+                <div class="absolute inset-0 bg-green-900/10 group-hover:bg-green-900/30 animate-pulse"></div>
+                <div class="text-5xl">📟</div>
+                <h3 class="text-2xl font-black text-green-500 font-mono">THE MATRIX</h3>
+                <p class="text-xs text-green-300 text-center font-mono">
+                    CRYPTO ANARCHY.<br>
+                    Fiat Banned. Crypto Volatility 500%.<br>
+                    Mouse Hacked (No Clicking).
+                </p>
+                <div class="bg-green-900/50 px-3 py-1 rounded text-xs text-white">PASSIVE ONLY</div>
+            </button>
+
+            <!-- THE VOID -->
+            <button onclick="initPhase3('void')" class="group relative bg-black border-2 border-slate-700 hover:border-white p-6 rounded-xl flex flex-col items-center gap-4 transition-all hover:scale-105 overflow-hidden">
+                <div class="absolute inset-0 bg-white/5 group-hover:bg-white/10 animate-pulse"></div>
+                <div class="text-5xl opacity-50">👻</div>
+                <h3 class="text-2xl font-black text-slate-300 blur-[1px] group-hover:blur-0 transition-all">THE VOID</h3>
+                <p class="text-xs text-slate-400 text-center font-mono">
+                    ENTROPY RISING.<br>
+                    Assets are deleted randomly.<br>
+                    Pay Data to restore.
+                </p>
+                <div class="bg-slate-800 px-3 py-1 rounded text-xs text-white">CHAOS MODE</div>
+            </button>
+        </div>
     </div>
 
     <script>
@@ -715,6 +820,12 @@
                 // Mechanics
                 clickDebuff: 1, // 1 = Normal, 0.5 = Canceled
 
+                // PHASE 3 VARS
+                p3_universe: null,
+                p3_firewallHealth: 100,
+                p3_entropyTimer: 0,
+                p3_exploitCost: 1000000000000,
+
                 // Yükseltme Seviyeleri
                 lvlPpc: 1,
                 lvlMulti: 0,
@@ -728,6 +839,156 @@
 
             // Kolay erişim için yerel değişken referansı
             let gameState = window.gameState;
+
+            // --- PHASE 3 LOGIC ---
+            const triggerPhase3 = () => {
+                gameState.phase = 3;
+
+                // Hide Game UI
+                document.getElementById('game-world').classList.add('hidden');
+                document.getElementById('message-box').style.opacity = 0;
+                document.getElementById('message-box').style.pointerEvents = 'none';
+
+                // Show BSOD
+                const bsod = document.getElementById('bsod-layer');
+                bsod.classList.remove('hidden');
+                bsod.classList.add('flex');
+
+                // Audio Cut & Phase 3 Setup
+                if(synth) {
+                    synth.triggerRelease();
+                    synth.volume.value = -12; // Lower volume
+                    // Add BitCrusher (Distortion)
+                    const crusher = new Tone.BitCrusher(4).toDestination();
+                    synth.disconnect();
+                    synth.connect(crusher);
+                }
+
+                // BSOD Counter
+                let percent = 0;
+                const interval = setInterval(() => {
+                    percent += Math.floor(Math.random() * 5);
+                    if(percent > 100) percent = 100;
+                    document.getElementById('bsod-percent').textContent = percent;
+                }, 500);
+
+                // 10s -> Blackout
+                setTimeout(() => {
+                    clearInterval(interval);
+                    bsod.classList.add('hidden');
+                    bsod.classList.remove('flex');
+                    document.getElementById('blackout-layer').classList.remove('hidden');
+
+                    // 3s -> Reboot
+                    setTimeout(() => {
+                        // RESET FOR PHASE 3
+                        gameState.score = 1000;
+                        gameState.clicks = 0;
+                        for(let k in assets) {
+                            assets[k].count = 0;
+                            assets[k].price = assets[k].history[0];
+                        }
+                        gameState.lvlPpc = 1; gameState.costPpc = 15;
+                        gameState.lvlMulti = 0; gameState.costMulti = 2500;
+                        gameState.lvlTax = 0; gameState.costTax = 10000;
+                        gameState.clickPower = 1;
+                        gameState.multiplier = 1;
+                        gameState.marketPassiveRate = 0;
+                        recalculateMultipliers();
+
+                        document.getElementById('blackout-layer').classList.add('hidden');
+
+                        // Glitch Effect
+                        const overlay = document.createElement('div');
+                        overlay.className = 'crt-overlay';
+                        document.body.appendChild(overlay);
+
+                        document.body.style.background = "#000";
+                        document.body.style.filter = "brightness(0.3) sepia(1) hue-rotate(180deg) contrast(1.2)";
+                        document.body.style.transition = "filter 2s";
+
+                        // Fade in Multiverse (Blink)
+                        const mvModal = document.getElementById('p3-multiverse-modal');
+                        mvModal.className += " blink-fade-in";
+                        mvModal.style.opacity = 1;
+                        mvModal.style.pointerEvents = 'auto';
+
+                        if(synth) synth.triggerAttackRelease("C1", "4n"); // Reboot sound
+
+                    }, 3000);
+                }, 10000);
+            };
+
+            window.initPhase3 = (universe) => {
+                gameState.p3_universe = universe;
+
+                // Hide Modal
+                document.getElementById('p3-multiverse-modal').style.opacity = 0;
+                document.getElementById('p3-multiverse-modal').style.pointerEvents = 'none';
+
+                // Show Game World
+                document.getElementById('game-world').classList.remove('hidden');
+
+                // Apply Universe Specifics
+                if (universe === 'matrix') {
+                    // Delete Fiat
+                    delete assets['tl'];
+                    delete assets['usd'];
+                    delete assets['eur'];
+                    // Disable Click
+                    gameState.clickPower = 0;
+                    createPopup("MOUSE HACKED", "#00ff00", window.innerWidth/2, window.innerHeight/2);
+                } else if (universe === 'void') {
+                    // Start Entropy
+                    createPopup("ENTROPY STARTED", "#ffffff", window.innerWidth/2, window.innerHeight/2);
+                } else {
+                    // Red Rot
+                    createPopup("INFLATION STARTED", "#ff0000", window.innerWidth/2, window.innerHeight/2);
+                }
+
+                // Start Loop
+                startPhase3Loop();
+                updateUI();
+            };
+
+            const startPhase3Loop = () => {
+                setInterval(() => {
+                    // Firewall Healing
+                    if(gameState.p3_firewallHealth < 100) {
+                        gameState.p3_firewallHealth += 0.5;
+                        if(gameState.p3_firewallHealth > 100) gameState.p3_firewallHealth = 100;
+                    }
+
+                    // Universe Mechanics
+                    if (gameState.p3_universe === 'red_rot') {
+                        // Rot Cash 1%
+                        gameState.score *= 0.99;
+                        // Inflation: Upgrade Costs & Exploit Cost
+                        const factor = 1.023;
+                        gameState.costPpc = Math.max(gameState.costPpc + 1, Math.floor(gameState.costPpc * factor));
+                        gameState.costMulti = Math.max(gameState.costMulti + 1, Math.floor(gameState.costMulti * factor));
+                        gameState.costTax = Math.max(gameState.costTax + 1, Math.floor(gameState.costTax * factor));
+                        gameState.p3_exploitCost *= 1.005;
+                    } else if (gameState.p3_universe === 'matrix') {
+                        // High Volatility is handled in volatility loop.
+                        // Here we can add passive income buff?
+                    } else if (gameState.p3_universe === 'void') {
+                        // Entropy: Delete asset randomly
+                        if(Math.random() < 0.1) { // 10% chance per second
+                            const keys = Object.keys(assets);
+                            if(keys.length > 0) {
+                                const target = keys[Math.floor(Math.random() * keys.length)];
+                                if(assets[target].count > 0) {
+                                    assets[target].count = Math.floor(assets[target].count * 0.9); // Lose 10%
+                                    createPopup(`ENTROPY: ${assets[target].name} LOST`, "#ffffff", 100, 100);
+                                }
+                            }
+                        }
+                    }
+
+                    updateUI();
+                }, 1000);
+            };
 
             // Elementler
             const els = {
@@ -765,6 +1026,7 @@
 
                 // Slot
                 spinBtn: document.getElementById('spin-btn'),
+                spinAllInBtn: document.getElementById('spin-all-in-btn'),
                 slotCost: document.getElementById('slot-cost'),
                 slotCostContainer: document.getElementById('slot-cost-container'),
                 slotBetInputContainer: document.getElementById('slot-bet-input-container'),
@@ -777,6 +1039,7 @@
                 ],
                 // Mobile Slot
                 mSpinBtn: document.getElementById('m-spin-btn'),
+                mSpinAllInBtn: document.getElementById('m-spin-all-in-btn'),
                 mSlotCost: document.getElementById('m-slot-cost'),
                 mSlotStatus: document.getElementById('m-slot-status'),
                 mReels: [
@@ -1248,11 +1511,13 @@
                 return slotSymbols[0];
             };
 
-            const spinSlots = async (isMobile = false) => {
+            const spinSlots = async (isMobile = false, overrideBet = -1) => {
                 let currentBet = slotCost;
 
-                // Phase 2: Use custom bet
-                if (gameState.phase === 2) {
+                // Phase 2+: Use custom bet or override
+                if (overrideBet > 0) {
+                    currentBet = overrideBet;
+                } else if (gameState.phase >= 2) {
                     const val = parseInt(els.slotBetInput.value);
                     if (isNaN(val) || val < 100) {
                         els.slotStatus.textContent = "Min Bet: 100";
@@ -1269,6 +1534,7 @@
                 }
 
                 if (isSpinning) return;
+                if (gameState.score < currentBet) return; // Safety check
 
                 // Initialize audio to prevent freeze
                 await initAudio();
@@ -1277,11 +1543,16 @@
                 isSpinning = true;
 
                 const btn = isMobile ? els.mSpinBtn : els.spinBtn;
+                const allInBtn = isMobile ? els.mSpinAllInBtn : els.spinAllInBtn;
                 const status = isMobile ? els.mSlotStatus : els.slotStatus;
                 const currentReels = isMobile ? els.mReels : els.reels;
 
                 btn.disabled = true;
                 btn.classList.add('opacity-50');
+                if(allInBtn) {
+                    allInBtn.disabled = true;
+                    allInBtn.classList.add('opacity-50');
+                }
                 status.textContent = "Çeviriliyor...";
                 status.className = "text-yellow-200 animate-pulse";
 
@@ -1393,12 +1664,18 @@
                     isSpinning = false;
                     btn.disabled = false;
                     btn.classList.remove('opacity-50');
+                    if(allInBtn) {
+                        allInBtn.disabled = false;
+                        allInBtn.classList.remove('opacity-50');
+                    }
                     updateUI();
                 }, 2000);
             };
 
             els.spinBtn.addEventListener('click', () => spinSlots(false));
             els.mSpinBtn.addEventListener('click', () => spinSlots(true));
+            if(els.spinAllInBtn) els.spinAllInBtn.addEventListener('click', () => spinSlots(false, gameState.score));
+            if(els.mSpinAllInBtn) els.mSpinAllInBtn.addEventListener('click', () => spinSlots(true, gameState.score));
 
 
             // --- MARKET SİSTEMİ ---
@@ -1529,8 +1806,8 @@
                 for (let key in assets) {
                     const asset = assets[key];
 
-                    // VICTORY PUMP: If Game Won and Player owns asset, it FLIES.
-                    if (gameState.gameWon && asset.count > 0) {
+                    // VICTORY PUMP (Phase 2 Only)
+                    if (gameState.gameWon && asset.count > 0 && gameState.phase !== 3) {
                         asset.price *= 1.25; // +25% every tick (Exponential Growth)
                         createPopup("🚀", "#10b981", Math.random() * window.innerWidth, Math.random() * window.innerHeight);
                     } else {
@@ -1581,81 +1858,119 @@
 
                 // --- YILONG vs PLAYER (RIVALRY LOGIC) ---
 
-                // Yilong'un Kendi Serveti (Sadece YilongBaseWealth)
-                const currentYilongWealth = YilongBaseWealth;
-                const displayYilong = formatNumber(currentYilongWealth);
+                if (gameState.phase === 3) {
+                    // PHASE 3 FIREWALL UI
+                    els.yilongAvatar.innerHTML = '🔥';
+                    const nameLabel = els.yilongAvatar.parentElement.nextElementSibling.querySelector('h3');
+                    if(nameLabel) nameLabel.textContent = "THE FIREWALL";
 
-                // Senin Hedefin: Phase 1 -> 2x, Phase 2 -> 10x
-                const targetMult = gameState.phase === 2 ? 10 : 2;
-                const currentTarget = currentYilongWealth * targetMult;
-                const displayTarget = formatNumber(currentTarget);
+                    els.yilongWealth.textContent = gameState.p3_firewallHealth.toFixed(1) + "% INTEGRITY";
+                    els.yilongWealth.style.color = "#ef4444";
+                    els.dynamicTargetText.textContent = "DESTROY";
 
-                // UI Güncelleme
-                els.yilongWealth.textContent = displayYilong;
-                els.yilongWealthDisplaySmall.textContent = displayYilong;
-                els.dynamicTargetText.textContent = displayTarget; // Yeni element
+                    els.wealthProgress.style.width = gameState.p3_firewallHealth + "%";
+                    els.wealthProgress.parentElement.classList.remove('bg-slate-800');
+                    els.wealthProgress.parentElement.classList.add('bg-red-900');
 
-                // Progress Bar: Senin Servetin / Hedef
-                let progress = (gameState.totalWealth / currentTarget) * 100;
-                if (progress < 0) progress = 0;
-                if (progress > 100) progress = 100;
-                els.wealthProgress.style.width = `${progress}%`;
+                    // Inject Exploit Button if not exists
+                    if(!document.getElementById('p3-exploit-btn')) {
+                        const upgrades = document.getElementById('upgrades-list');
+                        const btn = document.createElement('button');
+                        btn.id = 'p3-exploit-btn';
+                        btn.className = "upgrade-btn w-full bg-red-600 hover:bg-red-500 border-2 border-red-400 rounded-xl p-4 font-black text-white animate-pulse mt-4";
+                        btn.innerHTML = `LAUNCH EXPLOIT (Attack) <br> <span class='text-[10px] font-mono'>Cost: ${formatNumber(gameState.p3_exploitCost)}</span>`;
+                        btn.onclick = () => {
+                            const cost = gameState.p3_exploitCost;
+                            if(gameState.score >= cost) {
+                                gameState.score -= cost;
+                                gameState.p3_firewallHealth -= 5; // 5% damage
+                                createPopup("HIT! -5%", "#ff0000", window.innerWidth/2, window.innerHeight/2);
+                                if(gameState.p3_firewallHealth <= 0) {
+                                    // P3 Victory? Or Loop? For now just reset health or trigger 'Simulation Restored'
+                                    // "Reset: Ensure that if the player fails... they can Reboot...".
+                                    // If wins? "Simulation Collapse" usually implies end.
+                                    // I'll make it loop or just stay at 0.
+                                    gameState.p3_firewallHealth = 0;
+                                    createPopup("SYSTEM CRITICAL", "#ff0000", window.innerWidth/2, window.innerHeight/2);
+                                }
+                                updateUI();
+                            }
+                        };
+                        upgrades.prepend(btn);
+                    }
+                } else {
+                    // PHASE 1 & 2
+                    const currentYilongWealth = YilongBaseWealth;
+                    const displayYilong = formatNumber(currentYilongWealth);
+                    const targetMult = gameState.phase === 2 ? 10 : 2;
+                    const currentTarget = currentYilongWealth * targetMult;
+                    const displayTarget = formatNumber(currentTarget);
 
-                // KAZANMA KONTROLÜ (Phase 1 -> Phase 2 Transition)
-                if (gameState.phase === 1 && gameState.totalWealth >= currentTarget) {
-                    triggerPhase2();
-                }
+                    els.yilongWealth.textContent = displayYilong;
+                    els.yilongWealthDisplaySmall.textContent = displayYilong;
+                    els.dynamicTargetText.textContent = displayTarget;
 
-                // NEW: Phase 2 Victory (True Ending)
-                if (gameState.phase === 2 && gameState.totalWealth >= currentTarget && !gameState.gameWon) {
-                     gameState.gameWon = true;
+                    let progress = (gameState.totalWealth / currentTarget) * 100;
+                    if (progress < 0) progress = 0;
+                    if (progress > 100) progress = 100;
+                    els.wealthProgress.style.width = `${progress}%`;
 
-                     // 1. Visual Changes
-                     els.yilongAvatar.innerHTML = '😭';
-                     els.yilongAvatar.parentElement.classList.remove('bg-stone-500/20', 'border-stone-500/30');
-                     els.yilongAvatar.parentElement.classList.add('bg-red-500/20', 'border-red-500/30');
+                    // KAZANMA KONTROLÜ (Phase 1 -> Phase 2 Transition)
+                    if (gameState.phase === 1 && gameState.totalWealth >= currentTarget) {
+                        triggerPhase2();
+                    }
 
-                     // Background Change (King Theme)
-                     document.body.style.background = "linear-gradient(-45deg, #fcd34d, #059669, #fbbf24, #10b981)";
-                     document.body.style.backgroundSize = "400% 400%";
+                    // NEW: Phase 2 Victory (True Ending)
+                    if (gameState.phase === 2 && gameState.totalWealth >= currentTarget && !gameState.gameWon) {
+                        gameState.gameWon = true;
 
-                     // Update Names
-                     const nameLabel = els.yilongAvatar.parentElement.nextElementSibling.querySelector('h3');
-                     if(nameLabel) nameLabel.textContent = "BROKE YILONG";
-                     els.yilongWealthDisplaySmall.previousElementSibling.textContent = "BROKE YILONG";
+                        // 1. Visual Changes
+                        els.yilongAvatar.innerHTML = '😭';
+                        els.yilongAvatar.parentElement.classList.remove('bg-stone-500/20', 'border-stone-500/30');
+                        els.yilongAvatar.parentElement.classList.add('bg-red-500/20', 'border-red-500/30');
 
-                     // Player Ascension
-                     els.skibidi.textContent = '👑';
+                        // Background Change (King Theme)
+                        document.body.style.background = "linear-gradient(-45deg, #fcd34d, #059669, #fbbf24, #10b981)";
+                        document.body.style.backgroundSize = "400% 400%";
 
-                     // 2. Market Manipulation (Force Green)
-                     for(let k in assets) {
-                         assets[k].price *= 5; // Pump it
-                     }
+                        // Update Names
+                        const nameLabel = els.yilongAvatar.parentElement.nextElementSibling.querySelector('h3');
+                        if(nameLabel) nameLabel.textContent = "BROKE YILONG";
+                        els.yilongWealthDisplaySmall.previousElementSibling.textContent = "BROKE YILONG";
 
-                     // 3. Victory Modal
-                     showMessage(`
-                        <h2 class="text-5xl font-black text-yellow-400 mb-6 tracking-tighter animate-pulse">👑 PIYASANIN YENİ SAHİBİ SENSİN! 👑</h2>
-                        <p class="text-xl text-slate-300 mb-6">
-                            "Yilong Ma diz çöktü. Artık kuralları sen koyuyorsun."
-                        </p>
-                        <div class="text-8xl mb-6 animate-bounce">🗿</div>
-                        <p class="text-sm text-slate-400 mb-8">
-                            Sonsuz servet ve güç senin elinde.
-                        </p>
-                        <button id="victory-continue" class="bg-yellow-500 hover:bg-yellow-400 text-black px-8 py-4 rounded-xl font-black text-xl shadow-[0_0_30px_rgba(234,179,8,0.5)] transition-all transform hover:scale-105">
-                            SONSUZ MODDA DEVAM ET
-                        </button>
-                     `);
+                        // Player Ascension
+                        els.skibidi.textContent = '👑';
 
-                     setTimeout(() => {
-                        const btn = document.getElementById('victory-continue');
-                        if(btn) btn.addEventListener('click', () => {
-                             els.msgBox.style.opacity = 0;
-                             els.msgBox.style.pointerEvents = 'none';
-                        });
-                     }, 100);
+                        // 2. Market Manipulation (Force Green)
+                        for(let k in assets) {
+                            assets[k].price *= 5; // Pump it
+                        }
 
-                     if (synth) synth.triggerAttackRelease(["C4", "E4", "G4", "C5", "E5", "G5", "C6", "E6"], "1n");
+                        // 3. Victory Modal
+                        showMessage(`
+                            <h2 class="text-5xl font-black text-yellow-400 mb-6 tracking-tighter animate-pulse">👑 PIYASANIN YENİ SAHİBİ SENSİN! 👑</h2>
+                            <p class="text-xl text-slate-300 mb-6">
+                                "Yilong Ma diz çöktü. Artık kuralları sen koyuyorsun."
+                            </p>
+                            <div class="text-8xl mb-6 animate-bounce">🗿</div>
+                            <p class="text-sm text-slate-400 mb-8">
+                                Sonsuz servet ve güç senin elinde.
+                            </p>
+                            <button id="victory-continue" class="bg-yellow-500 hover:bg-yellow-400 text-black px-8 py-4 rounded-xl font-black text-xl shadow-[0_0_30px_rgba(234,179,8,0.5)] transition-all transform hover:scale-105">
+                                SONSUZ MODDA DEVAM ET
+                            </button>
+                        `);
+
+                        setTimeout(() => {
+                            const btn = document.getElementById('victory-continue');
+                            if(btn) btn.addEventListener('click', () => {
+                                // Trigger Phase 3 Transition instead of closing
+                                triggerPhase3();
+                            });
+                        }, 100);
+
+                        if (synth) synth.triggerAttackRelease(["C4", "E4", "G4", "C5", "E5", "G5", "C6", "E6"], "1n");
+                    }
                 }
 
                 // Phase 2 UI Update
@@ -1680,16 +1995,36 @@
 
                 els.slotCost.textContent = formatNumber(slotCost);
                 els.mSlotCost.textContent = formatNumber(slotCost);
+
+                // Toggle All In Visibility
+                if (gameState.phase >= 2) {
+                    if (els.spinAllInBtn) els.spinAllInBtn.classList.remove('hidden');
+                    if (els.mSpinAllInBtn) els.mSpinAllInBtn.classList.remove('hidden');
+                } else {
+                    if (els.spinAllInBtn) els.spinAllInBtn.classList.add('hidden');
+                    if (els.mSpinAllInBtn) els.mSpinAllInBtn.classList.add('hidden');
+                }
+
                 if (gameState.score < slotCost) {
                     els.spinBtn.disabled = true;
                     els.mSpinBtn.disabled = true;
                     els.spinBtn.classList.add('opacity-50');
                     els.mSpinBtn.classList.add('opacity-50');
+                    if(els.spinAllInBtn) els.spinAllInBtn.disabled = true;
+                    if(els.mSpinAllInBtn) els.mSpinAllInBtn.disabled = true;
                 } else if (!isSpinning) {
                     els.spinBtn.disabled = false;
                     els.mSpinBtn.disabled = false;
                     els.spinBtn.classList.remove('opacity-50');
                     els.mSpinBtn.classList.remove('opacity-50');
+                    if(els.spinAllInBtn) {
+                        els.spinAllInBtn.disabled = false;
+                        els.spinAllInBtn.classList.remove('opacity-50');
+                    }
+                    if(els.mSpinAllInBtn) {
+                        els.mSpinAllInBtn.disabled = false;
+                        els.mSpinAllInBtn.classList.remove('opacity-50');
+                    }
                 }
             };
 
