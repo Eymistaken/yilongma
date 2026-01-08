@@ -814,6 +814,7 @@
                 p3_universe: null,
                 p3_firewallHealth: 100,
                 p3_entropyTimer: 0,
+                p3_exploitCost: 1000000000000,
 
                 // Yükseltme Seviyeleri
                 lvlPpc: 1,
@@ -870,6 +871,21 @@
 
                     // 3s -> Reboot
                     setTimeout(() => {
+                        // RESET FOR PHASE 3
+                        gameState.score = 1000;
+                        gameState.clicks = 0;
+                        for(let k in assets) {
+                            assets[k].count = 0;
+                            assets[k].price = assets[k].history[0];
+                        }
+                        gameState.lvlPpc = 1; gameState.costPpc = 15;
+                        gameState.lvlMulti = 0; gameState.costMulti = 2500;
+                        gameState.lvlTax = 0; gameState.costTax = 10000;
+                        gameState.clickPower = 1;
+                        gameState.multiplier = 1;
+                        gameState.marketPassiveRate = 0;
+                        recalculateMultipliers();
+
                         document.getElementById('blackout-layer').classList.add('hidden');
 
                         // Glitch Effect
@@ -881,8 +897,9 @@
                         document.body.style.filter = "brightness(0.3) sepia(1) hue-rotate(180deg) contrast(1.2)";
                         document.body.style.transition = "filter 2s";
 
-                        // Fade in Multiverse
+                        // Fade in Multiverse (Blink)
                         const mvModal = document.getElementById('p3-multiverse-modal');
+                        mvModal.className += " blink-fade-in";
                         mvModal.style.opacity = 1;
                         mvModal.style.pointerEvents = 'auto';
 
@@ -936,10 +953,12 @@
                     if (gameState.p3_universe === 'red_rot') {
                         // Rot Cash 1%
                         gameState.score *= 0.99;
-                        // Inflation: Asset Prices Up (30s check done separately or here with counter?)
-                        // Let's do small inflation every tick (1s) to simulate 2x every 30s.
-                        // 2^(1/30) ~= 1.023
-                        for(let k in assets) assets[k].price *= 1.023;
+                        // Inflation: Upgrade Costs & Exploit Cost
+                        const factor = 1.023;
+                        gameState.costPpc = Math.max(gameState.costPpc + 1, Math.floor(gameState.costPpc * factor));
+                        gameState.costMulti = Math.max(gameState.costMulti + 1, Math.floor(gameState.costMulti * factor));
+                        gameState.costTax = Math.max(gameState.costTax + 1, Math.floor(gameState.costTax * factor));
+                        gameState.p3_exploitCost *= 1.005;
                     } else if (gameState.p3_universe === 'matrix') {
                         // High Volatility is handled in volatility loop.
                         // Here we can add passive income buff?
@@ -1833,9 +1852,9 @@
                         const btn = document.createElement('button');
                         btn.id = 'p3-exploit-btn';
                         btn.className = "upgrade-btn w-full bg-red-600 hover:bg-red-500 border-2 border-red-400 rounded-xl p-4 font-black text-white animate-pulse mt-4";
-                        btn.innerHTML = "LAUNCH EXPLOIT (Attack) <br> <span class='text-[10px] font-mono'>Cost: 1T (Fixed)</span>";
+                        btn.innerHTML = `LAUNCH EXPLOIT (Attack) <br> <span class='text-[10px] font-mono'>Cost: ${formatNumber(gameState.p3_exploitCost)}</span>`;
                         btn.onclick = () => {
-                            const cost = 1000000000000;
+                            const cost = gameState.p3_exploitCost;
                             if(gameState.score >= cost) {
                                 gameState.score -= cost;
                                 gameState.p3_firewallHealth -= 5; // 5% damage
