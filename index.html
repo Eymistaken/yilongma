@@ -394,6 +394,11 @@
         </div>
     </details>
 
+    <!-- TEMP DEV BUTTON -->
+    <button id="dev-cheat-btn" class="fixed top-4 left-24 z-50 bg-red-600/50 hover:bg-red-600 text-white text-[10px] font-bold px-2 py-1 rounded border border-white/20 backdrop-blur-sm transition-all">
+        DEV: 1.99x
+    </button>
+
     <!-- Ana Konteyner -->
     <div
         class="container mx-auto px-4 max-w-7xl relative z-10 flex flex-col lg:flex-row gap-6 h-full items-start mt-16 md:mt-4">
@@ -668,6 +673,11 @@
         <div class="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-8 w-full max-w-5xl px-4" id="gacha-cards">
             <!-- Cards injected by JS -->
         </div>
+    </div>
+
+    <!-- VERSION BADGE -->
+    <div class="fixed bottom-2 left-2 z-50 text-[10px] font-mono text-slate-500 opacity-50 pointer-events-none">
+        V3.1
     </div>
 
     <script>
@@ -1831,6 +1841,18 @@
                     updateUI();
                 }
             }, 60000);
+
+            // DEV BUTTON LOGIC
+            document.getElementById('dev-cheat-btn').addEventListener('click', () => {
+                // Set score to 1.99x of Yilong's Base Wealth
+                // Note: totalWealth calculation includes assets. If assets > 0, this might push over 2x instantly.
+                // But this is just a quick helper.
+                const target = YilongBaseWealth * 1.99;
+                gameState.score = target;
+
+                createPopup("DEV: CASH SET", "#ef4444", 100, 50);
+                updateUI();
+            });
         });
 
         function toggleMobileSlot() {
