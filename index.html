@@ -440,11 +440,6 @@
         </div>
     </details>
 
-    <!-- TEMP DEV BUTTON -->
-    <button id="dev-cheat-btn" class="fixed top-4 left-24 z-50 bg-red-600/50 hover:bg-red-600 text-white text-[10px] font-bold px-2 py-1 rounded border border-white/20 backdrop-blur-sm transition-all">
-        DEV: 1.99x
-    </button>
-
     <!-- Ana Konteyner -->
     <div
         class="container mx-auto px-4 max-w-7xl relative z-10 flex flex-col lg:flex-row gap-6 h-full items-start mt-16 md:mt-4">
@@ -2186,15 +2181,6 @@
                 }
             }, 60000);
 
-            // DEV BUTTON LOGIC
-            document.getElementById('dev-cheat-btn').addEventListener('click', () => {
-                const multiplier = gameState.phase === 2 ? 99 : 1.99;
-                const target = YilongBaseWealth * multiplier;
-                gameState.score = target;
-
-                createPopup(`DEV: ${multiplier}x CASH SET`, "#ef4444", 100, 50);
-                updateUI();
-            });
         });
 
         function toggleMobileSlot() {
