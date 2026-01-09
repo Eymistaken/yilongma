@@ -839,79 +839,88 @@
             const triggerPhase3 = () => {
                 gameState.phase = 3;
 
-                // Hide Game UI
+                // 1. INSTANT BLACKOUT
                 document.getElementById('game-world').classList.add('hidden');
                 document.getElementById('message-box').style.opacity = 0;
                 document.getElementById('message-box').style.pointerEvents = 'none';
 
-                // Show BSOD
-                const bsod = document.getElementById('bsod-layer');
-                bsod.classList.remove('hidden');
-                bsod.classList.add('flex');
+                // Show VOID
+                const voidLayer = document.getElementById('void-layer');
+                voidLayer.classList.remove('hidden');
 
-                // Audio Cut & Phase 3 Setup
-                if(synth) {
-                    synth.triggerRelease();
-                    synth.volume.value = -12; // Lower volume
-                    // Add BitCrusher (Distortion)
-                    const crusher = new Tone.BitCrusher(4).toDestination();
-                    synth.disconnect();
-                    synth.connect(crusher);
-                }
+                // SILENCE (Mute Audio)
+                if(synth) synth.triggerRelease();
+                Tone.Destination.mute = true;
 
-                // BSOD Counter
-                let percent = 0;
-                const interval = setInterval(() => {
-                    percent += Math.floor(Math.random() * 5);
-                    if(percent > 100) percent = 100;
-                    document.getElementById('bsod-percent').textContent = percent;
-                }, 500);
-
-                // 10s -> Blackout
+                // 2. THE WAIT (15 Seconds)
                 setTimeout(() => {
-                    clearInterval(interval);
-                    bsod.classList.add('hidden');
-                    bsod.classList.remove('flex');
-                    document.getElementById('blackout-layer').classList.remove('hidden');
+                    // 3. THE REBOOT
+                    voidLayer.classList.add('hidden');
 
-                    // 3s -> Reboot
+                    // Audio: Unmute & Glitch Sound
+                    Tone.Destination.mute = false;
+
+                    // Create Loud Glitch + Chime
+                    const noise = new Tone.NoiseSynth({
+                        noise: { type: 'pink' },
+                        envelope: { attack: 0.01, decay: 0.3, sustain: 0 }
+                    }).toDestination();
+                    noise.volume.value = 0; // Loud
+                    noise.triggerAttackRelease("8n");
+
+                    const deepSynth = new Tone.Synth({
+                        oscillator: { type: 'sawtooth' },
+                        envelope: { attack: 0.05, decay: 1, sustain: 0.1, release: 3 }
+                    }).toDestination();
+                    deepSynth.volume.value = -5;
+                    deepSynth.triggerAttackRelease("C1", "1n");
+
+                    // Setup Phase 3 Audio (Distorted)
+                    if(synth) {
+                        synth.volume.value = -12;
+                        const crusher = new Tone.BitCrusher(4).toDestination();
+                        synth.disconnect();
+                        synth.connect(crusher);
+                    }
+
+                    // Visuals: Reboot Glitch & Filters
+                    document.body.style.background = "#000";
+                    document.body.style.filter = "brightness(0.3) sepia(1) hue-rotate(180deg) contrast(1.2)";
+                    document.body.style.transition = "filter 0.5s";
+
+                    // Intense Glitch Animation (Temporary)
+                    document.body.classList.add('reboot-glitch');
                     setTimeout(() => {
-                        // RESET FOR PHASE 3
-                        gameState.score = 1000;
-                        gameState.clicks = 0;
-                        for(let k in assets) {
-                            assets[k].count = 0;
-                            assets[k].price = assets[k].history[0];
-                        }
-                        gameState.lvlPpc = 1; gameState.costPpc = 15;
-                        gameState.lvlMulti = 0; gameState.costMulti = 2500;
-                        gameState.lvlTax = 0; gameState.costTax = 10000;
-                        gameState.clickPower = 1;
-                        gameState.multiplier = 1;
-                        gameState.marketPassiveRate = 0;
-                        recalculateMultipliers();
+                        document.body.classList.remove('reboot-glitch');
+                    }, 1500);
 
-                        document.getElementById('blackout-layer').classList.add('hidden');
+                    // CRT Overlay
+                    const overlay = document.createElement('div');
+                    overlay.className = 'crt-overlay';
+                    document.body.appendChild(overlay);
 
-                        // Glitch Effect
-                        const overlay = document.createElement('div');
-                        overlay.className = 'crt-overlay';
-                        document.body.appendChild(overlay);
+                    // RESET STATE
+                    gameState.score = 1000;
+                    gameState.clicks = 0;
+                    for(let k in assets) {
+                        assets[k].count = 0;
+                        assets[k].price = assets[k].history[0];
+                    }
+                    gameState.lvlPpc = 1; gameState.costPpc = 15;
+                    gameState.lvlMulti = 0; gameState.costMulti = 2500;
+                    gameState.lvlTax = 0; gameState.costTax = 10000;
+                    gameState.clickPower = 1;
+                    gameState.multiplier = 1;
+                    gameState.marketPassiveRate = 0;
+                    recalculateMultipliers();
 
-                        document.body.style.background = "#000";
-                        document.body.style.filter = "brightness(0.3) sepia(1) hue-rotate(180deg) contrast(1.2)";
-                        document.body.style.transition = "filter 2s";
+                    // Fade in Multiverse
+                    const mvModal = document.getElementById('p3-multiverse-modal');
+                    mvModal.className += " blink-fade-in";
+                    mvModal.style.opacity = 1;
+                    mvModal.style.pointerEvents = 'auto';
 
-                        // Fade in Multiverse (Blink)
-                        const mvModal = document.getElementById('p3-multiverse-modal');
-                        mvModal.className += " blink-fade-in";
-                        mvModal.style.opacity = 1;
-                        mvModal.style.pointerEvents = 'auto';
-
-                        if(synth) synth.triggerAttackRelease("C1", "4n"); // Reboot sound
-
-                    }, 3000);
-                }, 10000);
+                }, 15000); // 15s Wait
             };
 
             window.initPhase3 = (universe) => {
