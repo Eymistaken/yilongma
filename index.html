@@ -440,6 +440,11 @@
         </div>
     </details>
 
+    <!-- Developer Button -->
+    <button id="dev-skip-btn" class="fixed top-8 left-24 z-50 bg-red-600/80 text-white text-[10px] font-bold px-3 py-1.5 rounded-full shadow-lg hover:bg-red-500 transition-all backdrop-blur-sm border border-white/20">
+        DEV SKIP
+    </button>
+
     <!-- Ana Konteyner -->
     <div
         class="container mx-auto px-4 max-w-7xl relative z-10 flex flex-col lg:flex-row gap-6 h-full items-start mt-16 md:mt-4">
@@ -1203,6 +1208,30 @@
             };
 
             els.skibidi.addEventListener('pointerdown', handleClick);
+
+            // --- DEVELOPER BUTTON LOGIC ---
+            document.getElementById('dev-skip-btn').addEventListener('click', () => {
+                if (gameState.phase === 3) {
+                    // Phase 3: Give enough money to destroy firewall
+                    const hitsNeeded = Math.ceil(gameState.p3_firewallHealth / 5);
+                    const amount = hitsNeeded * gameState.p3_exploitCost * 1.5; // 1.5x buffer
+                    gameState.score += amount;
+                    createPopup("DEV MONEY ADDED", "#ff0000", 100, 100);
+                } else {
+                    // Phase 1 & 2
+                    const targetMult = gameState.phase === 2 ? 10 : 2;
+                    const target = YilongBaseWealth * targetMult;
+                    const needed = target - gameState.totalWealth;
+
+                    if (needed > 0) {
+                        gameState.score += needed + 10000; // Buffer
+                        createPopup("DEV: PHASE SKIP READY", "#00ff00", 100, 100);
+                    } else {
+                        createPopup("ALREADY RICH ENOUGH", "#ffff00", 100, 100);
+                    }
+                }
+                updateUI();
+            });
 
             // --- YÜKSELTMELER (LOGIC) ---
             const buyUpgrade = (costKey, lvlKey, type) => {
