@@ -14,55 +14,64 @@
     <!-- SortableJS -->
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
     <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;500;700;900&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Kode+Mono:wght@400;700&display=swap"
+        rel="stylesheet">
 
     <script>
         tailwind.config = {
             theme: {
                 extend: {
                     fontFamily: {
-                        sans: ['Outfit', 'sans-serif'],
+                        sans: ['Kode Mono', 'monospace'],
+                        display: ['Orbitron', 'sans-serif'],
+                        mono: ['Kode Mono', 'monospace'],
                     },
                     colors: {
-                        glass: "rgba(20, 20, 25, 0.7)",
-                        glassBorder: "rgba(255, 255, 255, 0.08)",
-                        accent: "#8b5cf6"
+                        glass: "rgba(8, 8, 15, 0.92)",
+                        glassBorder: "rgba(255, 255, 255, 0.04)",
+                        accent: "#00f0ff",
+                        neon: {
+                            cyan: '#00f0ff',
+                            magenta: '#ff2d7b',
+                            lime: '#39ff14',
+                            gold: '#ffcf00',
+                        }
                     },
                     animation: {
                         'float': 'float 6s ease-in-out infinite',
                         'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
-                        'gradient-xy': 'gradient-xy 15s ease infinite',
                         'spin-slow': 'spin 3s linear infinite',
                         'bounce-short': 'bounce-short 0.5s ease-in-out',
                         'flash-green': 'flash-green 2s ease-out infinite',
-                        'glow-pulse': 'glow-pulse 1.5s ease-in-out infinite'
+                        'glow-pulse': 'glow-pulse 1.5s ease-in-out infinite',
+                        'stagger-in': 'stagger-in 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards',
+                        'neon-border': 'neon-border 2s ease-in-out infinite alternate',
                     },
                     keyframes: {
                         float: {
                             '0%, 100%': { transform: 'translateY(0)' },
                             '50%': { transform: 'translateY(-10px)' },
                         },
-                        'gradient-xy': {
-                            '0%, 100%': {
-                                'background-size': '400% 400%',
-                                'background-position': '0% 50%'
-                            },
-                            '50%': {
-                                'background-size': '400% 400%',
-                                'background-position': '100% 50%'
-                            }
-                        },
                         'bounce-short': {
                             '0%, 100%': { transform: 'translateY(0)' },
                             '50%': { transform: 'translateY(-20%)' }
                         },
                         'flash-green': {
-                            '0%, 100%': { boxShadow: '0 0 0 rgba(74, 222, 128, 0)' },
-                            '50%': { boxShadow: '0 0 20px rgba(74, 222, 128, 0.6)', borderColor: '#4ade80' }
+                            '0%, 100%': { boxShadow: '0 0 0 rgba(57, 255, 20, 0)' },
+                            '50%': { boxShadow: '0 0 20px rgba(57, 255, 20, 0.6)', borderColor: '#39ff14' }
                         },
                         'glow-pulse': {
-                            '0%, 100%': { filter: 'drop-shadow(0 0 2px rgba(250, 204, 21, 0.5))' },
-                            '50%': { filter: 'drop-shadow(0 0 10px rgba(250, 204, 21, 1))' }
+                            '0%, 100%': { filter: 'drop-shadow(0 0 2px rgba(255, 207, 0, 0.5))' },
+                            '50%': { filter: 'drop-shadow(0 0 10px rgba(255, 207, 0, 1))' }
+                        },
+                        'stagger-in': {
+                            '0%': { opacity: '0', transform: 'translateY(24px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' }
+                        },
+                        'neon-border': {
+                            '0%': { boxShadow: '0 0 5px var(--glow-color, #00f0ff), inset 0 0 5px transparent' },
+                            '100%': { boxShadow: '0 0 15px var(--glow-color, #00f0ff), inset 0 0 5px transparent' }
                         }
                     }
                 }
@@ -71,58 +80,109 @@
     </script>
 
     <style>
+        :root {
+            --bg-void: #050508;
+            --bg-panel: rgba(8, 8, 15, 0.92);
+            --border-dim: rgba(255, 255, 255, 0.04);
+            --neon-cyan: #00f0ff;
+            --neon-magenta: #ff2d7b;
+            --neon-lime: #39ff14;
+            --neon-gold: #ffcf00;
+            --text-primary: #e0e0e8;
+            --text-muted: #5a5a70;
+        }
+
         body {
-            background: linear-gradient(-45deg, #0f0c29, #302b63, #24243e, #1a1a2e);
-            background-size: 400% 400%;
-            animation: gradient-xy 15s ease infinite;
-            color: #e2e8f0;
+            background: var(--bg-void);
+            color: var(--text-primary);
             overflow-x: hidden;
             -webkit-tap-highlight-color: transparent;
             user-select: none;
+            font-family: 'Kode Mono', monospace;
+            position: relative;
+        }
+
+        /* Radial glow spots */
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background:
+                radial-gradient(ellipse 600px 400px at 15% 20%, rgba(0, 240, 255, 0.03), transparent),
+                radial-gradient(ellipse 500px 500px at 85% 80%, rgba(255, 45, 123, 0.03), transparent),
+                radial-gradient(ellipse 400px 300px at 50% 50%, rgba(57, 255, 20, 0.015), transparent);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* Dot-grid pattern */
+        body::after {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background-image: radial-gradient(circle, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+            background-size: 24px 24px;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* Scanline overlay */
+        .scanline-overlay {
+            position: fixed;
+            inset: 0;
+            background: repeating-linear-gradient(0deg,
+                    transparent,
+                    transparent 2px,
+                    rgba(0, 0, 0, 0.04) 2px,
+                    rgba(0, 0, 0, 0.04) 4px);
+            pointer-events: none;
+            z-index: 99998;
         }
 
         /* Özel Scrollbar */
         ::-webkit-scrollbar {
-            width: 6px;
+            width: 4px;
         }
 
         ::-webkit-scrollbar-track {
-            background: rgba(0, 0, 0, 0.1);
+            background: rgba(0, 0, 0, 0.2);
         }
 
         ::-webkit-scrollbar-thumb {
-            background: #4c1d95;
-            border-radius: 4px;
+            background: var(--neon-cyan);
+            border-radius: 2px;
+            box-shadow: 0 0 6px var(--neon-cyan);
         }
 
         ::-webkit-scrollbar-thumb:hover {
-            background: #6d28d9;
+            background: #33f5ff;
         }
 
         /* Glassmorphism Ortak Sınıfı */
         .glass-panel {
-            background: rgba(15, 15, 20, 0.95);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            box-shadow: 0 4px 16px 0 rgba(0, 0, 0, 0.4);
+            background: var(--bg-panel);
+            border: 1px solid var(--border-dim);
+            box-shadow: 0 4px 20px 0 rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(8px);
         }
 
         /* Skibidi Buton Animasyonları */
         #skibidi-toilet {
             font-size: 140px;
             cursor: pointer;
-            transition: transform 0.08s cubic-bezier(0.34, 1.56, 0.64, 1);
-            filter: drop-shadow(0 0 20px rgba(139, 92, 246, 0.4));
+            transition: transform 0.08s cubic-bezier(0.34, 1.56, 0.64, 1), filter 0.15s;
+            filter: drop-shadow(0 0 25px rgba(0, 240, 255, 0.4)) drop-shadow(0 0 60px rgba(0, 240, 255, 0.15));
             position: relative;
             z-index: 10;
         }
 
         #skibidi-toilet:active {
             transform: scale(0.85) rotate(-5deg);
-            filter: drop-shadow(0 0 10px rgba(139, 92, 246, 0.8));
+            filter: drop-shadow(0 0 15px rgba(0, 240, 255, 0.9)) drop-shadow(0 0 40px rgba(255, 45, 123, 0.6));
         }
 
         #skibidi-toilet:hover {
-            filter: drop-shadow(0 0 30px rgba(139, 92, 246, 0.7));
+            filter: drop-shadow(0 0 35px rgba(0, 240, 255, 0.7)) drop-shadow(0 0 80px rgba(0, 240, 255, 0.3));
             transform: scale(1.05);
         }
 
@@ -130,9 +190,10 @@
         .click-popup {
             position: absolute;
             font-weight: 900;
+            font-family: 'Orbitron', sans-serif;
             pointer-events: none;
             animation: popup-anim 0.8s cubic-bezier(0.22, 1, 0.36, 1) forwards;
-            text-shadow: 0 4px 15px rgba(0, 0, 0, 0.6);
+            text-shadow: 0 0 10px currentColor, 0 0 30px currentColor, 0 4px 15px rgba(0, 0, 0, 0.8);
             z-index: 20;
             white-space: nowrap;
         }
@@ -161,7 +222,7 @@
         .particle {
             position: absolute;
             pointer-events: none;
-            background: white;
+            background: var(--neon-cyan);
             border-radius: 50%;
             animation: particle-anim 0.8s cubic-bezier(0, 0.9, 0.57, 1) forwards;
             box-shadow: 0 0 10px currentColor;
@@ -184,10 +245,10 @@
             position: absolute;
             font-size: 2rem;
             pointer-events: none;
-            opacity: 0.05;
+            opacity: 0.04;
             z-index: 0;
             animation: float-up linear forwards;
-            filter: blur(2px);
+            filter: blur(3px) saturate(0.5);
         }
 
         @keyframes float-up {
@@ -197,11 +258,11 @@
             }
 
             10% {
-                opacity: 0.1;
+                opacity: 0.08;
             }
 
             90% {
-                opacity: 0.1;
+                opacity: 0.08;
             }
 
             to {
@@ -241,6 +302,7 @@
             transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
             position: relative;
             overflow: hidden;
+            border-left: 3px solid var(--neon-cyan) !important;
         }
 
         .upgrade-btn::after {
@@ -250,7 +312,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            background: linear-gradient(90deg, transparent, rgba(0, 240, 255, 0.05), transparent);
             transform: translateX(-100%);
             transition: transform 0.5s;
         }
@@ -259,29 +321,36 @@
             transform: translateX(100%);
         }
 
+        .upgrade-btn:hover {
+            box-shadow: 0 0 15px rgba(0, 240, 255, 0.15);
+            border-color: rgba(0, 240, 255, 0.4) !important;
+        }
+
         .upgrade-btn:active {
             transform: scale(0.96);
         }
 
         .upgrade-btn:disabled {
-            opacity: 0.5;
+            opacity: 0.35;
             cursor: not-allowed;
             filter: grayscale(0.8);
+            border-left-color: var(--text-muted) !important;
         }
 
         /* Sortable Ghost */
         .sortable-ghost {
             opacity: 0.2;
-            background: #6366f1;
+            background: rgba(0, 240, 255, 0.1);
         }
 
         /* Slot Makinesi */
         .slot-reel {
-            background: #1e1b4b;
+            background: #0a0a12;
             border-radius: 0.5rem;
             overflow: hidden;
             position: relative;
-            box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.8);
+            box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.8), 0 0 8px rgba(255, 207, 0, 0.1);
+            border: 1px solid rgba(255, 207, 0, 0.15);
         }
 
         .reel-inner {
@@ -303,21 +372,21 @@
 
         @keyframes jackpot {
             from {
-                text-shadow: 0 0 10px #fbbf24;
+                text-shadow: 0 0 10px var(--neon-gold);
                 transform: scale(1);
             }
 
             to {
-                text-shadow: 0 0 30px #f59e0b, 0 0 10px white;
+                text-shadow: 0 0 30px var(--neon-gold), 0 0 10px white;
                 transform: scale(1.1);
             }
         }
 
         /* Yilong Ma Wealth Box */
         .yilong-box {
-            background: linear-gradient(90deg, #1e293b, #0f172a);
-            border: 1px solid #334155;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            background: rgba(8, 8, 15, 0.95);
+            border: 1px solid rgba(255, 207, 0, 0.2);
+            box-shadow: 0 0 20px rgba(255, 207, 0, 0.08), 0 4px 15px rgba(0, 0, 0, 0.4);
         }
 
         .progress-bar {
@@ -327,20 +396,63 @@
         /* Yeni Efekt Sınıfları */
         .highlight-asset {
             animation: flash-green 2s ease-out infinite;
-            border-color: #4ade80 !important;
+            border-color: var(--neon-lime) !important;
         }
 
         .new-skitt-glow {
-            background: rgba(139, 92, 246, 0.2);
-            border-color: rgba(139, 92, 246, 0.5);
-            box-shadow: 0 0 15px rgba(139, 92, 246, 0.3);
+            background: rgba(0, 240, 255, 0.08);
+            border-color: rgba(0, 240, 255, 0.3);
+            box-shadow: 0 0 15px rgba(0, 240, 255, 0.15);
             animation: glow-pulse 1.5s ease-in-out infinite alternate;
+        }
+
+        /* Staggered load animation */
+        .stagger-load {
+            opacity: 0;
+            animation: stagger-in 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        .stagger-load:nth-child(1) {
+            animation-delay: 0.05s;
+        }
+
+        .stagger-load:nth-child(2) {
+            animation-delay: 0.12s;
+        }
+
+        .stagger-load:nth-child(3) {
+            animation-delay: 0.2s;
+        }
+
+        .stagger-load:nth-child(4) {
+            animation-delay: 0.28s;
+        }
+
+        @keyframes stagger-in {
+            0% {
+                opacity: 0;
+                transform: translateY(24px);
+            }
+
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Neon heading text */
+        .neon-title {
+            font-family: 'Orbitron', sans-serif;
+            text-shadow: 0 0 10px var(--neon-cyan), 0 0 40px rgba(0, 240, 255, 0.3);
         }
 
         /* PHASE 3 EFFECTS */
         .crt-overlay {
             position: fixed;
-            top: 0; left: 0; right: 0; bottom: 0;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
             background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
             background-size: 100% 2px, 3px 100%;
             pointer-events: none;
@@ -354,26 +466,52 @@
         }
 
         @keyframes glitch-anim {
-            0% { transform: translate(0) }
-            20% { transform: translate(-2px, 2px) }
-            40% { transform: translate(-2px, -2px) }
-            60% { transform: translate(2px, 2px) }
-            80% { transform: translate(2px, -2px) }
-            100% { transform: translate(0) }
+            0% {
+                transform: translate(0)
+            }
+
+            20% {
+                transform: translate(-2px, 2px)
+            }
+
+            40% {
+                transform: translate(-2px, -2px)
+            }
+
+            60% {
+                transform: translate(2px, 2px)
+            }
+
+            80% {
+                transform: translate(2px, -2px)
+            }
+
+            100% {
+                transform: translate(0)
+            }
         }
     </style>
 </head>
 
 <body class="min-h-screen flex flex-col items-center py-4 relative text-slate-200">
 
+    <!-- Scanline Overlay -->
+    <div class="scanline-overlay"></div>
+
     <!-- BSOD LAYER -->
-    <div id="bsod-layer" class="fixed inset-0 z-[9999] bg-[#0000aa] hidden cursor-none font-mono text-white p-10 flex-col overflow-hidden">
+    <div id="bsod-layer"
+        class="fixed inset-0 z-[9999] bg-[#0000aa] hidden cursor-none font-mono text-white p-10 flex-col overflow-hidden">
         <div class="max-w-4xl mx-auto space-y-4">
-            <p class="text-xl">A problem has been detected and Windows has been shut down to prevent damage to your computer.</p>
+            <p class="text-xl">A problem has been detected and Windows has been shut down to prevent damage to your
+                computer.</p>
             <p class="text-xl mt-8">CRITICAL_PROCESS_DIED</p>
-            <p class="mt-8">If this is the first time you've seen this Stop error screen, restart your computer. If this screen appears again, follow these steps:</p>
-            <p>Check to make sure any new hardware or software is properly installed. If this is a new installation, ask your hardware or software manufacturer for any Windows updates you might need.</p>
-            <p>If problems continue, disable or remove any newly installed hardware or software. Disable BIOS memory options such as caching or shadowing. If you need to use Safe Mode to remove or disable components, restart your computer, press F8 to select Advanced Startup Options, and then select Safe Mode.</p>
+            <p class="mt-8">If this is the first time you've seen this Stop error screen, restart your computer. If this
+                screen appears again, follow these steps:</p>
+            <p>Check to make sure any new hardware or software is properly installed. If this is a new installation, ask
+                your hardware or software manufacturer for any Windows updates you might need.</p>
+            <p>If problems continue, disable or remove any newly installed hardware or software. Disable BIOS memory
+                options such as caching or shadowing. If you need to use Safe Mode to remove or disable components,
+                restart your computer, press F8 to select Advanced Startup Options, and then select Safe Mode.</p>
             <p class="mt-8">Technical Information:</p>
             <p>*** STOP: 0x000000YILONG (0xFFFFFFFF, 0x00000000, 0x00000000, 0x00000000)</p>
             <p class="mt-8">Collecting data for crash dump ... <span id="bsod-percent">0</span>%</p>
@@ -387,292 +525,318 @@
     <!-- GAME WORLD WRAPPER -->
     <div id="game-world" class="contents">
 
-    <!-- Arka Plan Efektleri -->
-    <div id="floater-container" class="fixed inset-0 pointer-events-none overflow-hidden z-0"></div>
+        <!-- Arka Plan Efektleri -->
+        <div id="floater-container" class="fixed inset-0 pointer-events-none overflow-hidden z-0"></div>
 
-    <!-- YILONG MA SERVET KUTUSU -->
-    <div
-        class="fixed top-4 right-4 z-40 yilong-box rounded-2xl p-3 flex flex-col gap-1 w-64 animate-float border-l-4 border-yellow-500">
-        <div class="flex items-center gap-3 mb-1">
-            <div
-                class="w-10 h-10 rounded-full bg-yellow-500/20 flex items-center justify-center border border-yellow-500/30 overflow-hidden">
-                <span class="text-2xl" id="yilong-avatar">🤓</span>
-            </div>
-            <div>
-                <h3 class="text-xs font-bold text-slate-400 uppercase">Yilong Ma</h3>
-                <div id="realtime-yilong-wealth" class="text-lg font-mono font-black text-yellow-400 leading-none">5.00M
-                </div>
-            </div>
-        </div>
-
-        <!-- Hedef Progress Bar -->
-        <div class="w-full bg-slate-800 h-2 rounded-full overflow-hidden mt-1 relative">
-            <div id="wealth-progress" class="h-full bg-gradient-to-r from-violet-600 to-fuchsia-400 w-0 relative">
-                <div class="absolute right-0 top-0 bottom-0 w-1 bg-white/50 animate-pulse"></div>
-            </div>
-        </div>
-        <div class="flex justify-between text-[9px] text-slate-500 font-mono mt-0.5">
-            <span>Senin Paran</span>
-            <span class="text-violet-300">Hedef: <span id="dynamic-target">10M</span></span>
-        </div>
-    </div>
-
-    <!-- Skitter (Twitter) Widget - SOL ÜST -->
-    <details id="skitter-feed" class="fixed top-4 left-4 z-40 glass-panel rounded-2xl border-opacity-20 border-white">
-        <summary class="flex items-center justify-center w-full h-full p-0 m-0 focus:outline-none relative">
-            <div class="absolute inset-0 flex items-center justify-center transition-opacity duration-300 bg-sky-600 hover:bg-sky-500 text-white rounded-full"
-                id="skitter-icon">
-                <span class="text-2xl">🐦</span>
-            </div>
-            <div class="w-full px-4 py-3 flex justify-between items-center opacity-0 hidden"
-                id="skitter-expanded-header">
-                <span class="font-bold text-sky-400 flex items-center gap-2">Skitter <span
-                        class="text-[10px] bg-red-500/20 px-2 py-0.5 rounded border border-red-500/40 text-red-400 animate-pulse">LIVE</span></span>
-                <div class="text-right">
-                    <span class="text-[10px] text-slate-400 uppercase tracking-wider block">Yilong'u Geç</span>
-                    <span id="yilong-ma-servet-display" class="font-mono text-xs text-yellow-400 font-bold">5.00M</span>
-                </div>
-            </div>
-        </summary>
-        <div class="px-4 pb-4 pt-0 max-h-[400px] overflow-y-auto flex flex-col gap-3 mt-2 scrollbar-hide"
-            id="skitter-messages">
-            <!-- Mesajlar -->
-        </div>
-    </details>
-
-    <!-- Ana Konteyner -->
-    <div
-        class="container mx-auto px-4 max-w-7xl relative z-10 flex flex-col lg:flex-row gap-6 h-full items-start mt-16 md:mt-4">
-
-        <!-- SOL PANEL: Slot Makinesi & Mini Oyunlar -->
-        <div class="hidden lg:flex flex-col gap-4 w-1/4 sticky top-4">
-            <div class="glass-panel p-5 rounded-3xl border-t-4 border-yellow-500 relative overflow-hidden group">
-                <!-- Parlama Efekti -->
+        <!-- YILONG MA SERVET KUTUSU -->
+        <div class="fixed top-4 right-4 z-40 yilong-box rounded-2xl p-3 flex flex-col gap-1 w-64 animate-float border-l-4"
+            style="border-left-color: var(--neon-gold);">
+            <div class="flex items-center gap-3 mb-1">
                 <div
-                    class="absolute inset-0 bg-yellow-500/5 group-hover:bg-yellow-500/10 transition-colors duration-500">
+                    class="w-10 h-10 rounded-full bg-yellow-500/20 flex items-center justify-center border border-yellow-500/30 overflow-hidden">
+                    <span class="text-2xl" id="yilong-avatar">🤓</span>
                 </div>
-
-                <h2 class="text-xl font-black italic mb-4 text-yellow-400 flex items-center gap-2 relative z-10">
-                    🎰 SKIBIDI SLOTS
-                </h2>
-
-                <!-- Slot Ekranı -->
-                <div
-                    class="grid grid-cols-3 gap-2 mb-4 bg-black/40 p-2 rounded-xl border border-white/10 relative z-10">
-                    <div class="slot-reel h-20" id="reel-1">
-                        <div class="reel-inner" id="reel-inner-1">
-                            <div class="slot-symbol">🍒</div>
-                        </div>
+                <div>
+                    <h3 class="text-xs font-bold text-slate-400 uppercase">Yilong Ma</h3>
+                    <div id="realtime-yilong-wealth" class="text-lg font-mono font-black leading-none"
+                        style="color: var(--neon-gold);">5.00M
                     </div>
-                    <div class="slot-reel h-20" id="reel-2">
-                        <div class="reel-inner" id="reel-inner-2">
-                            <div class="slot-symbol">🍒</div>
-                        </div>
-                    </div>
-                    <div class="slot-reel h-20" id="reel-3">
-                        <div class="reel-inner" id="reel-inner-3">
-                            <div class="slot-symbol">🍒</div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Bilgi Notu (SÜRPRİZ) -->
-
-                <div class="flex justify-between items-center mb-2 relative z-10">
-                    <div id="slot-cost-container" class="text-xs text-slate-400">
-                        Bedel: <span class="text-violet-400 font-bold" id="slot-cost">500</span> Gyatt
-                    </div>
-                    <!-- Phase 2 Bet Input (Initially Hidden) -->
-                    <div id="slot-bet-input-container" class="hidden flex items-center gap-2">
-                        <span class="text-[10px] text-slate-400">BET:</span>
-                        <input type="number" id="slot-bet-input" value="1000" min="100" class="w-20 bg-black/50 border border-white/20 rounded px-2 py-1 text-xs text-right font-mono text-yellow-400 focus:outline-none focus:border-yellow-500">
-                    </div>
-
-                    <span class="text-xs text-yellow-400 font-bold" id="slot-status">Şansını Dene!</span>
-                </div>
-
-                <div class="flex gap-2 relative z-10">
-                    <button id="spin-btn"
-                        class="flex-1 bg-gradient-to-r from-yellow-600 to-orange-600 hover:from-yellow-500 hover:to-orange-500 text-white font-bold py-3 rounded-xl shadow-lg transform active:scale-95 transition-all border border-yellow-400/30">
-                        ÇEVİR!
-                    </button>
-                    <button id="spin-all-in-btn"
-                        class="hidden flex-1 bg-gradient-to-r from-red-600 to-purple-600 hover:from-red-500 hover:to-purple-500 text-white font-bold py-3 rounded-xl shadow-lg transform active:scale-95 transition-all border border-purple-400/30">
-                        ALL IN!
-                    </button>
                 </div>
             </div>
 
-            <!-- Ekstra İstatistikler -->
-            <div class="glass-panel p-5 rounded-3xl">
-                <h3 class="text-sm font-bold text-slate-400 uppercase tracking-widest mb-3">İstatistikler</h3>
-                <div class="space-y-2 text-sm">
-                    <div class="flex justify-between">
-                        <span class="text-slate-500">Toplam Tık</span>
-                        <span class="font-mono" id="stat-clicks">0</span>
-                    </div>
-                    <div class="flex justify-between">
-                        <span class="text-slate-500">Slot Kazancı</span>
-                        <span class="font-mono text-emerald-400" id="stat-slot-win">0</span>
-                    </div>
-                    <div class="flex justify-between">
-                        <span class="text-slate-500">Oyun Süresi</span>
-                        <span class="font-mono" id="stat-time">00:00</span>
-                    </div>
+            <!-- Hedef Progress Bar -->
+            <div class="w-full bg-slate-800 h-2 rounded-full overflow-hidden mt-1 relative">
+                <div id="wealth-progress" class="h-full w-0 relative"
+                    style="background: linear-gradient(90deg, var(--neon-cyan), var(--neon-magenta));">
+                    <div class="absolute right-0 top-0 bottom-0 w-1 bg-white/50 animate-pulse"></div>
                 </div>
+            </div>
+            <div class="flex justify-between text-[9px] text-slate-500 font-mono mt-0.5">
+                <span>Senin Paran</span>
+                <span style="color: var(--neon-cyan);">Hedef: <span id="dynamic-target">10M</span></span>
             </div>
         </div>
 
-        <!-- ORTA PANEL: Ana Oyun -->
-        <div class="w-full lg:w-2/4 flex flex-col items-center gap-6">
-
-            <!-- Başlık -->
-            <div class="text-center space-y-1 animate-float z-20">
-                <h1
-                    class="text-4xl md:text-6xl font-black tracking-tighter bg-clip-text text-transparent bg-gradient-to-r from-violet-400 via-fuchsia-400 to-white drop-shadow-[0_0_25px_rgba(139,92,246,0.6)]">
-                    SKIBIDI CLICKER
-                </h1>
-                <p class="text-slate-400 font-medium tracking-[0.3em] text-[10px] uppercase">Rivalry Edition: Beat
-                    Yilong</p>
-            </div>
-
-            <!-- Skor Kartları - Updated Grid to 2 cols (removed CPS) -->
-            <div class="grid grid-cols-2 gap-3 w-full">
-                <div class="glass-panel p-3 md:p-4 rounded-2xl flex flex-col items-center text-center">
-                    <span class="text-[10px] md:text-xs font-bold text-slate-400 uppercase">Gyatt Points</span>
-                    <div class="text-2xl md:text-4xl font-black text-violet-400 break-all leading-tight mt-1"
-                        id="score">0</div>
+        <!-- Skitter (Twitter) Widget - SOL ÜST -->
+        <details id="skitter-feed"
+            class="fixed top-4 left-4 z-40 glass-panel rounded-2xl border-opacity-20 border-white">
+            <summary class="flex items-center justify-center w-full h-full p-0 m-0 focus:outline-none relative">
+                <div class="absolute inset-0 flex items-center justify-center transition-opacity duration-300 rounded-full text-white"
+                    style="background: var(--neon-cyan); box-shadow: 0 0 15px rgba(0,240,255,0.4);" id="skitter-icon">
+                    <span class="text-2xl">🐦</span>
                 </div>
-                <div class="glass-panel p-3 md:p-4 rounded-2xl flex flex-col items-center text-center">
-                    <span class="text-[10px] md:text-xs font-bold text-slate-400 uppercase">Senin Servetin</span>
-                    <div class="text-xl md:text-3xl font-bold text-emerald-400 mt-1" id="total-wealth">0</div>
+                <div class="w-full px-4 py-3 flex justify-between items-center opacity-0 hidden"
+                    id="skitter-expanded-header">
+                    <span class="font-bold flex items-center gap-2" style="color: var(--neon-cyan);">Skitter <span
+                            class="text-[10px] bg-red-500/20 px-2 py-0.5 rounded border border-red-500/40 text-red-400 animate-pulse">LIVE</span></span>
+                    <div class="text-right">
+                        <span class="text-[10px] text-slate-400 uppercase tracking-wider block">Yilong'u Geç</span>
+                        <span id="yilong-ma-servet-display" class="font-mono text-xs font-bold"
+                            style="color: var(--neon-gold);">5.00M</span>
+                    </div>
                 </div>
+            </summary>
+            <div class="px-4 pb-4 pt-0 max-h-[400px] overflow-y-auto flex flex-col gap-3 mt-2 scrollbar-hide"
+                id="skitter-messages">
+                <!-- Mesajlar -->
             </div>
+        </details>
 
-            <!-- Tıklama Alanı -->
-            <div class="relative flex justify-center items-center py-6 md:py-12 w-full select-none">
-                <div id="popup-container" class="absolute inset-0 pointer-events-none overflow-visible"></div>
+        <!-- Ana Konteyner -->
+        <div
+            class="container mx-auto px-4 max-w-7xl relative z-10 flex flex-col lg:flex-row gap-6 h-full items-start mt-16 md:mt-4">
 
-                <div class="relative group cursor-pointer">
-                    <!-- Glow -->
+            <!-- SOL PANEL: Slot Makinesi & Mini Oyunlar -->
+            <div class="hidden lg:flex flex-col gap-4 w-1/4 sticky top-4">
+                <div class="glass-panel p-5 rounded-3xl border-t-4 relative overflow-hidden group"
+                    style="border-top-color: var(--neon-gold);">
+                    <!-- Parlama Efekti -->
+                    <div class="absolute inset-0 transition-colors duration-500"
+                        style="background: rgba(255,207,0,0.02);">
+                    </div>
+
+                    <h2 class="text-xl font-black italic mb-4 flex items-center gap-2 relative z-10 font-display"
+                        style="color: var(--neon-gold); text-shadow: 0 0 10px rgba(255,207,0,0.4);">
+                        🎰 SKIBIDI SLOTS
+                    </h2>
+
+                    <!-- Slot Ekranı -->
                     <div
-                        class="absolute inset-0 bg-violet-600 blur-[80px] opacity-20 group-hover:opacity-50 transition-opacity duration-500 rounded-full animate-pulse-slow">
+                        class="grid grid-cols-3 gap-2 mb-4 bg-black/40 p-2 rounded-xl border border-white/10 relative z-10">
+                        <div class="slot-reel h-20" id="reel-1">
+                            <div class="reel-inner" id="reel-inner-1">
+                                <div class="slot-symbol">🍒</div>
+                            </div>
+                        </div>
+                        <div class="slot-reel h-20" id="reel-2">
+                            <div class="reel-inner" id="reel-inner-2">
+                                <div class="slot-symbol">🍒</div>
+                            </div>
+                        </div>
+                        <div class="slot-reel h-20" id="reel-3">
+                            <div class="reel-inner" id="reel-inner-3">
+                                <div class="slot-symbol">🍒</div>
+                            </div>
+                        </div>
                     </div>
-                    <div id="skibidi-toilet" class="relative">🚽</div>
+
+                    <!-- Bilgi Notu (SÜRPRİZ) -->
+
+                    <div class="flex justify-between items-center mb-2 relative z-10">
+                        <div id="slot-cost-container" class="text-xs text-slate-400">
+                            Bedel: <span class="font-bold" id="slot-cost" style="color: var(--neon-cyan);">500</span>
+                            Gyatt
+                        </div>
+                        <!-- Phase 2 Bet Input (Initially Hidden) -->
+                        <div id="slot-bet-input-container" class="hidden flex items-center gap-2">
+                            <span class="text-[10px] text-slate-400">BET:</span>
+                            <input type="number" id="slot-bet-input" value="1000" min="100"
+                                class="w-20 bg-black/50 border border-white/20 rounded px-2 py-1 text-xs text-right font-mono text-yellow-400 focus:outline-none focus:border-yellow-500">
+                        </div>
+
+                        <span class="text-xs font-bold" id="slot-status" style="color: var(--neon-gold);">Şansını
+                            Dene!</span>
+                    </div>
+
+                    <div class="flex gap-2 relative z-10">
+                        <button id="spin-btn"
+                            class="flex-1 text-black font-bold font-display py-3 rounded-lg shadow-lg transform active:scale-95 transition-all"
+                            style="background: var(--neon-gold); box-shadow: 0 0 15px rgba(255,207,0,0.3);">
+                            ÇEVİR!
+                        </button>
+                        <button id="spin-all-in-btn"
+                            class="hidden flex-1 text-white font-bold font-display py-3 rounded-lg shadow-lg transform active:scale-95 transition-all"
+                            style="background: var(--neon-magenta); box-shadow: 0 0 15px rgba(255,45,123,0.3);">
+                            ALL IN!
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Ekstra İstatistikler -->
+                <div class="glass-panel p-5 rounded-3xl">
+                    <h3 class="text-sm font-bold text-slate-400 uppercase tracking-widest mb-3">İstatistikler</h3>
+                    <div class="space-y-2 text-sm">
+                        <div class="flex justify-between">
+                            <span class="text-slate-500">Toplam Tık</span>
+                            <span class="font-mono" id="stat-clicks">0</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-slate-500">Slot Kazancı</span>
+                            <span class="font-mono" id="stat-slot-win" style="color: var(--neon-lime);">0</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-slate-500">Oyun Süresi</span>
+                            <span class="font-mono" id="stat-time">00:00</span>
+                        </div>
+                    </div>
                 </div>
             </div>
 
-            <!-- Mobil İçin Slot Butonu (Sadece mobilde görünür) -->
-            <div class="lg:hidden w-full">
-                <button onclick="toggleMobileSlot()"
-                    class="w-full bg-yellow-600/20 border border-yellow-500/50 text-yellow-400 font-bold py-3 rounded-xl">
-                    🎰 Mini Game: Slots Oyna
-                </button>
+            <!-- ORTA PANEL: Ana Oyun -->
+            <div class="w-full lg:w-2/4 flex flex-col items-center gap-6">
+
+                <!-- Başlık -->
+                <div class="text-center space-y-1 animate-float z-20">
+                    <h1 class="text-4xl md:text-6xl font-black tracking-tighter font-display neon-title"
+                        style="color: var(--neon-cyan);">
+                        SKIBIDI CLICKER
+                    </h1>
+                    <p class="font-medium tracking-[0.3em] text-[10px] uppercase" style="color: var(--neon-magenta);">
+                        Rivalry Edition: Beat
+                        Yilong</p>
+                </div>
+
+                <!-- Skor Kartları - Updated Grid to 2 cols (removed CPS) -->
+                <div class="grid grid-cols-2 gap-3 w-full">
+                    <div class="glass-panel p-3 md:p-4 rounded-2xl flex flex-col items-center text-center"
+                        style="border-top: 2px solid var(--neon-cyan);">
+                        <span class="text-[10px] md:text-xs font-bold uppercase font-display"
+                            style="color: var(--text-muted);">Gyatt Points</span>
+                        <div class="text-2xl md:text-4xl font-black break-all leading-tight mt-1 font-display"
+                            style="color: var(--neon-cyan); text-shadow: 0 0 15px rgba(0,240,255,0.4);" id="score">0
+                        </div>
+                    </div>
+                    <div class="glass-panel p-3 md:p-4 rounded-2xl flex flex-col items-center text-center"
+                        style="border-top: 2px solid var(--neon-lime);">
+                        <span class="text-[10px] md:text-xs font-bold uppercase font-display"
+                            style="color: var(--text-muted);">Senin Servetin</span>
+                        <div class="text-xl md:text-3xl font-bold mt-1 font-display" id="total-wealth"
+                            style="color: var(--neon-lime); text-shadow: 0 0 15px rgba(57,255,20,0.4);">0</div>
+                    </div>
+                </div>
+
+                <!-- Tıklama Alanı -->
+                <div class="relative flex justify-center items-center py-6 md:py-12 w-full select-none">
+                    <div id="popup-container" class="absolute inset-0 pointer-events-none overflow-visible"></div>
+
+                    <div class="relative group cursor-pointer">
+                        <!-- Glow -->
+                        <div class="absolute inset-0 blur-[80px] opacity-20 group-hover:opacity-50 transition-opacity duration-500 rounded-full animate-pulse-slow"
+                            style="background: var(--neon-cyan);">
+                        </div>
+                        <div id="skibidi-toilet" class="relative">🚽</div>
+                    </div>
+                </div>
+
+                <!-- Mobil İçin Slot Butonu (Sadece mobilde görünür) -->
+                <div class="lg:hidden w-full">
+                    <button onclick="toggleMobileSlot()" class="w-full font-bold font-display py-3 rounded-lg"
+                        style="background: rgba(255,207,0,0.1); border: 1px solid rgba(255,207,0,0.3); color: var(--neon-gold);">
+                        🎰 Mini Game: Slots Oyna
+                    </button>
+                </div>
+
+                <!-- Piyasalar (Market) -->
+                <div class="w-full glass-panel rounded-2xl p-4 md:p-6 border-t-4 flex-grow"
+                    style="border-top-color: var(--neon-lime);">
+                    <h2 class="text-lg font-bold mb-4 flex items-center justify-between">
+                        <div class="flex items-center gap-2">
+                            <span class="p-1.5 rounded-lg"
+                                style="background: rgba(57,255,20,0.1); color: var(--neon-lime);">📈</span>
+                            <span class="font-display">Borsa (Stock Market)</span>
+                        </div>
+                        <span class="text-[10px] text-slate-500 font-normal hidden md:block">Drag & Drop Aktif</span>
+                    </h2>
+                    <div id="market-list-container" class="space-y-3 pb-20">
+                        <!-- Marketler buraya -->
+                    </div>
+                </div>
+
             </div>
 
-            <!-- Piyasalar (Market) -->
-            <div class="w-full glass-panel rounded-2xl p-4 md:p-6 border-t-4 border-emerald-500 flex-grow">
-                <h2 class="text-lg font-bold mb-4 flex items-center justify-between">
-                    <div class="flex items-center gap-2">
-                        <span class="bg-emerald-500/20 p-1.5 rounded-lg text-emerald-300">📈</span>
-                        <span>Borsa (Stock Market)</span>
+            <!-- SAĞ PANEL: Yükseltmeler -->
+            <div id="right-panel" class="w-full lg:w-1/4 flex flex-col gap-4 sticky top-4 h-fit">
+                <div class="glass-panel rounded-3xl p-5 border-t-4" style="border-top-color: var(--neon-cyan);">
+                    <h2 class="text-xl font-bold mb-4 flex items-center gap-2">
+                        <span class="p-2 rounded-lg"
+                            style="background: rgba(0,240,255,0.08); color: var(--neon-cyan);">⚡</span>
+                        <span class="font-display">Yükseltmeler</span>
+                    </h2>
+
+                    <div class="space-y-3" id="upgrades-list">
+                        <!-- Rizz Upgrade -->
+                        <button id="upgrade-ppc"
+                            class="upgrade-btn w-full bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg p-3 flex flex-col gap-1 text-left group">
+                            <div class="flex justify-between items-start w-full">
+                                <div>
+                                    <span class="font-bold text-slate-200 group-hover:text-white block">More Rizz</span>
+                                    <span class="text-[10px] text-slate-400">+1 Tık Gücü</span>
+                                </div>
+                                <div class="text-right">
+                                    <span class="text-[10px] px-1.5 py-0.5 rounded font-mono block mb-1"
+                                        style="background: rgba(0,240,255,0.1); color: var(--neon-cyan);">LVL
+                                        <span id="lvl-ppc">1</span></span>
+                                </div>
+                            </div>
+                            <div class="mt-1 pt-2 border-t border-white/5 flex justify-between items-center w-full">
+                                <span class="text-[10px] text-slate-500 uppercase">Bedel</span>
+                                <span id="cost-ppc" class="font-bold font-mono text-sm"
+                                    style="color: var(--neon-cyan);">15</span>
+                            </div>
+                        </button>
+
+                        <!-- Auto Clicker REMOVED -->
+
+                        <!-- Multiplier -->
+                        <button id="upgrade-multi"
+                            class="upgrade-btn w-full bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg p-3 flex flex-col gap-1 text-left group">
+                            <div class="flex justify-between items-start w-full">
+                                <div>
+                                    <span class="font-bold text-slate-200 group-hover:text-white block">Sigma
+                                        Grindset</span>
+                                    <span class="text-[10px] text-slate-400">Tüm Gelir x1.5</span>
+                                </div>
+                                <div class="text-right">
+                                    <span class="text-[10px] px-1.5 py-0.5 rounded font-mono block mb-1"
+                                        style="background: rgba(255,45,123,0.1); color: var(--neon-magenta);">LVL
+                                        <span id="lvl-multi">0</span></span>
+                                </div>
+                            </div>
+                            <div class="mt-1 pt-2 border-t border-white/5 flex justify-between items-center w-full">
+                                <span class="text-[10px] text-slate-500 uppercase">Bedel</span>
+                                <span id="cost-multi" class="font-bold font-mono text-sm"
+                                    style="color: var(--neon-magenta);">2,500</span>
+                            </div>
+                        </button>
+
+                        <!-- Fanum Tax -->
+                        <button id="upgrade-tax"
+                            class="upgrade-btn w-full bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg p-3 flex flex-col gap-1 text-left group">
+                            <div class="flex justify-between items-start w-full">
+                                <div>
+                                    <span class="font-bold text-slate-200 group-hover:text-white block">Fanum Tax</span>
+                                    <span class="text-[10px] text-slate-400">Piyasa Pasif Gelir %</span>
+                                </div>
+                                <div class="text-right">
+                                    <span class="text-[10px] px-1.5 py-0.5 rounded font-mono block mb-1"
+                                        style="background: rgba(57,255,20,0.1); color: var(--neon-lime);">LVL
+                                        <span id="lvl-tax">0</span></span>
+                                </div>
+                            </div>
+                            <div class="mt-1 pt-2 border-t border-white/5 flex justify-between items-center w-full">
+                                <span class="text-[10px] text-slate-500 uppercase">Bedel</span>
+                                <span id="cost-tax" class="font-bold font-mono text-sm"
+                                    style="color: var(--neon-lime);">10,000</span>
+                            </div>
+                        </button>
                     </div>
-                    <span class="text-[10px] text-slate-500 font-normal hidden md:block">Drag & Drop Aktif</span>
-                </h2>
-                <div id="market-list-container" class="space-y-3 pb-20">
-                    <!-- Marketler buraya -->
                 </div>
             </div>
 
         </div>
-
-        <!-- SAĞ PANEL: Yükseltmeler -->
-        <div id="right-panel" class="w-full lg:w-1/4 flex flex-col gap-4 sticky top-4 h-fit">
-            <div class="glass-panel rounded-3xl p-5 border-t-4 border-violet-500">
-                <h2 class="text-xl font-bold mb-4 flex items-center gap-2">
-                    <span class="bg-violet-500/20 p-2 rounded-lg text-violet-300">⚡</span>
-                    Yükseltmeler
-                </h2>
-
-                <div class="space-y-3" id="upgrades-list">
-                    <!-- Rizz Upgrade -->
-                    <button id="upgrade-ppc"
-                        class="upgrade-btn w-full bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl p-3 flex flex-col gap-1 text-left group">
-                        <div class="flex justify-between items-start w-full">
-                            <div>
-                                <span class="font-bold text-slate-200 group-hover:text-white block">More Rizz</span>
-                                <span class="text-[10px] text-slate-400">+1 Tık Gücü</span>
-                            </div>
-                            <div class="text-right">
-                                <span
-                                    class="bg-violet-500/20 text-violet-300 text-[10px] px-1.5 py-0.5 rounded font-mono block mb-1">LVL
-                                    <span id="lvl-ppc">1</span></span>
-                            </div>
-                        </div>
-                        <div class="mt-1 pt-2 border-t border-white/5 flex justify-between items-center w-full">
-                            <span class="text-[10px] text-slate-500 uppercase">Bedel</span>
-                            <span id="cost-ppc" class="text-violet-400 font-bold font-mono text-sm">15</span>
-                        </div>
-                    </button>
-
-                    <!-- Auto Clicker REMOVED -->
-
-                    <!-- Multiplier -->
-                    <button id="upgrade-multi"
-                        class="upgrade-btn w-full bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl p-3 flex flex-col gap-1 text-left group">
-                        <div class="flex justify-between items-start w-full">
-                            <div>
-                                <span class="font-bold text-slate-200 group-hover:text-white block">Sigma
-                                    Grindset</span>
-                                <span class="text-[10px] text-slate-400">Tüm Gelir x1.5</span>
-                            </div>
-                            <div class="text-right">
-                                <span
-                                    class="bg-pink-500/20 text-pink-300 text-[10px] px-1.5 py-0.5 rounded font-mono block mb-1">LVL
-                                    <span id="lvl-multi">0</span></span>
-                            </div>
-                        </div>
-                        <div class="mt-1 pt-2 border-t border-white/5 flex justify-between items-center w-full">
-                            <span class="text-[10px] text-slate-500 uppercase">Bedel</span>
-                            <span id="cost-multi" class="text-pink-400 font-bold font-mono text-sm">2,500</span>
-                        </div>
-                    </button>
-
-                    <!-- Fanum Tax -->
-                    <button id="upgrade-tax"
-                        class="upgrade-btn w-full bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl p-3 flex flex-col gap-1 text-left group">
-                        <div class="flex justify-between items-start w-full">
-                            <div>
-                                <span class="font-bold text-slate-200 group-hover:text-white block">Fanum Tax</span>
-                                <span class="text-[10px] text-slate-400">Piyasa Pasif Gelir %</span>
-                            </div>
-                            <div class="text-right">
-                                <span
-                                    class="bg-emerald-500/20 text-emerald-300 text-[10px] px-1.5 py-0.5 rounded font-mono block mb-1">LVL
-                                    <span id="lvl-tax">0</span></span>
-                            </div>
-                        </div>
-                        <div class="mt-1 pt-2 border-t border-white/5 flex justify-between items-center w-full">
-                            <span class="text-[10px] text-slate-500 uppercase">Bedel</span>
-                            <span id="cost-tax" class="text-emerald-400 font-bold font-mono text-sm">10,000</span>
-                        </div>
-                    </button>
-                </div>
-            </div>
-        </div>
-
-    </div>
 
     </div> <!-- END GAME WORLD WRAPPER -->
 
     <!-- Mesaj Modal -->
     <div id="message-box"
         class="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 opacity-0 pointer-events-none transition-opacity duration-300 px-4">
-        <div class="glass-panel p-8 rounded-3xl max-w-md w-full text-center transform scale-90 transition-transform duration-300 border-2 border-violet-500/30 shadow-[0_0_50px_rgba(139,92,246,0.3)]"
+        <div class="glass-panel p-8 rounded-3xl max-w-md w-full text-center transform scale-90 transition-transform duration-300"
+            style="border: 2px solid rgba(0,240,255,0.3); box-shadow: 0 0 50px rgba(0,240,255,0.2);"
             id="message-content-box">
             <div class="mb-6" id="message-text"></div>
             <button id="message-close"
-                class="w-full bg-gradient-to-r from-violet-600 to-fuchsia-600 hover:from-violet-500 hover:to-fuchsia-500 text-white font-bold py-3 px-8 rounded-xl shadow-lg shadow-violet-500/30 transition-all transform hover:-translate-y-1 hover:shadow-violet-500/50 active:translate-y-0">
+                class="w-full text-white font-bold font-display py-3 px-8 rounded-lg shadow-lg transition-all transform hover:-translate-y-1 active:translate-y-0"
+                style="background: linear-gradient(135deg, var(--neon-cyan), var(--neon-magenta)); box-shadow: 0 0 20px rgba(0,240,255,0.3);">
                 DEVAM ET 🔥
             </button>
         </div>
@@ -684,7 +848,8 @@
         <div class="w-full max-w-sm glass-panel p-6 rounded-2xl relative">
             <button onclick="toggleMobileSlot()"
                 class="absolute top-2 right-2 text-white/50 hover:text-white text-2xl">&times;</button>
-            <h2 class="text-2xl font-black text-center text-yellow-400 mb-6">🎰 MOBILE SLOTS</h2>
+            <h2 class="text-2xl font-black text-center mb-6 font-display"
+                style="color: var(--neon-gold); text-shadow: 0 0 15px rgba(255,207,0,0.4);">🎰 MOBILE SLOTS</h2>
 
             <div class="grid grid-cols-3 gap-2 mb-6 bg-black/40 p-2 rounded-xl border border-white/10">
                 <div class="slot-reel h-20" id="m-reel-1">
@@ -705,23 +870,27 @@
             </div>
 
             <div class="text-center mb-4">
-                <p class="text-sm text-slate-400">Bedel: <span class="text-violet-400 font-bold"
-                        id="m-slot-cost">500</span></p>
-                <p class="text-lg font-bold text-yellow-500" id="m-slot-status">Şansını Dene!</p>
+                <p class="text-sm text-slate-400">Bedel: <span class="font-bold" id="m-slot-cost"
+                        style="color: var(--neon-cyan);">500</span></p>
+                <p class="text-lg font-bold font-display" id="m-slot-status" style="color: var(--neon-gold);">Şansını
+                    Dene!</p>
             </div>
 
             <div class="flex gap-2 w-full">
-                <button id="m-spin-btn"
-                    class="flex-1 bg-yellow-600 hover:bg-yellow-500 text-white font-bold py-4 rounded-xl">ÇEVİR!</button>
-                <button id="m-spin-all-in-btn"
-                    class="hidden flex-1 bg-purple-600 hover:bg-purple-500 text-white font-bold py-4 rounded-xl">ALL IN!</button>
+                <button id="m-spin-btn" class="flex-1 text-black font-bold font-display py-4 rounded-lg"
+                    style="background: var(--neon-gold);">ÇEVİR!</button>
+                <button id="m-spin-all-in-btn" class="hidden flex-1 text-white font-bold font-display py-4 rounded-lg"
+                    style="background: var(--neon-magenta);">ALL
+                    IN!</button>
             </div>
         </div>
     </div>
 
     <!-- Gacha Modal -->
-    <div id="gacha-modal" class="fixed inset-0 z-[100] bg-black/95 flex flex-col items-center justify-center opacity-0 pointer-events-none transition-opacity duration-300 backdrop-blur-md">
-        <h2 class="text-3xl md:text-5xl font-black text-red-500 mb-8 animate-pulse tracking-widest uppercase">GİZLİ KASA</h2>
+    <div id="gacha-modal"
+        class="fixed inset-0 z-[100] bg-black/95 flex flex-col items-center justify-center opacity-0 pointer-events-none transition-opacity duration-300 backdrop-blur-md">
+        <h2 class="text-3xl md:text-5xl font-black text-red-500 mb-8 animate-pulse tracking-widest uppercase">GİZLİ KASA
+        </h2>
         <p class="text-slate-400 mb-8 animate-bounce">Bir kart seç...</p>
         <div class="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-8 w-full max-w-5xl px-4" id="gacha-cards">
             <!-- Cards injected by JS -->
@@ -729,18 +898,22 @@
     </div>
 
     <!-- VERSION BADGE -->
-    <div class="fixed bottom-2 left-2 z-50 text-[10px] font-mono text-slate-500 opacity-50 pointer-events-none">
+    <div class="fixed bottom-2 left-2 z-50 text-[10px] font-mono opacity-60 pointer-events-none font-display"
+        style="color: var(--neon-cyan); text-shadow: 0 0 5px rgba(0,240,255,0.5);">
         V3.2
     </div>
 
     <!-- PHASE 3 MULTIVERSE MODAL -->
-    <div id="p3-multiverse-modal" class="fixed inset-0 z-[100] bg-black flex flex-col items-center justify-center opacity-0 pointer-events-none transition-opacity duration-1000">
-        <h1 class="text-4xl md:text-6xl font-black text-white mb-2 glitch-text tracking-widest">SYSTEM REBOOT</h1>
+    <div id="p3-multiverse-modal"
+        class="fixed inset-0 z-[100] bg-black flex flex-col items-center justify-center opacity-0 pointer-events-none transition-opacity duration-1000">
+        <h1 class="text-4xl md:text-6xl font-black text-white mb-2 glitch-text tracking-widest font-display">SYSTEM
+            REBOOT</h1>
         <p class="text-slate-400 mb-10 font-mono">Select timeline initialization...</p>
 
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-6xl w-full px-4">
             <!-- RED ROT -->
-            <button onclick="initPhase3('red_rot')" class="group relative bg-black border-2 border-red-900 hover:border-red-500 p-6 rounded-xl flex flex-col items-center gap-4 transition-all hover:scale-105 overflow-hidden">
+            <button onclick="initPhase3('red_rot')"
+                class="group relative bg-black border-2 border-red-900 hover:border-red-500 p-6 rounded-xl flex flex-col items-center gap-4 transition-all hover:scale-105 overflow-hidden">
                 <div class="absolute inset-0 bg-red-900/10 group-hover:bg-red-900/30 animate-pulse"></div>
                 <div class="text-5xl">🩸</div>
                 <h3 class="text-2xl font-black text-red-500">THE RED ROT</h3>
@@ -753,7 +926,8 @@
             </button>
 
             <!-- THE MATRIX -->
-            <button onclick="initPhase3('matrix')" class="group relative bg-black border-2 border-green-900 hover:border-green-500 p-6 rounded-xl flex flex-col items-center gap-4 transition-all hover:scale-105 overflow-hidden">
+            <button onclick="initPhase3('matrix')"
+                class="group relative bg-black border-2 border-green-900 hover:border-green-500 p-6 rounded-xl flex flex-col items-center gap-4 transition-all hover:scale-105 overflow-hidden">
                 <div class="absolute inset-0 bg-green-900/10 group-hover:bg-green-900/30 animate-pulse"></div>
                 <div class="text-5xl">📟</div>
                 <h3 class="text-2xl font-black text-green-500 font-mono">THE MATRIX</h3>
@@ -766,10 +940,12 @@
             </button>
 
             <!-- THE VOID -->
-            <button onclick="initPhase3('void')" class="group relative bg-black border-2 border-slate-700 hover:border-white p-6 rounded-xl flex flex-col items-center gap-4 transition-all hover:scale-105 overflow-hidden">
+            <button onclick="initPhase3('void')"
+                class="group relative bg-black border-2 border-slate-700 hover:border-white p-6 rounded-xl flex flex-col items-center gap-4 transition-all hover:scale-105 overflow-hidden">
                 <div class="absolute inset-0 bg-white/5 group-hover:bg-white/10 animate-pulse"></div>
                 <div class="text-5xl opacity-50">👻</div>
-                <h3 class="text-2xl font-black text-slate-300 blur-[1px] group-hover:blur-0 transition-all">THE VOID</h3>
+                <h3 class="text-2xl font-black text-slate-300 blur-[1px] group-hover:blur-0 transition-all">THE VOID
+                </h3>
                 <p class="text-xs text-slate-400 text-center font-mono">
                     ENTROPY RISING.<br>
                     Assets are deleted randomly.<br>
@@ -850,7 +1026,7 @@
                 bsod.classList.add('flex');
 
                 // Audio Cut & Phase 3 Setup
-                if(synth) {
+                if (synth) {
                     synth.triggerRelease();
                     synth.volume.value = -12; // Lower volume
                     // Add BitCrusher (Distortion)
@@ -863,7 +1039,7 @@
                 let percent = 0;
                 const interval = setInterval(() => {
                     percent += Math.floor(Math.random() * 5);
-                    if(percent > 100) percent = 100;
+                    if (percent > 100) percent = 100;
                     document.getElementById('bsod-percent').textContent = percent;
                 }, 500);
 
@@ -879,7 +1055,7 @@
                         // RESET FOR PHASE 3
                         gameState.score = 1000;
                         gameState.clicks = 0;
-                        for(let k in assets) {
+                        for (let k in assets) {
                             assets[k].count = 0;
                             assets[k].price = assets[k].history[0];
                         }
@@ -908,7 +1084,7 @@
                         mvModal.style.opacity = 1;
                         mvModal.style.pointerEvents = 'auto';
 
-                        if(synth) synth.triggerAttackRelease("C1", "4n"); // Reboot sound
+                        if (synth) synth.triggerAttackRelease("C1", "4n"); // Reboot sound
 
                     }, 3000);
                 }, 10000);
@@ -932,13 +1108,13 @@
                     delete assets['eur'];
                     // Disable Click
                     gameState.clickPower = 0;
-                    createPopup("MOUSE HACKED", "#00ff00", window.innerWidth/2, window.innerHeight/2);
+                    createPopup("MOUSE HACKED", "#00ff00", window.innerWidth / 2, window.innerHeight / 2);
                 } else if (universe === 'void') {
                     // Start Entropy
-                    createPopup("ENTROPY STARTED", "#ffffff", window.innerWidth/2, window.innerHeight/2);
+                    createPopup("ENTROPY STARTED", "#ffffff", window.innerWidth / 2, window.innerHeight / 2);
                 } else {
                     // Red Rot
-                    createPopup("INFLATION STARTED", "#ff0000", window.innerWidth/2, window.innerHeight/2);
+                    createPopup("INFLATION STARTED", "#ff0000", window.innerWidth / 2, window.innerHeight / 2);
                 }
 
                 // Start Loop
@@ -949,9 +1125,9 @@
             const startPhase3Loop = () => {
                 setInterval(() => {
                     // Firewall Healing
-                    if(gameState.p3_firewallHealth < 100) {
+                    if (gameState.p3_firewallHealth < 100) {
                         gameState.p3_firewallHealth += 0.5;
-                        if(gameState.p3_firewallHealth > 100) gameState.p3_firewallHealth = 100;
+                        if (gameState.p3_firewallHealth > 100) gameState.p3_firewallHealth = 100;
                     }
 
                     // Universe Mechanics
@@ -969,11 +1145,11 @@
                         // Here we can add passive income buff?
                     } else if (gameState.p3_universe === 'void') {
                         // Entropy: Delete asset randomly
-                        if(Math.random() < 0.1) { // 10% chance per second
+                        if (Math.random() < 0.1) { // 10% chance per second
                             const keys = Object.keys(assets);
-                            if(keys.length > 0) {
+                            if (keys.length > 0) {
                                 const target = keys[Math.floor(Math.random() * keys.length)];
-                                if(assets[target].count > 0) {
+                                if (assets[target].count > 0) {
                                     assets[target].count = Math.floor(assets[target].count * 0.9); // Lose 10%
                                     createPopup(`ENTROPY: ${assets[target].name} LOST`, "#ffffff", 100, 100);
                                 }
@@ -1073,8 +1249,9 @@
                     // OPTIMIZATION: Limit polyphony to 4 voices
                     synth = new Tone.PolySynth(Tone.Synth, {
                         maxPolyphony: 4,
-                        oscillator: { type: "triangle" },
-                        envelope: { attack: 0.005, decay: 0.1, sustain: 0, release: 0.1 }
+                        oscillator: { type: "sine" },
+                        envelope: { attack: 0.001, decay: 0.06, sustain: 0, release: 0.04 },
+                        volume: -18
                     }).toDestination();
 
                     sellSynth = new Tone.MembraneSynth().toDestination();
@@ -1180,8 +1357,8 @@
                 gameState.clicks++;
 
                 if (synth) {
-                    const notes = ["C5", "E5", "G5", "B5", "C6"];
-                    synth.triggerAttackRelease(notes[Math.floor(Math.random() * notes.length)], "32n");
+                    const notes = ["C2", "D2", "E2", "F2", "G2"];
+                    synth.triggerAttackRelease(notes[Math.floor(Math.random() * notes.length)], "64n");
                 }
 
                 const rect = els.skibidi.getBoundingClientRect();
@@ -1262,7 +1439,7 @@
                 gameState.lvlTax = 0; gameState.costTax = 10000;
 
                 // Reset Assets
-                for(let k in assets) {
+                for (let k in assets) {
                     assets[k].count = 0;
                     assets[k].price = assets[k].history[0]; // Reset price roughly to base
                 }
@@ -1316,7 +1493,7 @@
                 let bmMult = 1;
                 gameState.blackMarketBuffs.forEach(buffId => {
                     const item = blackMarketItems.find(i => i.id === buffId);
-                    if(item) bmMult *= item.mult;
+                    if (item) bmMult *= item.mult;
                 });
                 gameState.multiplier *= bmMult;
             };
@@ -1354,11 +1531,11 @@
             const updateBlackMarketUI = () => {
                 const btn = document.getElementById('btn-black-market-buy');
                 const costDisplay = document.getElementById('bm-cost-display');
-                if(!btn) return;
+                if (!btn) return;
 
                 costDisplay.textContent = formatNumber(gameState.blackMarketCost);
 
-                if(gameState.score < gameState.blackMarketCost) {
+                if (gameState.score < gameState.blackMarketCost) {
                     btn.disabled = true;
                     btn.classList.add('opacity-50', 'grayscale');
                 } else {
@@ -1370,7 +1547,7 @@
                 inv.innerHTML = '';
                 gameState.blackMarketBuffs.forEach(buffId => {
                     const item = blackMarketItems.find(i => i.id === buffId);
-                    if(item) {
+                    if (item) {
                         const el = document.createElement('div');
                         el.className = 'aspect-square rounded-lg bg-slate-800 border flex items-center justify-center text-xl relative group cursor-help';
                         el.style.borderColor = item.color;
@@ -1388,7 +1565,7 @@
             };
 
             const buyBlackMarketItem = () => {
-                if(gameState.score >= gameState.blackMarketCost) {
+                if (gameState.score >= gameState.blackMarketCost) {
                     gameState.score -= gameState.blackMarketCost;
 
                     // Update Cost: 10x
@@ -1410,7 +1587,7 @@
                 let hasPicked = false;
 
                 // Create 4 Cards
-                for(let i=0; i<4; i++) {
+                for (let i = 0; i < 4; i++) {
                     const card = document.createElement('div');
                     card.className = "aspect-[3/4] bg-gradient-to-br from-slate-800 to-black border-2 border-red-900/50 rounded-xl cursor-pointer transform hover:scale-105 transition-all duration-300 relative overflow-hidden group shadow-[0_0_30px_rgba(220,38,38,0.2)]";
                     card.innerHTML = `
@@ -1419,21 +1596,21 @@
                     `;
 
                     card.addEventListener('click', () => {
-                        if(hasPicked) return;
+                        if (hasPicked) return;
                         hasPicked = true;
 
                         // Select Item
                         const roll = Math.random();
                         let item;
-                        if(roll < 0.05) {
+                        if (roll < 0.05) {
                             // Legendary (0 or 5)
                             item = Math.random() < 0.5 ? blackMarketItems[0] : blackMarketItems[5];
                         }
-                        else if(roll < 0.20) {
+                        else if (roll < 0.20) {
                             // Epic (1 or 4)
                             item = Math.random() < 0.5 ? blackMarketItems[1] : blackMarketItems[4];
                         }
-                        else if(roll < 0.50) item = blackMarketItems[2]; // Rare
+                        else if (roll < 0.50) item = blackMarketItems[2]; // Rare
                         else item = blackMarketItems[3]; // Common
 
                         // Reveal Animation for Selected Card
@@ -1449,12 +1626,12 @@
                                 <div class="text-6xl animate-bounce">🎁</div>
                                 <div class="text-center px-2">
                                     <h3 class="font-bold text-xl leading-tight">${item.name}</h3>
-                                    <p class="text-xs text-white mt-2 font-mono">${item.type === 'sabotage' ? 'Yilong -%' + (item.val*100) : 'x' + item.mult + ' Mult'}</p>
+                                    <p class="text-xs text-white mt-2 font-mono">${item.type === 'sabotage' ? 'Yilong -%' + (item.val * 100) : 'x' + item.mult + ' Mult'}</p>
                                     <p class="text-[10px] mt-1 opacity-70">${item.rarity}</p>
                                 </div>
                             `;
 
-                            if(synth) synth.triggerAttackRelease(["C4", "G4", "C5"], "4n");
+                            if (synth) synth.triggerAttackRelease(["C4", "G4", "C5"], "4n");
 
                             // Process Reward
                             if (item.type === 'sabotage') {
@@ -1480,7 +1657,7 @@
 
                         // Fade out other cards
                         Array.from(container.children).forEach(c => {
-                            if(c !== card) c.style.opacity = 0.2;
+                            if (c !== card) c.style.opacity = 0.2;
                         });
                     });
 
@@ -1544,7 +1721,7 @@
 
                 btn.disabled = true;
                 btn.classList.add('opacity-50');
-                if(allInBtn) {
+                if (allInBtn) {
                     allInBtn.disabled = true;
                     allInBtn.classList.add('opacity-50');
                 }
@@ -1563,7 +1740,7 @@
                             symbolDiv.textContent = randomSymbol;
                         } else {
                             // Fallback if structure is missing
-                             reel.innerHTML = `<div class="slot-symbol">${randomSymbol}</div>`;
+                            reel.innerHTML = `<div class="slot-symbol">${randomSymbol}</div>`;
                         }
                     });
 
@@ -1579,14 +1756,14 @@
                         const symbolDiv = reel.querySelector('.slot-symbol');
                         if (symbolDiv) {
                             symbolDiv.textContent = results[i];
-                             // Ensure text size is correct for result
-                            if(!symbolDiv.classList.contains('text-4xl')) {
+                            // Ensure text size is correct for result
+                            if (!symbolDiv.classList.contains('text-4xl')) {
                                 // Add if needed, though default CSS might handle it.
                                 // The original code added text-4xl only on result.
                                 symbolDiv.classList.add('text-4xl');
                             }
                         } else {
-                             reel.innerHTML = `<div class="slot-symbol text-4xl">${results[i]}</div>`;
+                            reel.innerHTML = `<div class="slot-symbol text-4xl">${results[i]}</div>`;
                         }
                     });
 
@@ -1659,7 +1836,7 @@
                     isSpinning = false;
                     btn.disabled = false;
                     btn.classList.remove('opacity-50');
-                    if(allInBtn) {
+                    if (allInBtn) {
                         allInBtn.disabled = false;
                         allInBtn.classList.remove('opacity-50');
                     }
@@ -1669,8 +1846,8 @@
 
             els.spinBtn.addEventListener('click', () => spinSlots(false));
             els.mSpinBtn.addEventListener('click', () => spinSlots(true));
-            if(els.spinAllInBtn) els.spinAllInBtn.addEventListener('click', () => spinSlots(false, gameState.score));
-            if(els.mSpinAllInBtn) els.mSpinAllInBtn.addEventListener('click', () => spinSlots(true, gameState.score));
+            if (els.spinAllInBtn) els.spinAllInBtn.addEventListener('click', () => spinSlots(false, gameState.score));
+            if (els.mSpinAllInBtn) els.mSpinAllInBtn.addEventListener('click', () => spinSlots(true, gameState.score));
 
 
             // --- MARKET SİSTEMİ ---
@@ -1857,7 +2034,7 @@
                     // PHASE 3 FIREWALL UI
                     els.yilongAvatar.innerHTML = '🔥';
                     const nameLabel = els.yilongAvatar.parentElement.nextElementSibling.querySelector('h3');
-                    if(nameLabel) nameLabel.textContent = "THE FIREWALL";
+                    if (nameLabel) nameLabel.textContent = "THE FIREWALL";
 
                     els.yilongWealth.textContent = gameState.p3_firewallHealth.toFixed(1) + "% INTEGRITY";
                     els.yilongWealth.style.color = "#ef4444";
@@ -1868,7 +2045,7 @@
                     els.wealthProgress.parentElement.classList.add('bg-red-900');
 
                     // Inject Exploit Button if not exists
-                    if(!document.getElementById('p3-exploit-btn')) {
+                    if (!document.getElementById('p3-exploit-btn')) {
                         const upgrades = document.getElementById('upgrades-list');
                         const btn = document.createElement('button');
                         btn.id = 'p3-exploit-btn';
@@ -1876,17 +2053,17 @@
                         btn.innerHTML = `LAUNCH EXPLOIT (Attack) <br> <span class='text-[10px] font-mono'>Cost: ${formatNumber(gameState.p3_exploitCost)}</span>`;
                         btn.onclick = () => {
                             const cost = gameState.p3_exploitCost;
-                            if(gameState.score >= cost) {
+                            if (gameState.score >= cost) {
                                 gameState.score -= cost;
                                 gameState.p3_firewallHealth -= 5; // 5% damage
-                                createPopup("HIT! -5%", "#ff0000", window.innerWidth/2, window.innerHeight/2);
-                                if(gameState.p3_firewallHealth <= 0) {
+                                createPopup("HIT! -5%", "#ff0000", window.innerWidth / 2, window.innerHeight / 2);
+                                if (gameState.p3_firewallHealth <= 0) {
                                     // P3 Victory? Or Loop? For now just reset health or trigger 'Simulation Restored'
                                     // "Reset: Ensure that if the player fails... they can Reboot...".
                                     // If wins? "Simulation Collapse" usually implies end.
                                     // I'll make it loop or just stay at 0.
                                     gameState.p3_firewallHealth = 0;
-                                    createPopup("SYSTEM CRITICAL", "#ff0000", window.innerWidth/2, window.innerHeight/2);
+                                    createPopup("SYSTEM CRITICAL", "#ff0000", window.innerWidth / 2, window.innerHeight / 2);
                                 }
                                 updateUI();
                             }
@@ -1930,14 +2107,14 @@
 
                         // Update Names
                         const nameLabel = els.yilongAvatar.parentElement.nextElementSibling.querySelector('h3');
-                        if(nameLabel) nameLabel.textContent = "BROKE YILONG";
+                        if (nameLabel) nameLabel.textContent = "BROKE YILONG";
                         els.yilongWealthDisplaySmall.previousElementSibling.textContent = "BROKE YILONG";
 
                         // Player Ascension
                         els.skibidi.textContent = '👑';
 
                         // 2. Market Manipulation (Force Green)
-                        for(let k in assets) {
+                        for (let k in assets) {
                             assets[k].price *= 5; // Pump it
                         }
 
@@ -1958,7 +2135,7 @@
 
                         setTimeout(() => {
                             const btn = document.getElementById('victory-continue');
-                            if(btn) btn.addEventListener('click', () => {
+                            if (btn) btn.addEventListener('click', () => {
                                 // Trigger Phase 3 Transition instead of closing
                                 triggerPhase3();
                             });
@@ -2005,18 +2182,18 @@
                     els.mSpinBtn.disabled = true;
                     els.spinBtn.classList.add('opacity-50');
                     els.mSpinBtn.classList.add('opacity-50');
-                    if(els.spinAllInBtn) els.spinAllInBtn.disabled = true;
-                    if(els.mSpinAllInBtn) els.mSpinAllInBtn.disabled = true;
+                    if (els.spinAllInBtn) els.spinAllInBtn.disabled = true;
+                    if (els.mSpinAllInBtn) els.mSpinAllInBtn.disabled = true;
                 } else if (!isSpinning) {
                     els.spinBtn.disabled = false;
                     els.mSpinBtn.disabled = false;
                     els.spinBtn.classList.remove('opacity-50');
                     els.mSpinBtn.classList.remove('opacity-50');
-                    if(els.spinAllInBtn) {
+                    if (els.spinAllInBtn) {
                         els.spinAllInBtn.disabled = false;
                         els.spinAllInBtn.classList.remove('opacity-50');
                     }
-                    if(els.mSpinAllInBtn) {
+                    if (els.mSpinAllInBtn) {
                         els.mSpinAllInBtn.disabled = false;
                         els.mSpinAllInBtn.classList.remove('opacity-50');
                     }
@@ -2102,59 +2279,59 @@
                         phrase = toxic[Math.floor(Math.random() * toxic.length)];
 
                         // Phase 2 extra annoying buff
-                        if(Math.random() < 0.3) {
+                        if (Math.random() < 0.3) {
                             // Cancel Culture Debuff (30% Chance)
                             if (Math.random() < 0.3) {
                                 gameState.clickDebuff = 0.5;
                                 phrase = `<span class="text-red-500 font-black">🚫 CANCELED! Tık gücün %50 düştü!</span>`;
-                                createPopup("CANCELED! 📉", "#ef4444", window.innerWidth/2, window.innerHeight/2);
+                                createPopup("CANCELED! 📉", "#ef4444", window.innerWidth / 2, window.innerHeight / 2);
                                 setTimeout(() => { gameState.clickDebuff = 1; }, 10000);
                             }
                         }
                     } else {
                         // STANDARD LOGIC (Phase 1)
                         if (target.type === 'fiat') {
-                        phrase = `Bütün paramı ${target.name}'ye yatırdım. Diğer kağıt paralar çöp! 🚮`;
+                            phrase = `Bütün paramı ${target.name}'ye yatırdım. Diğer kağıt paralar çöp! 🚮`;
 
-                        for (let k in assets) {
-                            if (k === targetKey) {
-                                assets[k].price *= (1 + (Math.random() * 0.15 + 0.05)); // %5-%20 Artış
-                            } else if (assets[k].type === 'fiat') {
-                                assets[k].price *= (1 - (Math.random() * 0.05 + 0.02)); // %2-%7 Düşüş (Rakipler)
+                            for (let k in assets) {
+                                if (k === targetKey) {
+                                    assets[k].price *= (1 + (Math.random() * 0.15 + 0.05)); // %5-%20 Artış
+                                } else if (assets[k].type === 'fiat') {
+                                    assets[k].price *= (1 - (Math.random() * 0.05 + 0.02)); // %2-%7 Düşüş (Rakipler)
+                                }
                             }
                         }
-                    }
-                    else if (target.type === 'tech') {
-                        phrase = `${target.name} geleceği inşa ediyor. Yapay zeka, roketler, her şey! 🚀`;
-                        assets[targetKey].price *= 1.10; // %10 net artış
-                    }
-                    else {
-                        phrase = `${target.name} aya çıkıyor! Hold hold hold! 💎🙌`;
-                        assets[targetKey].price *= 1.20; // %20 artış
-                    }
+                        else if (target.type === 'tech') {
+                            phrase = `${target.name} geleceği inşa ediyor. Yapay zeka, roketler, her şey! 🚀`;
+                            assets[targetKey].price *= 1.10; // %10 net artış
+                        }
+                        else {
+                            phrase = `${target.name} aya çıkıyor! Hold hold hold! 💎🙌`;
+                            assets[targetKey].price *= 1.20; // %20 artış
+                        }
 
-                    // YILONG MA KAZANIYOR! (Servetine ekle)
-                    let profit = 0;
-                    if (isPhase2) {
-                        // Phase 2 Scaling: 1% - 4% of Current Wealth
-                        profit = YilongBaseWealth * (Math.random() * 0.03 + 0.01);
-                    } else {
-                        profit = Math.floor(Math.random() * 50000) + 10000;
+                        // YILONG MA KAZANIYOR! (Servetine ekle)
+                        let profit = 0;
+                        if (isPhase2) {
+                            // Phase 2 Scaling: 1% - 4% of Current Wealth
+                            profit = YilongBaseWealth * (Math.random() * 0.03 + 0.01);
+                        } else {
+                            profit = Math.floor(Math.random() * 50000) + 10000;
+                        }
+
+                        YilongBaseWealth += profit; // Kendi serveti artıyor
+                        createPopup(`Yilong: +${formatNumber(profit)}`, "#facc15", 90, 10); // Sağ üstte popup
+
+                        // VARLIĞI PARLAT (Piyasa Listesinde)
+                        if (marketItem) {
+                            marketItem.classList.add('highlight-asset');
+                            setTimeout(() => marketItem.classList.remove('highlight-asset'), 3000);
+                        }
+
+                        // TWEET AT (isNew = true ile parlamasını sağla)
+                        postSkitt(phrase, "Yilong Ma", true);
+                        updateUI();
                     }
-
-                    YilongBaseWealth += profit; // Kendi serveti artıyor
-                    createPopup(`Yilong: +${formatNumber(profit)}`, "#facc15", 90, 10); // Sağ üstte popup
-
-                    // VARLIĞI PARLAT (Piyasa Listesinde)
-                    if (marketItem) {
-                        marketItem.classList.add('highlight-asset');
-                        setTimeout(() => marketItem.classList.remove('highlight-asset'), 3000);
-                    }
-
-                    // TWEET AT (isNew = true ile parlamasını sağla)
-                    postSkitt(phrase, "Yilong Ma", true);
-                    updateUI();
-                }
                 } // Close outer if
             }, 12000); // 12 saniyede bir
 
