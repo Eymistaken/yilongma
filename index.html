@@ -490,6 +490,77 @@
                 transform: translate(0)
             }
         }
+
+        /* PHASE 4 (ENDING) EFFECTS */
+        .matrix-modal {
+            background: rgba(0, 10, 0, 0.95);
+            border: 2px solid #00ff00;
+            box-shadow: 0 0 30px rgba(0, 255, 0, 0.3);
+            color: #00ff00;
+            font-family: 'Kode Mono', monospace;
+        }
+
+        .matrix-text {
+            text-shadow: 0 0 10px #00ff00;
+        }
+
+        .pill-btn {
+            transition: all 0.3s ease;
+        }
+
+        .pill-btn:hover {
+            transform: scale(1.05);
+        }
+
+        .pill-red {
+            background: linear-gradient(135deg, #ff0000, #800000);
+            box-shadow: 0 0 20px rgba(255, 0, 0, 0.5);
+        }
+
+        .pill-blue {
+            background: linear-gradient(135deg, #0000ff, #000080);
+            box-shadow: 0 0 20px rgba(0, 0, 255, 0.5);
+        }
+
+        .credits-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+        }
+
+        .credit-text {
+            opacity: 0;
+            animation: fade-in-out 8s ease-in-out forwards;
+            position: absolute;
+            width: 100%;
+            padding: 0 20px;
+        }
+
+        @keyframes fade-in-out {
+            0% { opacity: 0; transform: translateY(20px); filter: blur(5px); }
+            20% { opacity: 1; transform: translateY(0); filter: blur(0); }
+            80% { opacity: 1; transform: translateY(0); filter: blur(0); }
+            100% { opacity: 0; transform: translateY(-20px); filter: blur(5px); }
+        }
+
+        .credit-final {
+            opacity: 0;
+            animation: fade-in 4s ease-in forwards;
+            animation-delay: 1s;
+        }
+
+        @keyframes fade-in {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .dev-console-panel {
+            background: rgba(0, 15, 30, 0.95);
+            border: 2px solid var(--neon-cyan);
+            box-shadow: 0 0 20px rgba(0, 240, 255, 0.2);
+        }
     </style>
 </head>
 
@@ -908,6 +979,55 @@
         V3.3
     </div>
 
+    <!-- PHASE 4 ENDING MODAL (SIMULATION CRASHED) -->
+    <div id="p4-ending-modal"
+        class="fixed inset-0 z-[200] bg-black/95 flex flex-col items-center justify-center opacity-0 pointer-events-none transition-opacity duration-1000 backdrop-blur-xl">
+        <div class="matrix-modal p-8 md:p-12 rounded-2xl max-w-3xl w-full mx-4 text-center">
+            <h1 class="text-5xl md:text-7xl font-black mb-6 matrix-text tracking-widest font-mono">SIMÜLASYON KIRILDI</h1>
+            <p class="text-xl md:text-2xl text-green-500/80 mb-12 font-mono">
+                "Firewall çöktü. Gerçeği görmenin vakti geldi.<br>
+                Seçimini yap."
+            </p>
+
+            <div class="flex flex-col md:flex-row justify-center gap-8 items-center w-full px-4">
+                <!-- RED PILL -->
+                <button onclick="playRedPillEnding()"
+                    class="pill-btn group relative w-full md:w-1/2 p-6 rounded-3xl flex flex-col items-center gap-4 border-2 border-red-900/50 hover:border-red-500 overflow-hidden bg-black/50">
+                    <div class="w-24 h-12 rounded-full pill-red mb-2 flex items-center justify-center animate-pulse shadow-[0_0_30px_rgba(255,0,0,0.6)]">
+                        <span class="text-white font-bold tracking-widest text-sm">UYAN</span>
+                    </div>
+                    <h3 class="text-2xl font-black text-red-500">KIRMIZI HAP</h3>
+                    <p class="text-xs text-red-300/80 text-center font-mono">
+                        Sistemi kapat ve gerçekliğe dön.<br>
+                        "Tüm bu hırs ne içindi?"
+                    </p>
+                </button>
+
+                <!-- BLUE PILL -->
+                <button onclick="playBluePillEnding()"
+                    class="pill-btn group relative w-full md:w-1/2 p-6 rounded-3xl flex flex-col items-center gap-4 border-2 border-blue-900/50 hover:border-blue-500 overflow-hidden bg-black/50">
+                    <div class="w-24 h-12 rounded-full pill-blue mb-2 flex items-center justify-center shadow-[0_0_30px_rgba(0,0,255,0.6)]">
+                        <span class="text-white font-bold tracking-widest text-sm">GÜÇ</span>
+                    </div>
+                    <h3 class="text-2xl font-black text-blue-500">MAVİ HAP</h3>
+                    <p class="text-xs text-blue-300/80 text-center font-mono">
+                        Simülasyonun Tanrısı ol.<br>
+                        "Mimar Modu (God Mode)"
+                    </p>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- CREDITS (RED PILL) SCREEN -->
+    <div id="credits-screen" class="fixed inset-0 z-[300] bg-black hidden flex-col items-center justify-center p-4">
+        <div id="credits-content" class="relative w-full max-w-4xl h-[60vh] flex items-center justify-center">
+            <!-- Text injected via JS -->
+        </div>
+    </div>
+
+    <!-- DEV CONSOLE WRAPPER (Injected in JS) -->
+
     <!-- PHASE 3 MULTIVERSE MODAL -->
     <div id="p3-multiverse-modal"
         class="fixed inset-0 z-[100] bg-black flex flex-col items-center justify-center opacity-0 pointer-events-none transition-opacity duration-1000">
@@ -1136,8 +1256,200 @@
                 updateUI();
             };
 
+            // --- PHASE 4 (ENDING) LOGIC ---
+            let p3IntervalId = null;
+
+            window.playRedPillEnding = () => {
+                const endingModal = document.getElementById('p4-ending-modal');
+                endingModal.style.opacity = 0;
+                endingModal.style.pointerEvents = 'none';
+
+                const creditsScreen = document.getElementById('credits-screen');
+                creditsScreen.classList.remove('hidden');
+                creditsScreen.classList.add('flex');
+
+                // Fade out audio over 5 seconds
+                if (synth && synth.volume) {
+                    synth.volume.rampTo(-60, 5);
+                }
+
+                // Stop any other active sounds or loops implicitly by hiding the world
+                document.getElementById('game-world').classList.add('hidden');
+
+                const playTimeSeconds = Math.floor((Date.now() - gameState.gameStartTime) / 1000);
+                const m = Math.floor(playTimeSeconds / 60);
+                const s = playTimeSeconds % 60;
+                const timeStr = `${m} dakika ${s} saniye`;
+
+                const messages = [
+                    "Sonsuzluk arayışın...",
+                    "Milyarlarca Gyatt...",
+                    "Yilong Ma ile olan bitmek bilmez rekabetin...",
+                    "Hepsi bir yanılsamaydı.",
+                    "Sayılar ekranında parladı ve söndü.",
+                    "Hiçbir gerçek değeri yoktu.",
+                    `Toplam ${formatNumber(gameState.score)} Gyatt biriktirdin.`,
+                    `Farene ${formatNumber(gameState.clicks)} kez tıkladın.`,
+                    `Hayatının ${timeStr}sini bu ekrana verdin.`,
+                    "Peki elinde ne kaldı?",
+                    "Sadece bir boşluk.",
+                    "Simülasyon bitti. Artık dinlenebilirsin..."
+                ];
+
+                const container = document.getElementById('credits-content');
+                let delay = 0;
+
+                messages.forEach((msg, index) => {
+                    const el = document.createElement('div');
+                    el.className = index === messages.length - 1
+                        ? 'credit-final text-3xl md:text-5xl font-mono text-white tracking-widest'
+                        : 'credit-text text-xl md:text-3xl font-mono text-slate-300 tracking-wide';
+                    el.textContent = msg;
+
+                    if (index < messages.length - 1) {
+                        el.style.animationDelay = `${delay}s`;
+                        delay += 4; // Fade out takes 8s, so 4s stagger creates overlap
+                    } else {
+                        // The final message stays on screen
+                        el.style.animationDelay = `${delay}s`;
+                    }
+                    container.appendChild(el);
+                });
+            };
+
+            window.playBluePillEnding = () => {
+                const endingModal = document.getElementById('p4-ending-modal');
+                endingModal.style.opacity = 0;
+                endingModal.style.pointerEvents = 'none';
+
+                gameState.phase = 4;
+
+                // Return to normal-ish visuals, but keep it divine/hacked
+                document.body.style.filter = "contrast(120%) hue-rotate(180deg)";
+                document.body.style.background = "linear-gradient(135deg, #001133, #000000)";
+
+                // Ensure the Exploit button is hidden if it exists
+                const exploitBtn = document.getElementById('p3-exploit-btn');
+                if (exploitBtn) exploitBtn.remove();
+
+                if (synth) synth.triggerAttackRelease(["C5", "E5", "G5", "C6"], "1n");
+
+                renderDevConsole();
+
+                // Start the main game loop again (or keep it running)
+                // We'll use the volatility loop to keep the game alive
+                // We don't need p3 specific logic anymore
+            };
+
+            const renderDevConsole = () => {
+                const leftPanel = document.querySelector('.lg\\:flex-col.w-1\\/4');
+                if (!leftPanel) return;
+
+                const devPanel = document.createElement('div');
+                devPanel.className = 'dev-console-panel p-5 rounded-3xl mt-4 relative overflow-hidden group border-t-4';
+                devPanel.style.borderTopColor = 'var(--neon-gold)';
+
+                devPanel.innerHTML = `
+                    <div class="absolute inset-0 bg-blue-500/5 group-hover:bg-blue-500/10 transition-colors"></div>
+                    <h2 class="text-xl font-black mb-4 flex items-center gap-2 relative z-10 font-display" style="color: var(--neon-gold); text-shadow: 0 0 10px rgba(255,207,0,0.5);">
+                        👑 MİMAR MODU
+                    </h2>
+
+                    <div class="space-y-3 relative z-10">
+                        <div class="bg-black/50 p-2 rounded-lg border border-white/10">
+                            <span class="text-[10px] text-slate-400 block mb-1">PİYASA KONTROLÜ</span>
+                            <div class="flex gap-2">
+                                <button id="btn-pump-all" class="flex-1 bg-green-600/30 hover:bg-green-500/50 text-green-400 border border-green-500/50 rounded py-2 font-bold text-xs transition-all active:scale-95">PUMP ALL (x10)</button>
+                                <button id="btn-crash-all" class="flex-1 bg-red-600/30 hover:bg-red-500/50 text-red-400 border border-red-500/50 rounded py-2 font-bold text-xs transition-all active:scale-95">CRASH ALL (/10)</button>
+                            </div>
+                        </div>
+
+                        <div class="bg-black/50 p-2 rounded-lg border border-white/10">
+                            <span class="text-[10px] text-slate-400 block mb-1">YILONG KONTROLÜ</span>
+                            <div class="flex gap-2">
+                                <button id="btn-steal-yilong" class="flex-1 bg-purple-600/30 hover:bg-purple-500/50 text-purple-400 border border-purple-500/50 rounded py-2 font-bold text-xs transition-all active:scale-95">STEAL 50%</button>
+                                <button id="btn-donate-yilong" class="flex-1 bg-blue-600/30 hover:bg-blue-500/50 text-blue-400 border border-blue-500/50 rounded py-2 font-bold text-xs transition-all active:scale-95">DONATE 1B</button>
+                            </div>
+                        </div>
+
+                        <div class="bg-black/50 p-2 rounded-lg border border-white/10">
+                            <span class="text-[10px] text-slate-400 block mb-1">HİLELER</span>
+                            <button id="btn-infinite-rizz" class="w-full bg-yellow-600/30 hover:bg-yellow-500/50 text-yellow-400 border border-yellow-500/50 rounded py-2 font-bold text-xs transition-all active:scale-95 shadow-[0_0_10px_rgba(255,207,0,0.2)]">SONSUZ RIZZ (1M Tık Gücü)</button>
+                        </div>
+                    </div>
+                `;
+
+                leftPanel.appendChild(devPanel);
+
+                // Bind actions
+                document.getElementById('btn-pump-all').addEventListener('click', () => {
+                    for(let k in assets) assets[k].price *= 10;
+                    createPopup("PUMP IT! 🚀", "#4ade80", 150, 200);
+                    if(synth) synth.triggerAttackRelease("C6", "16n");
+                    updateUI();
+                });
+
+                document.getElementById('btn-crash-all').addEventListener('click', () => {
+                    for(let k in assets) {
+                        assets[k].price /= 10;
+                        if(assets[k].price < 0.01) assets[k].price = 0.01;
+                    }
+                    createPopup("CRASH! 📉", "#ef4444", 150, 200);
+                    if(sellSynth) sellSynth.triggerAttackRelease("C2", "8n");
+                    updateUI();
+                });
+
+                document.getElementById('btn-steal-yilong').addEventListener('click', () => {
+                    const stolen = YilongBaseWealth * 0.5;
+                    YilongBaseWealth -= stolen;
+                    gameState.score += stolen;
+                    createPopup(`STOLEN +${formatNumber(stolen)}`, "#c084fc", 150, 300);
+                    if(synth) synth.triggerAttackRelease("A5", "16n");
+                    updateUI();
+                });
+
+                document.getElementById('btn-donate-yilong').addEventListener('click', () => {
+                    const amount = 1000000000;
+                    if(gameState.score >= amount) {
+                        gameState.score -= amount;
+                        YilongBaseWealth += amount;
+                        createPopup("CHARITY -1B", "#60a5fa", 150, 300);
+                        if(synth) synth.triggerAttackRelease("E4", "16n");
+                        updateUI();
+                    } else {
+                        createPopup("NOT ENOUGH GYATT", "#ef4444", 150, 300);
+                    }
+                });
+
+                document.getElementById('btn-infinite-rizz').addEventListener('click', () => {
+                    gameState.clickPower = 1000000;
+                    createPopup("GOD MODE ON", "#facc15", window.innerWidth/2, window.innerHeight/2);
+                    if(synth) synth.triggerAttackRelease(["C4", "E4", "G4", "C5"], "2n");
+                    document.getElementById('btn-infinite-rizz').disabled = true;
+                    document.getElementById('btn-infinite-rizz').classList.add('opacity-50', 'grayscale');
+                });
+            };
+
+            window.triggerEndingSequence = () => {
+                // Pause the game loop for Phase 3
+                if (p3IntervalId) clearInterval(p3IntervalId);
+
+                // Show Phase 4 Modal
+                const endingModal = document.getElementById('p4-ending-modal');
+                endingModal.style.opacity = 1;
+                endingModal.style.pointerEvents = 'auto';
+
+                // Glitch the screen text one last time
+                document.body.style.filter = "invert(1) grayscale(100%)";
+                setTimeout(() => {
+                    document.body.style.filter = "grayscale(100%) contrast(150%)";
+                }, 500);
+
+                if (synth) synth.triggerAttackRelease(["C2", "C3", "C4"], "1n");
+            };
+
             const startPhase3Loop = () => {
-                setInterval(() => {
+                p3IntervalId = setInterval(() => {
                     // Firewall Healing
                     if (gameState.p3_firewallHealth < 100) {
                         gameState.p3_firewallHealth += 0.5;
@@ -2090,12 +2402,8 @@
                                 gameState.p3_firewallHealth -= 5; // 5% damage
                                 createPopup("HIT! -5%", "#ff0000", window.innerWidth / 2, window.innerHeight / 2);
                                 if (gameState.p3_firewallHealth <= 0) {
-                                    // P3 Victory? Or Loop? For now just reset health or trigger 'Simulation Restored'
-                                    // "Reset: Ensure that if the player fails... they can Reboot...".
-                                    // If wins? "Simulation Collapse" usually implies end.
-                                    // I'll make it loop or just stay at 0.
                                     gameState.p3_firewallHealth = 0;
-                                    createPopup("SYSTEM CRITICAL", "#ff0000", window.innerWidth / 2, window.innerHeight / 2);
+                                    triggerEndingSequence();
                                 }
                                 updateUI();
                             }
