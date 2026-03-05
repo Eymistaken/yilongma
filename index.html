@@ -599,9 +599,12 @@
             background: black;
             z-index: 999998;
             opacity: 0;
-            pointer-events: auto;
+            pointer-events: none;
             transition: opacity 3s ease-in;
             cursor: none !important;
+        }
+        .pitch-black-void.active {
+            pointer-events: auto;
         }
 
         .dev-console-panel {
@@ -1388,6 +1391,7 @@
                 // ve flaşı yavaşça kapatıyoruz
                 await sleep(1000);
                 const voidScreen = document.getElementById('pitch-black');
+                voidScreen.classList.add('active');
                 voidScreen.style.opacity = 1;
 
                 await sleep(100);
