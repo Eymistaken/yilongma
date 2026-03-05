@@ -522,38 +522,86 @@
             box-shadow: 0 0 20px rgba(0, 0, 255, 0.5);
         }
 
+        /* --- RED PILL CREDITS (CINEMATIC) --- */
         .credits-container {
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: center;
+            justify-content: flex-start;
             text-align: center;
-        }
-
-        .credit-text {
-            opacity: 0;
-            animation: fade-in-out 8s ease-in-out forwards;
-            position: absolute;
+            padding-top: 10vh;
+            gap: 2rem;
             width: 100%;
-            padding: 0 20px;
+            height: 100%;
+            overflow: hidden;
         }
 
-        @keyframes fade-in-out {
+        .credit-msg {
+            opacity: 0;
+            transform: translateY(20px);
+            filter: blur(5px);
+            animation: credit-fade-in-out 6s ease-in-out forwards;
+            /* Yükseklik animasyonu için max-height geçişi */
+            max-height: 100px;
+            overflow: hidden;
+            transition: max-height 1s ease-out, margin 1s ease-out;
+        }
+
+        .credit-msg.collapse {
+            max-height: 0;
+            margin-top: 0;
+            margin-bottom: 0;
+        }
+
+        @keyframes credit-fade-in-out {
             0% { opacity: 0; transform: translateY(20px); filter: blur(5px); }
-            20% { opacity: 1; transform: translateY(0); filter: blur(0); }
-            80% { opacity: 1; transform: translateY(0); filter: blur(0); }
+            15% { opacity: 1; transform: translateY(0); filter: blur(0); }
+            85% { opacity: 1; transform: translateY(0); filter: blur(0); }
             100% { opacity: 0; transform: translateY(-20px); filter: blur(5px); }
         }
 
-        .credit-final {
+        /* Merkezdeki Final Mesajı */
+        .credit-final-msg {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
             opacity: 0;
-            animation: fade-in 4s ease-in forwards;
-            animation-delay: 1s;
+            animation: final-msg-anim 10s ease-in-out forwards;
+            width: 100%;
+            text-align: center;
+            padding: 0 20px;
+            z-index: 10;
         }
 
-        @keyframes fade-in {
-            from { opacity: 0; }
-            to { opacity: 1; }
+        @keyframes final-msg-anim {
+            0% { opacity: 0; transform: translate(-50%, -40%); filter: blur(10px); }
+            20% { opacity: 1; transform: translate(-50%, -50%); filter: blur(0); }
+            70% { opacity: 1; transform: translate(-50%, -50%); filter: blur(0); }
+            100% { opacity: 0; transform: translate(-50%, -60%); filter: blur(10px); }
+        }
+
+        /* BEYAZ FLAŞ */
+        .white-flash-overlay {
+            position: fixed;
+            inset: 0;
+            background: white;
+            z-index: 999999;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 3s cubic-bezier(0.4, 0, 1, 1);
+        }
+
+        /* SONSUZ SİYAHLIK */
+        .pitch-black-void {
+            position: fixed;
+            inset: 0;
+            background: black;
+            z-index: 999998;
+            opacity: 0;
+            pointer-events: auto;
+            transition: opacity 3s ease-in;
+            cursor: none !important;
         }
 
         .dev-console-panel {
@@ -1020,11 +1068,14 @@
     </div>
 
     <!-- CREDITS (RED PILL) SCREEN -->
-    <div id="credits-screen" class="fixed inset-0 z-[300] bg-black hidden flex-col items-center justify-center p-4">
-        <div id="credits-content" class="relative w-full max-w-4xl h-[60vh] flex items-center justify-center">
+    <div id="credits-screen" class="fixed inset-0 z-[300] bg-black hidden flex-col items-center justify-center p-4 overflow-hidden">
+        <div id="credits-content" class="credits-container w-full max-w-4xl">
             <!-- Text injected via JS -->
         </div>
     </div>
+
+    <div id="white-flash" class="white-flash-overlay"></div>
+    <div id="pitch-black" class="pitch-black-void"></div>
 
     <!-- DEV CONSOLE WRAPPER (Injected in JS) -->
 
@@ -1259,7 +1310,7 @@
             // --- PHASE 4 (ENDING) LOGIC ---
             let p3IntervalId = null;
 
-            window.playRedPillEnding = () => {
+            window.playRedPillEnding = async () => {
                 const endingModal = document.getElementById('p4-ending-modal');
                 endingModal.style.opacity = 0;
                 endingModal.style.pointerEvents = 'none';
@@ -1290,31 +1341,60 @@
                     "Hiçbir gerçek değeri yoktu.",
                     `Toplam ${formatNumber(gameState.score)} Gyatt biriktirdin.`,
                     `Farene ${formatNumber(gameState.clicks)} kez tıkladın.`,
-                    `Hayatının ${timeStr}sini bu ekrana verdin.`,
+                    `Hayatının ${timeStr}'sini bu ekrana verdin.`,
                     "Peki elinde ne kaldı?",
-                    "Sadece bir boşluk.",
-                    "Simülasyon bitti. Artık dinlenebilirsin..."
+                    "Sadece bir boşluk."
                 ];
 
+                const finalMessage = "Simülasyon bitti. Artık dinlenebilirsin...";
                 const container = document.getElementById('credits-content');
-                let delay = 0;
 
-                messages.forEach((msg, index) => {
-                    const el = document.createElement('div');
-                    el.className = index === messages.length - 1
-                        ? 'credit-final text-3xl md:text-5xl font-mono text-white tracking-widest'
-                        : 'credit-text text-xl md:text-3xl font-mono text-slate-300 tracking-wide';
-                    el.textContent = msg;
+                const sleep = ms => new Promise(r => setTimeout(r, ms));
 
-                    if (index < messages.length - 1) {
-                        el.style.animationDelay = `${delay}s`;
-                        delay += 4; // Fade out takes 8s, so 4s stagger creates overlap
-                    } else {
-                        // The final message stays on screen
-                        el.style.animationDelay = `${delay}s`;
-                    }
-                    container.appendChild(el);
-                });
+                // 1. Sıralı, akışkan mesajlar
+                for (let i = 0; i < messages.length; i++) {
+                    const msgEl = document.createElement('div');
+                    msgEl.className = 'credit-msg text-xl md:text-3xl font-mono text-slate-300 tracking-wide w-full';
+                    msgEl.textContent = messages[i];
+                    container.appendChild(msgEl);
+
+                    // Fade out & Collapse timeline (CSS animasyonu 6s sürüyor. 5s sonra çökmeye başlasın)
+                    setTimeout(() => {
+                        msgEl.classList.add('collapse');
+                    }, 5000);
+
+                    // Bir sonraki yazıyı eklemeden önce bekle
+                    await sleep(3000);
+                }
+
+                // Son yazının kaybolması için biraz daha bekle (DOM'u temizlemek için)
+                await sleep(4000);
+                container.innerHTML = ''; // Ekranı tamamen temizle
+
+                // 2. Merkezdeki Final Mesajı
+                const finalEl = document.createElement('div');
+                finalEl.className = 'credit-final-msg text-3xl md:text-5xl font-mono text-white tracking-widest font-black';
+                finalEl.textContent = finalMessage;
+                creditsScreen.appendChild(finalEl);
+
+                // CSS final-msg-anim 10s sürüyor, 8. saniyede flash başlasın
+                await sleep(8000);
+
+                // 3. Beyaz Flaş Patlaması
+                const flash = document.getElementById('white-flash');
+                flash.style.opacity = 1;
+
+                // Flaş en parlak anındayken (yaklaşık 1s sonra) ekranı pitch black'e alıyoruz
+                // ve flaşı yavaşça kapatıyoruz
+                await sleep(1000);
+                const voidScreen = document.getElementById('pitch-black');
+                voidScreen.style.opacity = 1;
+
+                await sleep(100);
+                flash.style.opacity = 0;
+
+                // 4. Sonsuz Siyahlık (Oyun tamamen kilitlendi)
+                // Her şey pitch-black div'inin arkasında kalacak, cursor:none yapıldı CSS'de.
             };
 
             window.playBluePillEnding = () => {
