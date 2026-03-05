@@ -558,6 +558,11 @@
         </div>
 
         <!-- Skitter (Twitter) Widget - SOL ÜST -->
+        <!-- Dev Skip Button -->
+        <button id="dev-skip-btn" class="fixed top-8 left-24 z-50 bg-red-600/50 hover:bg-red-500/80 text-white font-mono text-[10px] px-2 py-1 rounded border border-red-500/50 backdrop-blur-sm transition-all shadow-[0_0_10px_rgba(255,0,0,0.3)]">
+            DEV: SKIP
+        </button>
+
         <details id="skitter-feed"
             class="fixed top-4 left-4 z-40 glass-panel rounded-2xl border-opacity-20 border-white">
             <summary class="flex items-center justify-center w-full h-full p-0 m-0 focus:outline-none relative">
@@ -900,7 +905,7 @@
     <!-- VERSION BADGE -->
     <div class="fixed bottom-2 left-2 z-50 text-[10px] font-mono opacity-60 pointer-events-none font-display"
         style="color: var(--neon-cyan); text-shadow: 0 0 5px rgba(0,240,255,0.5);">
-        V3.2
+        V3.3
     </div>
 
     <!-- PHASE 3 MULTIVERSE MODAL -->
@@ -1069,14 +1074,23 @@
 
                         document.getElementById('blackout-layer').classList.add('hidden');
 
-                        // Glitch Effect
+                        // Phase 3 Visuals: Grayscale, High Contrast, Static Noise
                         const overlay = document.createElement('div');
                         overlay.className = 'crt-overlay';
+                        // Lightweight static noise via Data URI
+                        overlay.style.backgroundImage = 'url("data:image/svg+xml,%3Csvg viewBox=\'0 0 200 200\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cfilter id=\'noiseFilter\'%3E%3CfeTurbulence type=\'fractalNoise\' baseFrequency=\'0.65\' numOctaves=\'3\' stitchTiles=\'stitch\'/%3E%3C/filter%3E%3Crect width=\'100%25\' height=\'100%25\' filter=\'url(%23noiseFilter)\'/%3E%3C/svg%3E")';
+                        overlay.style.opacity = '0.05';
+                        overlay.style.mixBlendMode = 'overlay';
                         document.body.appendChild(overlay);
 
                         document.body.style.background = "#000";
-                        document.body.style.filter = "brightness(0.3) sepia(1) hue-rotate(180deg) contrast(1.2)";
+                        // Grayscale 100% and High Contrast
+                        document.body.style.filter = "grayscale(100%) contrast(150%)";
                         document.body.style.transition = "filter 2s";
+
+                        // Disable resource-intensive background animations
+                        const scanline = document.querySelector('.scanline-overlay');
+                        if (scanline) scanline.style.display = 'none';
 
                         // Fade in Multiverse (Blink)
                         const mvModal = document.getElementById('p3-multiverse-modal');
@@ -1367,10 +1381,10 @@
 
                 if (isCrit) {
                     createPopup("CRITICAL GYATT!", "#facc15", x, y);
-                    createParticles(x, y, 6, ['#facc15', '#f87171']);
+                    createParticles(x, y, 3, ['#facc15', '#f87171']);
                 } else {
                     createPopup(`+${formatNumber(gain)}`, "#c084fc", x, y);
-                    createParticles(x, y);
+                    createParticles(x, y, 1);
                 }
 
                 els.skibidi.style.transform = `scale(0.95) rotate(${Math.random() * 10 - 5}deg)`;
@@ -2012,35 +2026,53 @@
                 }
             }, 6000);
 
+            // DOM Update Helper
+            const updateText = (el, text) => {
+                if (el && el.textContent !== text) {
+                    el.textContent = text;
+                }
+            };
+
+            const updateHTML = (el, html) => {
+                if (el && el.innerHTML !== html) {
+                    el.innerHTML = html;
+                }
+            };
+
             // --- UI GÜNCELLEME ---
             window.updateUI = () => {
-                els.score.textContent = formatNumber(gameState.score);
+                updateText(els.score, formatNumber(gameState.score));
                 // CPS Logic Removed
-                els.statClicks.textContent = formatNumber(gameState.clicks);
-                els.statSlotWin.textContent = formatNumber(gameState.slotWins);
+                updateText(els.statClicks, formatNumber(gameState.clicks));
+                updateText(els.statSlotWin, formatNumber(gameState.slotWins));
 
                 let tw = gameState.score;
                 for (let k in assets) {
                     tw += assets[k].count * assets[k].price;
-                    document.getElementById(`count-${k}`).textContent = formatNumber(assets[k].count);
+                    updateText(document.getElementById(`count-${k}`), formatNumber(assets[k].count));
                 }
 
                 gameState.totalWealth = tw;
-                els.wealth.textContent = formatNumber(gameState.totalWealth);
+                updateText(els.wealth, formatNumber(gameState.totalWealth));
 
                 // --- YILONG vs PLAYER (RIVALRY LOGIC) ---
 
                 if (gameState.phase === 3) {
                     // PHASE 3 FIREWALL UI
-                    els.yilongAvatar.innerHTML = '🔥';
+                    updateHTML(els.yilongAvatar, '🔥');
                     const nameLabel = els.yilongAvatar.parentElement.nextElementSibling.querySelector('h3');
-                    if (nameLabel) nameLabel.textContent = "THE FIREWALL";
+                    if (nameLabel) updateText(nameLabel, "THE FIREWALL");
 
-                    els.yilongWealth.textContent = gameState.p3_firewallHealth.toFixed(1) + "% INTEGRITY";
-                    els.yilongWealth.style.color = "#ef4444";
-                    els.dynamicTargetText.textContent = "DESTROY";
+                    updateText(els.yilongWealth, gameState.p3_firewallHealth.toFixed(1) + "% INTEGRITY");
+                    if (els.yilongWealth.style.color !== "rgb(239, 68, 68)") {
+                        els.yilongWealth.style.color = "#ef4444";
+                    }
+                    updateText(els.dynamicTargetText, "DESTROY");
 
-                    els.wealthProgress.style.width = gameState.p3_firewallHealth + "%";
+                    const newWidth = gameState.p3_firewallHealth + "%";
+                    if (els.wealthProgress.style.width !== newWidth) {
+                        els.wealthProgress.style.width = newWidth;
+                    }
                     els.wealthProgress.parentElement.classList.remove('bg-slate-800');
                     els.wealthProgress.parentElement.classList.add('bg-red-900');
 
@@ -2078,14 +2110,17 @@
                     const currentTarget = currentYilongWealth * targetMult;
                     const displayTarget = formatNumber(currentTarget);
 
-                    els.yilongWealth.textContent = displayYilong;
-                    els.yilongWealthDisplaySmall.textContent = displayYilong;
-                    els.dynamicTargetText.textContent = displayTarget;
+                    updateText(els.yilongWealth, displayYilong);
+                    updateText(els.yilongWealthDisplaySmall, displayYilong);
+                    updateText(els.dynamicTargetText, displayTarget);
 
                     let progress = (gameState.totalWealth / currentTarget) * 100;
                     if (progress < 0) progress = 0;
                     if (progress > 100) progress = 100;
-                    els.wealthProgress.style.width = `${progress}%`;
+                    const newProgress = `${progress}%`;
+                    if (els.wealthProgress.style.width !== newProgress) {
+                        els.wealthProgress.style.width = newProgress;
+                    }
 
                     // KAZANMA KONTROLÜ (Phase 1 -> Phase 2 Transition)
                     if (gameState.phase === 1 && gameState.totalWealth >= currentTarget) {
@@ -2097,7 +2132,7 @@
                         gameState.gameWon = true;
 
                         // 1. Visual Changes
-                        els.yilongAvatar.innerHTML = '😭';
+                        updateHTML(els.yilongAvatar, '😭');
                         els.yilongAvatar.parentElement.classList.remove('bg-stone-500/20', 'border-stone-500/30');
                         els.yilongAvatar.parentElement.classList.add('bg-red-500/20', 'border-red-500/30');
 
@@ -2107,11 +2142,11 @@
 
                         // Update Names
                         const nameLabel = els.yilongAvatar.parentElement.nextElementSibling.querySelector('h3');
-                        if (nameLabel) nameLabel.textContent = "BROKE YILONG";
-                        els.yilongWealthDisplaySmall.previousElementSibling.textContent = "BROKE YILONG";
+                        if (nameLabel) updateText(nameLabel, "BROKE YILONG");
+                        updateText(els.yilongWealthDisplaySmall.previousElementSibling, "BROKE YILONG");
 
                         // Player Ascension
-                        els.skibidi.textContent = '👑';
+                        updateText(els.skibidi, '👑');
 
                         // 2. Market Manipulation (Force Green)
                         for (let k in assets) {
@@ -2151,22 +2186,28 @@
                 }
 
                 // Buton Durumları
-                els.txtLvlPpc.textContent = gameState.lvlPpc;
-                els.txtCostPpc.textContent = formatNumber(gameState.costPpc);
-                els.btnPpc.disabled = gameState.score < gameState.costPpc;
+                updateText(els.txtLvlPpc, gameState.lvlPpc.toString());
+                updateText(els.txtCostPpc, formatNumber(gameState.costPpc));
+                if (els.btnPpc.disabled !== (gameState.score < gameState.costPpc)) {
+                    els.btnPpc.disabled = gameState.score < gameState.costPpc;
+                }
 
                 // Auto Button Logic Removed
 
-                els.txtLvlMulti.textContent = gameState.lvlMulti;
-                els.txtCostMulti.textContent = formatNumber(gameState.costMulti);
-                els.btnMulti.disabled = gameState.score < gameState.costMulti;
+                updateText(els.txtLvlMulti, gameState.lvlMulti.toString());
+                updateText(els.txtCostMulti, formatNumber(gameState.costMulti));
+                if (els.btnMulti.disabled !== (gameState.score < gameState.costMulti)) {
+                    els.btnMulti.disabled = gameState.score < gameState.costMulti;
+                }
 
-                els.txtLvlTax.textContent = gameState.lvlTax;
-                els.txtCostTax.textContent = formatNumber(gameState.costTax);
-                els.btnTax.disabled = gameState.score < gameState.costTax;
+                updateText(els.txtLvlTax, gameState.lvlTax.toString());
+                updateText(els.txtCostTax, formatNumber(gameState.costTax));
+                if (els.btnTax.disabled !== (gameState.score < gameState.costTax)) {
+                    els.btnTax.disabled = gameState.score < gameState.costTax;
+                }
 
-                els.slotCost.textContent = formatNumber(slotCost);
-                els.mSlotCost.textContent = formatNumber(slotCost);
+                updateText(els.slotCost, formatNumber(slotCost));
+                updateText(els.mSlotCost, formatNumber(slotCost));
 
                 // Toggle All In Visibility
                 if (gameState.phase >= 2) {
@@ -2213,6 +2254,19 @@
 
             // OPTIMIZATION: Reduced floater generation from 2000ms to 4000ms
             setInterval(createFloater, 4000);
+
+            // Developer Skip Button
+            const devSkipBtn = document.getElementById('dev-skip-btn');
+            if (devSkipBtn) {
+                devSkipBtn.addEventListener('click', () => {
+                    // Provide massive resources to instantly skip the current phase
+                    gameState.score += 1000000000000;
+                    gameState.totalWealth += 1000000000000;
+                    gameState.clickPower += 1000000;
+                    createPopup("DEV HACK: +1 TRILLION", "#ef4444", 100, 100);
+                    updateUI();
+                });
+            }
 
             // --- SKITTER SİSTEMİ (MANİPÜLASYON) ---
             const skitterMessagesEl = document.getElementById('skitter-messages');
