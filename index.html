@@ -4,16 +4,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="description" content="Skibidi Clicker: Rivalry — Yilong Ma'yı geçmek için tıkla, yatırım yap, yüksel.">
+    <meta name="theme-color" content="#050508">
     <title>Skibidi Clicker: Rivalry</title>
-    <!-- Tailwind CSS -->
+
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Tone.js (Sesler için) -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
-    <!-- Chart.js (Grafikler için) -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <!-- SortableJS -->
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
-    <!-- Google Fonts -->
     <link
         href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Kode+Mono:wght@400;700&display=swap"
         rel="stylesheet">
@@ -31,12 +29,7 @@
                         glass: "rgba(8, 8, 15, 0.92)",
                         glassBorder: "rgba(255, 255, 255, 0.04)",
                         accent: "#00f0ff",
-                        neon: {
-                            cyan: '#00f0ff',
-                            magenta: '#ff2d7b',
-                            lime: '#39ff14',
-                            gold: '#ffcf00',
-                        }
+                        neon: { cyan: '#00f0ff', magenta: '#ff2d7b', lime: '#39ff14', gold: '#ffcf00' }
                     },
                     animation: {
                         'float': 'float 6s ease-in-out infinite',
@@ -49,14 +42,8 @@
                         'neon-border': 'neon-border 2s ease-in-out infinite alternate',
                     },
                     keyframes: {
-                        float: {
-                            '0%, 100%': { transform: 'translateY(0)' },
-                            '50%': { transform: 'translateY(-10px)' },
-                        },
-                        'bounce-short': {
-                            '0%, 100%': { transform: 'translateY(0)' },
-                            '50%': { transform: 'translateY(-20%)' }
-                        },
+                        float: { '0%, 100%': { transform: 'translateY(0)' }, '50%': { transform: 'translateY(-10px)' } },
+                        'bounce-short': { '0%, 100%': { transform: 'translateY(0)' }, '50%': { transform: 'translateY(-20%)' } },
                         'flash-green': {
                             '0%, 100%': { boxShadow: '0 0 0 rgba(57, 255, 20, 0)' },
                             '50%': { boxShadow: '0 0 20px rgba(57, 255, 20, 0.6)', borderColor: '#39ff14' }
@@ -65,10 +52,7 @@
                             '0%, 100%': { filter: 'drop-shadow(0 0 2px rgba(255, 207, 0, 0.5))' },
                             '50%': { filter: 'drop-shadow(0 0 10px rgba(255, 207, 0, 1))' }
                         },
-                        'stagger-in': {
-                            '0%': { opacity: '0', transform: 'translateY(24px)' },
-                            '100%': { opacity: '1', transform: 'translateY(0)' }
-                        },
+                        'stagger-in': { '0%': { opacity: '0', transform: 'translateY(24px)' }, '100%': { opacity: '1', transform: 'translateY(0)' } },
                         'neon-border': {
                             '0%': { boxShadow: '0 0 5px var(--glow-color, #00f0ff), inset 0 0 5px transparent' },
                             '100%': { boxShadow: '0 0 15px var(--glow-color, #00f0ff), inset 0 0 5px transparent' }
@@ -79,554 +63,21 @@
         }
     </script>
 
-    <style>
-        :root {
-            --bg-void: #050508;
-            --bg-panel: rgba(8, 8, 15, 0.92);
-            --border-dim: rgba(255, 255, 255, 0.04);
-            --neon-cyan: #00f0ff;
-            --neon-magenta: #ff2d7b;
-            --neon-lime: #39ff14;
-            --neon-gold: #ffcf00;
-            --text-primary: #e0e0e8;
-            --text-muted: #5a5a70;
-        }
-
-        body {
-            background: var(--bg-void);
-            color: var(--text-primary);
-            overflow-x: hidden;
-            -webkit-tap-highlight-color: transparent;
-            user-select: none;
-            font-family: 'Kode Mono', monospace;
-            position: relative;
-        }
-
-        /* Radial glow spots */
-        body::before {
-            content: '';
-            position: fixed;
-            inset: 0;
-            background:
-                radial-gradient(ellipse 600px 400px at 15% 20%, rgba(0, 240, 255, 0.03), transparent),
-                radial-gradient(ellipse 500px 500px at 85% 80%, rgba(255, 45, 123, 0.03), transparent),
-                radial-gradient(ellipse 400px 300px at 50% 50%, rgba(57, 255, 20, 0.015), transparent);
-            pointer-events: none;
-            z-index: 0;
-        }
-
-        /* Dot-grid pattern */
-        body::after {
-            content: '';
-            position: fixed;
-            inset: 0;
-            background-image: radial-gradient(circle, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
-            background-size: 24px 24px;
-            pointer-events: none;
-            z-index: 0;
-        }
-
-        /* Scanline overlay */
-        .scanline-overlay {
-            position: fixed;
-            inset: 0;
-            background: repeating-linear-gradient(0deg,
-                    transparent,
-                    transparent 2px,
-                    rgba(0, 0, 0, 0.04) 2px,
-                    rgba(0, 0, 0, 0.04) 4px);
-            pointer-events: none;
-            z-index: 99998;
-        }
-
-        /* Özel Scrollbar */
-        ::-webkit-scrollbar {
-            width: 4px;
-        }
-
-        ::-webkit-scrollbar-track {
-            background: rgba(0, 0, 0, 0.2);
-        }
-
-        ::-webkit-scrollbar-thumb {
-            background: var(--neon-cyan);
-            border-radius: 2px;
-            box-shadow: 0 0 6px var(--neon-cyan);
-        }
-
-        ::-webkit-scrollbar-thumb:hover {
-            background: #33f5ff;
-        }
-
-        /* Glassmorphism Ortak Sınıfı */
-        .glass-panel {
-            background: var(--bg-panel);
-            border: 1px solid var(--border-dim);
-            box-shadow: 0 4px 20px 0 rgba(0, 0, 0, 0.6);
-            backdrop-filter: blur(8px);
-        }
-
-        /* Skibidi Buton Animasyonları */
-        #skibidi-toilet {
-            font-size: 140px;
-            cursor: pointer;
-            transition: transform 0.08s cubic-bezier(0.34, 1.56, 0.64, 1), filter 0.15s;
-            filter: drop-shadow(0 0 25px rgba(0, 240, 255, 0.4)) drop-shadow(0 0 60px rgba(0, 240, 255, 0.15));
-            position: relative;
-            z-index: 10;
-        }
-
-        #skibidi-toilet:active {
-            transform: scale(0.85) rotate(-5deg);
-            filter: drop-shadow(0 0 15px rgba(0, 240, 255, 0.9)) drop-shadow(0 0 40px rgba(255, 45, 123, 0.6));
-        }
-
-        #skibidi-toilet:hover {
-            filter: drop-shadow(0 0 35px rgba(0, 240, 255, 0.7)) drop-shadow(0 0 80px rgba(0, 240, 255, 0.3));
-            transform: scale(1.05);
-        }
-
-        /* Parçacık ve Popup Efektleri */
-        .click-popup {
-            position: absolute;
-            font-weight: 900;
-            font-family: 'Orbitron', sans-serif;
-            pointer-events: none;
-            animation: popup-anim 0.8s cubic-bezier(0.22, 1, 0.36, 1) forwards;
-            text-shadow: 0 0 10px currentColor, 0 0 30px currentColor, 0 4px 15px rgba(0, 0, 0, 0.8);
-            z-index: 20;
-            white-space: nowrap;
-        }
-
-        @keyframes popup-anim {
-            0% {
-                transform: translateY(0) scale(0.5) rotate(var(--rot));
-                opacity: 0;
-            }
-
-            20% {
-                transform: translateY(-30px) scale(1.3) rotate(var(--rot));
-                opacity: 1;
-            }
-
-            80% {
-                opacity: 1;
-            }
-
-            100% {
-                transform: translateY(-120px) scale(0.8) rotate(var(--rot));
-                opacity: 0;
-            }
-        }
-
-        .particle {
-            position: absolute;
-            pointer-events: none;
-            background: var(--neon-cyan);
-            border-radius: 50%;
-            animation: particle-anim 0.8s cubic-bezier(0, 0.9, 0.57, 1) forwards;
-            box-shadow: 0 0 10px currentColor;
-        }
-
-        @keyframes particle-anim {
-            0% {
-                transform: translate(0, 0) scale(1);
-                opacity: 1;
-            }
-
-            100% {
-                transform: translate(var(--tx), var(--ty)) scale(0);
-                opacity: 0;
-            }
-        }
-
-        /* Arka Plan Yüzen Objeler */
-        .floater {
-            position: absolute;
-            font-size: 2rem;
-            pointer-events: none;
-            opacity: 0.04;
-            z-index: 0;
-            animation: float-up linear forwards;
-            filter: blur(3px) saturate(0.5);
-        }
-
-        @keyframes float-up {
-            from {
-                transform: translateY(110vh) rotate(0deg);
-                opacity: 0;
-            }
-
-            10% {
-                opacity: 0.08;
-            }
-
-            90% {
-                opacity: 0.08;
-            }
-
-            to {
-                transform: translateY(-10vh) rotate(360deg);
-                opacity: 0;
-            }
-        }
-
-        /* Skitter Feed Stilleri */
-        details#skitter-feed {
-            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-
-        details#skitter-feed[open] {
-            width: 340px;
-            max-height: 500px;
-        }
-
-        details#skitter-feed:not([open]) {
-            width: 56px;
-            height: 56px;
-            border-radius: 50%;
-            overflow: hidden;
-        }
-
-        details#skitter-feed summary {
-            list-style: none;
-            cursor: pointer;
-        }
-
-        details#skitter-feed summary::-webkit-details-marker {
-            display: none;
-        }
-
-        /* Yükseltme Butonları */
-        .upgrade-btn {
-            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-            position: relative;
-            overflow: hidden;
-            border-left: 3px solid var(--neon-cyan) !important;
-        }
-
-        .upgrade-btn::after {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(0, 240, 255, 0.05), transparent);
-            transform: translateX(-100%);
-            transition: transform 0.5s;
-        }
-
-        .upgrade-btn:hover::after {
-            transform: translateX(100%);
-        }
-
-        .upgrade-btn:hover {
-            box-shadow: 0 0 15px rgba(0, 240, 255, 0.15);
-            border-color: rgba(0, 240, 255, 0.4) !important;
-        }
-
-        .upgrade-btn:active {
-            transform: scale(0.96);
-        }
-
-        .upgrade-btn:disabled {
-            opacity: 0.35;
-            cursor: not-allowed;
-            filter: grayscale(0.8);
-            border-left-color: var(--text-muted) !important;
-        }
-
-        /* Sortable Ghost */
-        .sortable-ghost {
-            opacity: 0.2;
-            background: rgba(0, 240, 255, 0.1);
-        }
-
-        /* Slot Makinesi */
-        .slot-reel {
-            background: #0a0a12;
-            border-radius: 0.5rem;
-            overflow: hidden;
-            position: relative;
-            box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.8), 0 0 8px rgba(255, 207, 0, 0.1);
-            border: 1px solid rgba(255, 207, 0, 0.15);
-        }
-
-        .reel-inner {
-            transition: transform 0.1s ease-out;
-            will-change: transform;
-        }
-
-        .slot-symbol {
-            height: 80px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 3rem;
-        }
-
-        .jackpot-anim {
-            animation: jackpot 0.5s ease-in-out infinite alternate;
-        }
-
-        @keyframes jackpot {
-            from {
-                text-shadow: 0 0 10px var(--neon-gold);
-                transform: scale(1);
-            }
-
-            to {
-                text-shadow: 0 0 30px var(--neon-gold), 0 0 10px white;
-                transform: scale(1.1);
-            }
-        }
-
-        /* Yilong Ma Wealth Box */
-        .yilong-box {
-            background: rgba(8, 8, 15, 0.95);
-            border: 1px solid rgba(255, 207, 0, 0.2);
-            box-shadow: 0 0 20px rgba(255, 207, 0, 0.08), 0 4px 15px rgba(0, 0, 0, 0.4);
-        }
-
-        .progress-bar {
-            transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        /* Yeni Efekt Sınıfları */
-        .highlight-asset {
-            animation: flash-green 2s ease-out infinite;
-            border-color: var(--neon-lime) !important;
-        }
-
-        .new-skitt-glow {
-            background: rgba(0, 240, 255, 0.08);
-            border-color: rgba(0, 240, 255, 0.3);
-            box-shadow: 0 0 15px rgba(0, 240, 255, 0.15);
-            animation: glow-pulse 1.5s ease-in-out infinite alternate;
-        }
-
-        /* Staggered load animation */
-        .stagger-load {
-            opacity: 0;
-            animation: stagger-in 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-        }
-
-        .stagger-load:nth-child(1) {
-            animation-delay: 0.05s;
-        }
-
-        .stagger-load:nth-child(2) {
-            animation-delay: 0.12s;
-        }
-
-        .stagger-load:nth-child(3) {
-            animation-delay: 0.2s;
-        }
-
-        .stagger-load:nth-child(4) {
-            animation-delay: 0.28s;
-        }
-
-        @keyframes stagger-in {
-            0% {
-                opacity: 0;
-                transform: translateY(24px);
-            }
-
-            100% {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        /* Neon heading text */
-        .neon-title {
-            font-family: 'Orbitron', sans-serif;
-            text-shadow: 0 0 10px var(--neon-cyan), 0 0 40px rgba(0, 240, 255, 0.3);
-        }
-
-        /* PHASE 3 EFFECTS */
-        .crt-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
-            background-size: 100% 2px, 3px 100%;
-            pointer-events: none;
-            z-index: 99999;
-            opacity: 0.7;
-        }
-
-        .glitch-text {
-            text-shadow: 2px 2px #ff0000, -2px -2px #0000ff;
-            animation: glitch-anim 0.3s infinite;
-        }
-
-        @keyframes glitch-anim {
-            0% {
-                transform: translate(0)
-            }
-
-            20% {
-                transform: translate(-2px, 2px)
-            }
-
-            40% {
-                transform: translate(-2px, -2px)
-            }
-
-            60% {
-                transform: translate(2px, 2px)
-            }
-
-            80% {
-                transform: translate(2px, -2px)
-            }
-
-            100% {
-                transform: translate(0)
-            }
-        }
-
-        /* PHASE 4 (ENDING) EFFECTS */
-        .matrix-modal {
-            background: rgba(0, 10, 0, 0.95);
-            border: 2px solid #00ff00;
-            box-shadow: 0 0 30px rgba(0, 255, 0, 0.3);
-            color: #00ff00;
-            font-family: 'Kode Mono', monospace;
-        }
-
-        .matrix-text {
-            text-shadow: 0 0 10px #00ff00;
-        }
-
-        .pill-btn {
-            transition: all 0.3s ease;
-        }
-
-        .pill-btn:hover {
-            transform: scale(1.05);
-        }
-
-        .pill-red {
-            background: linear-gradient(135deg, #ff0000, #800000);
-            box-shadow: 0 0 20px rgba(255, 0, 0, 0.5);
-        }
-
-        .pill-blue {
-            background: linear-gradient(135deg, #0000ff, #000080);
-            box-shadow: 0 0 20px rgba(0, 0, 255, 0.5);
-        }
-
-        /* --- RED PILL CREDITS (CINEMATIC) --- */
-        .credits-container {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: flex-start;
-            text-align: center;
-            padding-top: 10vh;
-            gap: 2rem;
-            width: 100%;
-            height: 100%;
-            overflow: hidden;
-        }
-
-        .credit-msg {
-            opacity: 0;
-            transform: translateY(20px);
-            filter: blur(5px);
-            animation: credit-fade-in-out 6s ease-in-out forwards;
-            /* Yükseklik animasyonu için max-height geçişi */
-            max-height: 100px;
-            overflow: hidden;
-            transition: max-height 1s ease-out, margin 1s ease-out;
-        }
-
-        .credit-msg.collapse {
-            max-height: 0;
-            margin-top: 0;
-            margin-bottom: 0;
-        }
-
-        @keyframes credit-fade-in-out {
-            0% { opacity: 0; transform: translateY(20px); filter: blur(5px); }
-            15% { opacity: 1; transform: translateY(0); filter: blur(0); }
-            85% { opacity: 1; transform: translateY(0); filter: blur(0); }
-            100% { opacity: 0; transform: translateY(-20px); filter: blur(5px); }
-        }
-
-        /* Merkezdeki Final Mesajı */
-        .credit-final-msg {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            opacity: 0;
-            animation: final-msg-anim 10s ease-in-out forwards;
-            width: 100%;
-            text-align: center;
-            padding: 0 20px;
-            z-index: 10;
-        }
-
-        @keyframes final-msg-anim {
-            0% { opacity: 0; transform: translate(-50%, -40%); filter: blur(10px); }
-            20% { opacity: 1; transform: translate(-50%, -50%); filter: blur(0); }
-            70% { opacity: 1; transform: translate(-50%, -50%); filter: blur(0); }
-            100% { opacity: 0; transform: translate(-50%, -60%); filter: blur(10px); }
-        }
-
-        /* BEYAZ FLAŞ */
-        .white-flash-overlay {
-            position: fixed;
-            inset: 0;
-            background: white;
-            z-index: 999999;
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 3s cubic-bezier(0.4, 0, 1, 1);
-        }
-
-        /* SONSUZ SİYAHLIK */
-        .pitch-black-void {
-            position: fixed;
-            inset: 0;
-            background: black;
-            z-index: 999998;
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 3s ease-in;
-            cursor: none !important;
-        }
-        .pitch-black-void.active {
-            pointer-events: auto;
-        }
-
-        .dev-console-panel {
-            background: rgba(0, 15, 30, 0.95);
-            border: 2px solid var(--neon-cyan);
-            box-shadow: 0 0 20px rgba(0, 240, 255, 0.2);
-        }
-    </style>
+    <link rel="stylesheet" href="src/css/style.css">
 </head>
 
 <body class="min-h-screen flex flex-col items-center py-4 relative text-slate-200">
 
-    <!-- Scanline Overlay -->
     <div class="scanline-overlay"></div>
 
-    <!-- BSOD LAYER -->
+    <!-- ================= SİSTEM KATMANLARI ================= -->
+
     <div id="bsod-layer"
-        class="fixed inset-0 z-[9999] bg-[#0000aa] hidden cursor-none font-mono text-white p-10 flex-col overflow-hidden">
+        class="fixed inset-0 z-[9999] bg-[#0000aa] hidden cursor-none font-mono text-white p-6 md:p-10 flex-col overflow-hidden">
         <div class="max-w-4xl mx-auto space-y-4">
-            <p class="text-xl">A problem has been detected and Windows has been shut down to prevent damage to your
-                computer.</p>
-            <p class="text-xl mt-8">CRITICAL_PROCESS_DIED</p>
+            <p class="text-lg md:text-xl">A problem has been detected and Windows has been shut down to prevent damage
+                to your computer.</p>
+            <p class="text-lg md:text-xl mt-8">CRITICAL_PROCESS_DIED</p>
             <p class="mt-8">If this is the first time you've seen this Stop error screen, restart your computer. If this
                 screen appears again, follow these steps:</p>
             <p>Check to make sure any new hardware or software is properly installed. If this is a new installation, ask
@@ -641,32 +92,36 @@
         </div>
     </div>
 
-    <!-- BLACKOUT LAYER -->
     <div id="blackout-layer" class="fixed inset-0 z-[9998] bg-black hidden"></div>
 
-    <!-- GAME WORLD WRAPPER -->
+    <!-- Tehdit / olay bandı -->
+    <div id="threat-banner" class="threat-banner"></div>
+
+    <!-- Bildirim yığını -->
+    <div id="toast-container" class="toast-container"></div>
+
+    <div id="fps-meter" class="fps-meter hidden">0 FPS</div>
+
+    <!-- ================= OYUN DÜNYASI ================= -->
+
     <div id="game-world" class="contents">
 
-        <!-- Arka Plan Efektleri -->
         <div id="floater-container" class="fixed inset-0 pointer-events-none overflow-hidden z-0"></div>
 
-        <!-- YILONG MA SERVET KUTUSU -->
-        <div class="fixed top-4 right-4 z-40 yilong-box rounded-2xl p-3 flex flex-col gap-1 w-64 animate-float border-l-4"
+        <!-- RAKİP KUTUSU -->
+        <div class="fixed top-2 right-2 md:top-4 md:right-4 z-40 yilong-box rounded-2xl p-3 flex flex-col gap-1 w-[min(16rem,calc(100vw-1rem))] animate-float border-l-4"
             style="border-left-color: var(--neon-gold);">
             <div class="flex items-center gap-3 mb-1">
-                <div
-                    class="w-10 h-10 rounded-full bg-yellow-500/20 flex items-center justify-center border border-yellow-500/30 overflow-hidden">
+                <div class="w-10 h-10 shrink-0 rounded-full bg-yellow-500/20 flex items-center justify-center border border-yellow-500/30 overflow-hidden">
                     <span class="text-2xl" id="yilong-avatar">🤓</span>
                 </div>
-                <div>
-                    <h3 class="text-xs font-bold text-slate-400 uppercase">Yilong Ma</h3>
+                <div class="min-w-0">
+                    <h3 class="text-xs font-bold text-slate-400 uppercase truncate" id="yilong-name">Yilong Ma</h3>
                     <div id="realtime-yilong-wealth" class="text-lg font-mono font-black leading-none"
-                        style="color: var(--neon-gold);">5.00M
-                    </div>
+                        style="color: var(--neon-gold);">5.00M</div>
                 </div>
             </div>
 
-            <!-- Hedef Progress Bar -->
             <div class="w-full bg-slate-800 h-2 rounded-full overflow-hidden mt-1 relative">
                 <div id="wealth-progress" class="h-full w-0 relative"
                     style="background: linear-gradient(90deg, var(--neon-cyan), var(--neon-magenta));">
@@ -677,289 +132,311 @@
                 <span>Senin Paran</span>
                 <span style="color: var(--neon-cyan);">Hedef: <span id="dynamic-target">10M</span></span>
             </div>
+            <div class="text-[9px] font-mono tracking-wider mt-0.5" id="yilong-mood">SALDIRGANLIK %20</div>
         </div>
 
-        <!-- Skitter (Twitter) Widget - SOL ÜST -->
-        <!-- Dev Skip Button -->
-        <button id="dev-skip-btn" class="fixed top-8 left-24 z-50 bg-red-600/50 hover:bg-red-500/80 text-white font-mono text-[10px] px-2 py-1 rounded border border-red-500/50 backdrop-blur-sm transition-all shadow-[0_0_10px_rgba(255,0,0,0.3)]">
-            DEV: SKIP
-        </button>
-
-        <details id="skitter-feed"
-            class="fixed top-4 left-4 z-40 glass-panel rounded-2xl border-opacity-20 border-white">
+        <!-- SKITTER AKIŞI -->
+        <details id="skitter-feed" class="fixed top-2 left-2 md:top-4 md:left-4 z-40 glass-panel rounded-2xl border-opacity-20 border-white">
             <summary class="flex items-center justify-center w-full h-full p-0 m-0 focus:outline-none relative">
                 <div class="absolute inset-0 flex items-center justify-center transition-opacity duration-300 rounded-full text-white"
                     style="background: var(--neon-cyan); box-shadow: 0 0 15px rgba(0,240,255,0.4);" id="skitter-icon">
                     <span class="text-2xl">🐦</span>
                 </div>
-                <div class="w-full px-4 py-3 flex justify-between items-center opacity-0 hidden"
-                    id="skitter-expanded-header">
-                    <span class="font-bold flex items-center gap-2" style="color: var(--neon-cyan);">Skitter <span
-                            class="text-[10px] bg-red-500/20 px-2 py-0.5 rounded border border-red-500/40 text-red-400 animate-pulse">LIVE</span></span>
+                <span id="skitter-badge" class="skitter-badge hidden">0</span>
+                <div class="w-full px-4 py-3 flex justify-between items-center opacity-0 hidden" id="skitter-expanded-header">
+                    <span class="font-bold flex items-center gap-2" style="color: var(--neon-cyan);">Skitter
+                        <span class="text-[10px] bg-red-500/20 px-2 py-0.5 rounded border border-red-500/40 text-red-400 animate-pulse">LIVE</span></span>
                     <div class="text-right">
                         <span class="text-[10px] text-slate-400 uppercase tracking-wider block">Yilong'u Geç</span>
-                        <span id="yilong-ma-servet-display" class="font-mono text-xs font-bold"
-                            style="color: var(--neon-gold);">5.00M</span>
+                        <span id="yilong-ma-servet-display" class="font-mono text-xs font-bold" style="color: var(--neon-gold);">5.00M</span>
                     </div>
                 </div>
             </summary>
-            <div class="px-4 pb-4 pt-0 max-h-[400px] overflow-y-auto flex flex-col gap-3 mt-2 scrollbar-hide"
-                id="skitter-messages">
-                <!-- Mesajlar -->
-            </div>
+            <div class="px-4 pb-4 pt-0 max-h-[400px] overflow-y-auto flex flex-col gap-3 mt-2 scrollbar-hide" id="skitter-messages"></div>
         </details>
 
-        <!-- Ana Konteyner -->
-        <div
-            class="container mx-auto px-4 max-w-7xl relative z-10 flex flex-col lg:flex-row gap-6 h-full items-start mt-16 md:mt-4">
+        <!-- ARAÇ ÇUBUĞU -->
+        <div class="toolbar">
+            <button class="toolbar-btn" data-openmodal="achievements" title="Başarımlar (A)">🏆<span>Başarım</span></button>
+            <button class="toolbar-btn" data-openmodal="settings" title="Ayarlar (S)">⚙️<span>Ayar</span></button>
+            <button class="toolbar-btn" data-openmodal="help" title="Nasıl oynanır (H)">❓<span>Yardım</span></button>
+            <button id="dev-skip-btn" class="toolbar-btn toolbar-dev" title="Geliştirici: +1T Gyatt">🧪<span>Dev</span></button>
+        </div>
 
-            <!-- SOL PANEL: Slot Makinesi & Mini Oyunlar -->
-            <div class="hidden lg:flex flex-col gap-4 w-1/4 sticky top-4">
-                <div class="glass-panel p-5 rounded-3xl border-t-4 relative overflow-hidden group"
-                    style="border-top-color: var(--neon-gold);">
-                    <!-- Parlama Efekti -->
-                    <div class="absolute inset-0 transition-colors duration-500"
-                        style="background: rgba(255,207,0,0.02);">
-                    </div>
+        <!-- ANA IZGARA -->
+        <div class="container mx-auto px-3 md:px-4 max-w-7xl relative z-10 flex flex-col lg:flex-row gap-5 h-full items-start mt-32 lg:mt-28">
 
-                    <h2 class="text-xl font-black italic mb-4 flex items-center gap-2 relative z-10 font-display"
-                        style="color: var(--neon-gold); text-shadow: 0 0 10px rgba(255,207,0,0.4);">
-                        🎰 SKIBIDI SLOTS
-                    </h2>
+            <!-- ======== SOL SÜTUN ======== -->
+            <div id="left-column" class="w-full lg:w-[23%] flex flex-col gap-4 lg:sticky lg:top-24 order-2 lg:order-1">
+                <div id="left-panel-stack" class="flex flex-col gap-4">
 
-                    <!-- Slot Ekranı -->
-                    <div
-                        class="grid grid-cols-3 gap-2 mb-4 bg-black/40 p-2 rounded-xl border border-white/10 relative z-10">
-                        <div class="slot-reel h-20" id="reel-1">
-                            <div class="reel-inner" id="reel-inner-1">
-                                <div class="slot-symbol">🍒</div>
+                    <div class="glass-panel rounded-3xl overflow-hidden">
+                        <div class="tab-bar">
+                            <button class="tab-btn" data-tabgroup="left" data-tab="slots" title="Slot (1)">🎰</button>
+                            <button class="tab-btn" data-tabgroup="left" data-tab="portfolio" title="Portföy (2)">💼</button>
+                            <button class="tab-btn" data-tabgroup="left" data-tab="quests" title="Görevler (3)">🎯</button>
+                            <button class="tab-btn" data-tabgroup="left" data-tab="stats" title="İstatistik (4)">📊</button>
+                        </div>
+
+                        <!-- SLOT -->
+                        <div class="p-4" data-panelgroup="left" data-panel="slots">
+                            <h2 class="panel-title" style="color: var(--neon-gold);">🎰 SKIBIDI SLOTS</h2>
+
+                            <div class="grid grid-cols-3 gap-2 mb-3 bg-black/40 p-2 rounded-xl border border-white/10">
+                                <div class="slot-reel h-20" id="reel-1"><div class="reel-inner" id="reel-inner-1"><div class="slot-symbol">🍒</div></div></div>
+                                <div class="slot-reel h-20" id="reel-2"><div class="reel-inner" id="reel-inner-2"><div class="slot-symbol">🍒</div></div></div>
+                                <div class="slot-reel h-20" id="reel-3"><div class="reel-inner" id="reel-inner-3"><div class="slot-symbol">🍒</div></div></div>
                             </div>
-                        </div>
-                        <div class="slot-reel h-20" id="reel-2">
-                            <div class="reel-inner" id="reel-inner-2">
-                                <div class="slot-symbol">🍒</div>
+
+                            <div class="flex justify-between items-center mb-2 gap-2 flex-wrap">
+                                <div id="slot-cost-container" class="text-xs text-slate-400">
+                                    Bedel: <span class="font-bold" id="slot-cost" style="color: var(--neon-cyan);">500</span> Gyatt
+                                </div>
+                                <div id="slot-bet-input-container" class="hidden items-center gap-2">
+                                    <span class="text-[10px] text-slate-400">BAHİS:</span>
+                                    <input type="number" id="slot-bet-input" value="1000" min="100"
+                                        class="w-24 bg-black/50 border border-white/20 rounded px-2 py-1 text-xs text-right font-mono text-yellow-400 focus:outline-none focus:border-yellow-500">
+                                </div>
+                                <span class="text-xs font-bold" id="slot-status" style="color: var(--neon-gold);">Şansını Dene!</span>
                             </div>
-                        </div>
-                        <div class="slot-reel h-20" id="reel-3">
-                            <div class="reel-inner" id="reel-inner-3">
-                                <div class="slot-symbol">🍒</div>
+
+                            <div class="text-[10px] font-mono text-emerald-400 mb-2 h-3" id="slot-luck-bonus"></div>
+
+                            <div class="flex gap-2">
+                                <button id="spin-btn" class="flex-1 text-black font-bold font-display py-3 rounded-lg shadow-lg transform active:scale-95 transition-all"
+                                    style="background: var(--neon-gold); box-shadow: 0 0 15px rgba(255,207,0,0.3);">ÇEVİR!</button>
+                                <button id="spin-all-in-btn" class="hidden flex-1 text-white font-bold font-display py-3 rounded-lg shadow-lg transform active:scale-95 transition-all"
+                                    style="background: var(--neon-magenta); box-shadow: 0 0 15px rgba(255,45,123,0.3);">ALL IN!</button>
                             </div>
-                        </div>
-                    </div>
 
-                    <!-- Bilgi Notu (SÜRPRİZ) -->
-
-                    <div class="flex justify-between items-center mb-2 relative z-10">
-                        <div id="slot-cost-container" class="text-xs text-slate-400">
-                            Bedel: <span class="font-bold" id="slot-cost" style="color: var(--neon-cyan);">500</span>
-                            Gyatt
+                            <details class="payout-table mt-3">
+                                <summary>Ödeme tablosu</summary>
+                                <div class="payout-rows">
+                                    <div><span>🚽🚽🚽</span><span>x500 / x1000</span></div>
+                                    <div><span>7️⃣8️⃣9️⃣</span><span>x50 / x60</span></div>
+                                    <div><span>7️⃣7️⃣7️⃣</span><span>x100 / x200</span></div>
+                                    <div><span>💎💎💎</span><span>x50 / x100</span></div>
+                                    <div><span>6️⃣7️⃣ yan yana</span><span>x10 / x50</span></div>
+                                    <div><span>Üçlü (diğer)</span><span>x20 / x40</span></div>
+                                    <div><span>İkili</span><span>x3 / x5</span></div>
+                                    <div class="payout-note">Sağdaki değerler Faz 2 ödemeleridir.</div>
+                                </div>
+                            </details>
                         </div>
-                        <!-- Phase 2 Bet Input (Initially Hidden) -->
-                        <div id="slot-bet-input-container" class="hidden flex items-center gap-2">
-                            <span class="text-[10px] text-slate-400">BET:</span>
-                            <input type="number" id="slot-bet-input" value="1000" min="100"
-                                class="w-20 bg-black/50 border border-white/20 rounded px-2 py-1 text-xs text-right font-mono text-yellow-400 focus:outline-none focus:border-yellow-500">
+
+                        <!-- PORTFÖY -->
+                        <div class="p-4 hidden" data-panelgroup="left" data-panel="portfolio">
+                            <h2 class="panel-title" style="color: var(--neon-lime);">💼 PORTFÖY</h2>
+
+                            <div class="grid grid-cols-2 gap-2 mb-3">
+                                <div class="mini-stat"><span>Piyasa Değeri</span><strong id="pf-value">0</strong></div>
+                                <div class="mini-stat"><span>Açık K/Z</span><strong id="pf-pnl">0</strong></div>
+                                <div class="mini-stat"><span>Realize Kâr</span><strong id="pf-realized">0</strong></div>
+                                <div class="mini-stat"><span>Komisyon</span><strong id="pf-fee">%0.50</strong></div>
+                            </div>
+
+                            <div id="portfolio-body" class="portfolio-body"></div>
+
+                            <h3 class="section-label mt-4">📋 AÇIK EMİRLER (<span id="orders-count">0</span>)</h3>
+                            <div id="orders-body" class="orders-body"></div>
                         </div>
 
-                        <span class="text-xs font-bold" id="slot-status" style="color: var(--neon-gold);">Şansını
-                            Dene!</span>
-                    </div>
-
-                    <div class="flex gap-2 relative z-10">
-                        <button id="spin-btn"
-                            class="flex-1 text-black font-bold font-display py-3 rounded-lg shadow-lg transform active:scale-95 transition-all"
-                            style="background: var(--neon-gold); box-shadow: 0 0 15px rgba(255,207,0,0.3);">
-                            ÇEVİR!
-                        </button>
-                        <button id="spin-all-in-btn"
-                            class="hidden flex-1 text-white font-bold font-display py-3 rounded-lg shadow-lg transform active:scale-95 transition-all"
-                            style="background: var(--neon-magenta); box-shadow: 0 0 15px rgba(255,45,123,0.3);">
-                            ALL IN!
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Ekstra İstatistikler -->
-                <div class="glass-panel p-5 rounded-3xl">
-                    <h3 class="text-sm font-bold text-slate-400 uppercase tracking-widest mb-3">İstatistikler</h3>
-                    <div class="space-y-2 text-sm">
-                        <div class="flex justify-between">
-                            <span class="text-slate-500">Toplam Tık</span>
-                            <span class="font-mono" id="stat-clicks">0</span>
+                        <!-- GÖREVLER -->
+                        <div class="p-4 hidden" data-panelgroup="left" data-panel="quests">
+                            <h2 class="panel-title" style="color: var(--neon-magenta);">🎯 GÖREVLER</h2>
+                            <p class="text-[10px] text-slate-500 mb-3">Tamamlanan görev: <span id="quest-completed" class="font-mono text-slate-300">0</span> · 🔄 ile beğenmediğini değiştir.</p>
+                            <div id="quest-list" class="flex flex-col gap-3"></div>
                         </div>
-                        <div class="flex justify-between">
-                            <span class="text-slate-500">Slot Kazancı</span>
-                            <span class="font-mono" id="stat-slot-win" style="color: var(--neon-lime);">0</span>
-                        </div>
-                        <div class="flex justify-between">
-                            <span class="text-slate-500">Oyun Süresi</span>
-                            <span class="font-mono" id="stat-time">00:00</span>
+
+                        <!-- İSTATİSTİK -->
+                        <div class="p-4 hidden" data-panelgroup="left" data-panel="stats">
+                            <h2 class="panel-title" style="color: var(--neon-cyan);">📊 İSTATİSTİK</h2>
+                            <div class="grid grid-cols-3 gap-2 mb-3">
+                                <div class="mini-stat"><span>Tık</span><strong id="stat-clicks">0</strong></div>
+                                <div class="mini-stat"><span>Slot</span><strong id="stat-slot-win">0</strong></div>
+                                <div class="mini-stat"><span>Süre</span><strong id="stat-time">00:00</strong></div>
+                            </div>
+                            <div id="stats-body" class="stats-body"></div>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- ORTA PANEL: Ana Oyun -->
-            <div class="w-full lg:w-2/4 flex flex-col items-center gap-6">
+            <!-- ======== ORTA SÜTUN ======== -->
+            <div class="w-full lg:w-[54%] flex flex-col items-center gap-5 order-1 lg:order-2">
 
-                <!-- Başlık -->
                 <div class="text-center space-y-1 animate-float z-20">
-                    <h1 class="text-4xl md:text-6xl font-black tracking-tighter font-display neon-title"
-                        style="color: var(--neon-cyan);">
+                    <h1 class="text-3xl md:text-5xl font-black tracking-tighter font-display neon-title" style="color: var(--neon-cyan);">
                         SKIBIDI CLICKER
                     </h1>
                     <p class="font-medium tracking-[0.3em] text-[10px] uppercase" style="color: var(--neon-magenta);">
-                        Rivalry Edition: Beat
-                        Yilong</p>
+                        Rivalry Edition: Beat Yilong</p>
                 </div>
 
-                <!-- Skor Kartları - Updated Grid to 2 cols (removed CPS) -->
-                <div class="grid grid-cols-2 gap-3 w-full">
-                    <div class="glass-panel p-3 md:p-4 rounded-2xl flex flex-col items-center text-center"
-                        style="border-top: 2px solid var(--neon-cyan);">
-                        <span class="text-[10px] md:text-xs font-bold uppercase font-display"
-                            style="color: var(--text-muted);">Gyatt Points</span>
-                        <div class="text-2xl md:text-4xl font-black break-all leading-tight mt-1 font-display"
-                            style="color: var(--neon-cyan); text-shadow: 0 0 15px rgba(0,240,255,0.4);" id="score">0
-                        </div>
+                <!-- SKOR KARTLARI -->
+                <div class="grid grid-cols-2 md:grid-cols-3 gap-3 w-full">
+                    <div class="glass-panel p-3 md:p-4 rounded-2xl flex flex-col items-center text-center" style="border-top: 2px solid var(--neon-cyan);">
+                        <span class="text-[10px] md:text-xs font-bold uppercase font-display" style="color: var(--text-muted);">Gyatt Points</span>
+                        <div class="text-2xl md:text-3xl font-black break-all leading-tight mt-1 font-display"
+                            style="color: var(--neon-cyan); text-shadow: 0 0 15px rgba(0,240,255,0.4);" id="score">0</div>
+                        <span class="text-[9px] font-mono text-slate-500 mt-1">tık: <span id="stat-click-gain">1</span></span>
                     </div>
-                    <div class="glass-panel p-3 md:p-4 rounded-2xl flex flex-col items-center text-center"
-                        style="border-top: 2px solid var(--neon-lime);">
-                        <span class="text-[10px] md:text-xs font-bold uppercase font-display"
-                            style="color: var(--text-muted);">Senin Servetin</span>
-                        <div class="text-xl md:text-3xl font-bold mt-1 font-display" id="total-wealth"
+                    <div class="glass-panel p-3 md:p-4 rounded-2xl flex flex-col items-center text-center" style="border-top: 2px solid var(--neon-lime);">
+                        <span class="text-[10px] md:text-xs font-bold uppercase font-display" style="color: var(--text-muted);">Senin Servetin</span>
+                        <div class="text-xl md:text-2xl font-bold mt-1 font-display" id="total-wealth"
                             style="color: var(--neon-lime); text-shadow: 0 0 15px rgba(57,255,20,0.4);">0</div>
+                        <span class="text-[9px] font-mono text-slate-500 mt-1">nakit + portföy</span>
+                    </div>
+                    <div class="glass-panel p-3 md:p-4 rounded-2xl flex flex-col items-center text-center col-span-2 md:col-span-1"
+                        id="cps-card" style="border-top: 2px solid var(--neon-gold);">
+                        <span class="text-[10px] md:text-xs font-bold uppercase font-display" style="color: var(--text-muted);">Pasif Üretim</span>
+                        <div class="text-xl md:text-2xl font-bold mt-1 font-display" id="stat-cps"
+                            style="color: var(--neon-gold); text-shadow: 0 0 15px rgba(255,207,0,0.4);">0/sn</div>
+                        <span class="text-[9px] font-mono text-rose-400 mt-1 h-3" id="cps-note"></span>
                     </div>
                 </div>
 
-                <!-- Tıklama Alanı -->
-                <div class="relative flex justify-center items-center py-6 md:py-12 w-full select-none">
-                    <div id="popup-container" class="absolute inset-0 pointer-events-none overflow-visible"></div>
+                <!-- AKTİF ETKİLER -->
+                <div id="buff-strip" class="buff-strip"></div>
 
+                <!-- KOMBO ÇUBUĞU -->
+                <div id="combo-wrap" class="combo-wrap combo-idle">
+                    <div class="combo-track"><div id="combo-fill" class="combo-fill"></div></div>
+                    <div id="combo-label" class="combo-label">KOMBO 0/100 — x1.00</div>
+                </div>
+
+                <!-- TIKLAMA ALANI -->
+                <div class="relative flex justify-center items-center py-4 md:py-8 w-full select-none">
+                    <div id="popup-container" class="absolute inset-0 pointer-events-none overflow-visible"></div>
                     <div class="relative group cursor-pointer">
-                        <!-- Glow -->
                         <div class="absolute inset-0 blur-[80px] opacity-20 group-hover:opacity-50 transition-opacity duration-500 rounded-full animate-pulse-slow"
-                            style="background: var(--neon-cyan);">
-                        </div>
+                            style="background: var(--neon-cyan);"></div>
                         <div id="skibidi-toilet" class="relative">🚽</div>
                     </div>
                 </div>
 
-                <!-- Mobil İçin Slot Butonu (Sadece mobilde görünür) -->
                 <div class="lg:hidden w-full">
                     <button onclick="toggleMobileSlot()" class="w-full font-bold font-display py-3 rounded-lg"
                         style="background: rgba(255,207,0,0.1); border: 1px solid rgba(255,207,0,0.3); color: var(--neon-gold);">
-                        🎰 Mini Game: Slots Oyna
+                        🎰 Mini Oyun: Slots Oyna
                     </button>
                 </div>
 
-                <!-- Piyasalar (Market) -->
-                <div class="w-full glass-panel rounded-2xl p-4 md:p-6 border-t-4 flex-grow"
-                    style="border-top-color: var(--neon-lime);">
-                    <h2 class="text-lg font-bold mb-4 flex items-center justify-between">
+                <!-- BORSA -->
+                <div id="market-section" class="w-full glass-panel rounded-2xl p-3 md:p-5 border-t-4 flex-grow" style="border-top-color: var(--neon-lime);">
+                    <h2 class="text-lg font-bold mb-3 flex items-center justify-between flex-wrap gap-2">
                         <div class="flex items-center gap-2">
-                            <span class="p-1.5 rounded-lg"
-                                style="background: rgba(57,255,20,0.1); color: var(--neon-lime);">📈</span>
-                            <span class="font-display">Borsa (Stock Market)</span>
+                            <span class="p-1.5 rounded-lg" style="background: rgba(57,255,20,0.1); color: var(--neon-lime);">📈</span>
+                            <span class="font-display">Borsa</span>
                         </div>
-                        <span class="text-[10px] text-slate-500 font-normal hidden md:block">Drag & Drop Aktif</span>
+                        <div class="qty-picker" data-qtygroup="trade">
+                            <span class="qty-label">ADET</span>
+                            <button class="qty-btn qty-active" data-qty="1" data-qtygroup="trade">1</button>
+                            <button class="qty-btn" data-qty="10" data-qtygroup="trade">10</button>
+                            <button class="qty-btn" data-qty="100" data-qtygroup="trade">100</button>
+                            <button class="qty-btn" data-qty="max" data-qtygroup="trade">MAX</button>
+                        </div>
                     </h2>
-                    <div id="market-list-container" class="space-y-3 pb-20">
-                        <!-- Marketler buraya -->
-                    </div>
-                </div>
-
-            </div>
-
-            <!-- SAĞ PANEL: Yükseltmeler -->
-            <div id="right-panel" class="w-full lg:w-1/4 flex flex-col gap-4 sticky top-4 h-fit">
-                <div class="glass-panel rounded-3xl p-5 border-t-4" style="border-top-color: var(--neon-cyan);">
-                    <h2 class="text-xl font-bold mb-4 flex items-center gap-2">
-                        <span class="p-2 rounded-lg"
-                            style="background: rgba(0,240,255,0.08); color: var(--neon-cyan);">⚡</span>
-                        <span class="font-display">Yükseltmeler</span>
-                    </h2>
-
-                    <div class="space-y-3" id="upgrades-list">
-                        <!-- Rizz Upgrade -->
-                        <button id="upgrade-ppc"
-                            class="upgrade-btn w-full bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg p-3 flex flex-col gap-1 text-left group">
-                            <div class="flex justify-between items-start w-full">
-                                <div>
-                                    <span class="font-bold text-slate-200 group-hover:text-white block">More Rizz</span>
-                                    <span class="text-[10px] text-slate-400">+1 Tık Gücü</span>
-                                </div>
-                                <div class="text-right">
-                                    <span class="text-[10px] px-1.5 py-0.5 rounded font-mono block mb-1"
-                                        style="background: rgba(0,240,255,0.1); color: var(--neon-cyan);">LVL
-                                        <span id="lvl-ppc">1</span></span>
-                                </div>
-                            </div>
-                            <div class="mt-1 pt-2 border-t border-white/5 flex justify-between items-center w-full">
-                                <span class="text-[10px] text-slate-500 uppercase">Bedel</span>
-                                <span id="cost-ppc" class="font-bold font-mono text-sm"
-                                    style="color: var(--neon-cyan);">15</span>
-                            </div>
-                        </button>
-
-                        <!-- Auto Clicker REMOVED -->
-
-                        <!-- Multiplier -->
-                        <button id="upgrade-multi"
-                            class="upgrade-btn w-full bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg p-3 flex flex-col gap-1 text-left group">
-                            <div class="flex justify-between items-start w-full">
-                                <div>
-                                    <span class="font-bold text-slate-200 group-hover:text-white block">Sigma
-                                        Grindset</span>
-                                    <span class="text-[10px] text-slate-400">Tüm Gelir x1.5</span>
-                                </div>
-                                <div class="text-right">
-                                    <span class="text-[10px] px-1.5 py-0.5 rounded font-mono block mb-1"
-                                        style="background: rgba(255,45,123,0.1); color: var(--neon-magenta);">LVL
-                                        <span id="lvl-multi">0</span></span>
-                                </div>
-                            </div>
-                            <div class="mt-1 pt-2 border-t border-white/5 flex justify-between items-center w-full">
-                                <span class="text-[10px] text-slate-500 uppercase">Bedel</span>
-                                <span id="cost-multi" class="font-bold font-mono text-sm"
-                                    style="color: var(--neon-magenta);">2,500</span>
-                            </div>
-                        </button>
-
-                        <!-- Fanum Tax -->
-                        <button id="upgrade-tax"
-                            class="upgrade-btn w-full bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg p-3 flex flex-col gap-1 text-left group">
-                            <div class="flex justify-between items-start w-full">
-                                <div>
-                                    <span class="font-bold text-slate-200 group-hover:text-white block">Fanum Tax</span>
-                                    <span class="text-[10px] text-slate-400">Piyasa Pasif Gelir %</span>
-                                </div>
-                                <div class="text-right">
-                                    <span class="text-[10px] px-1.5 py-0.5 rounded font-mono block mb-1"
-                                        style="background: rgba(57,255,20,0.1); color: var(--neon-lime);">LVL
-                                        <span id="lvl-tax">0</span></span>
-                                </div>
-                            </div>
-                            <div class="mt-1 pt-2 border-t border-white/5 flex justify-between items-center w-full">
-                                <span class="text-[10px] text-slate-500 uppercase">Bedel</span>
-                                <span id="cost-tax" class="font-bold font-mono text-sm"
-                                    style="color: var(--neon-lime);">10,000</span>
-                            </div>
-                        </button>
-                    </div>
+                    <div id="market-list-container" class="space-y-3 pb-4"></div>
                 </div>
             </div>
 
+            <!-- ======== SAĞ SÜTUN ======== -->
+            <div id="right-column" class="w-full lg:w-[23%] flex flex-col gap-4 lg:sticky lg:top-24 h-fit order-3">
+                <div class="glass-panel rounded-3xl overflow-hidden">
+                    <div class="tab-bar">
+                        <button class="tab-btn" data-tabgroup="right" data-tab="upgrades" title="Yükseltmeler (Q)">⚡</button>
+                        <button class="tab-btn" data-tabgroup="right" data-tab="generators" title="Üretim (W)">⚙️</button>
+                        <button class="tab-btn" data-tabgroup="right" data-tab="skills" title="Yetenek (E)">💠</button>
+                        <button class="tab-btn" data-tabgroup="right" data-tab="market" title="Kara Borsa (R)">🏴‍☠️</button>
+                    </div>
+
+                    <!-- YÜKSELTMELER -->
+                    <div class="p-4" data-panelgroup="right" data-panel="upgrades">
+                        <h2 class="panel-title" style="color: var(--neon-cyan);">⚡ YÜKSELTMELER</h2>
+                        <div class="space-y-3" id="upgrades-list"></div>
+                    </div>
+
+                    <!-- ÜRETİCİLER -->
+                    <div class="p-4 hidden" data-panelgroup="right" data-panel="generators">
+                        <h2 class="panel-title" style="color: var(--neon-gold);">⚙️ ÜRETİM HATTI</h2>
+                        <div class="qty-picker mb-3" data-qtygroup="gen">
+                            <span class="qty-label">AL</span>
+                            <button class="qty-btn qty-active" data-qty="1" data-qtygroup="gen">1</button>
+                            <button class="qty-btn" data-qty="10" data-qtygroup="gen">10</button>
+                            <button class="qty-btn" data-qty="100" data-qtygroup="gen">100</button>
+                            <button class="qty-btn" data-qty="max" data-qtygroup="gen">MAX</button>
+                        </div>
+                        <div class="flex flex-col gap-2" id="generator-list"></div>
+                        <p class="text-[10px] text-slate-500 mt-3">
+                            Her 10 / 25 / 50 / 100 / 150 / 200 / 300 adette o üreticinin çıktısı <strong>ikiye katlanır</strong>.
+                        </p>
+                    </div>
+
+                    <!-- YETENEK AĞACI -->
+                    <div class="p-4 hidden" data-panelgroup="right" data-panel="skills">
+                        <h2 class="panel-title" style="color: #c084fc;">💠 SİGMA YÜKSELİŞİ</h2>
+
+                        <div class="ascend-box">
+                            <div class="grid grid-cols-3 gap-2 mb-3">
+                                <div class="mini-stat"><span>Parça</span><strong id="shard-balance">0</strong></div>
+                                <div class="mini-stat"><span>Toplam</span><strong id="shard-total">0</strong></div>
+                                <div class="mini-stat"><span>Yükseliş</span><strong id="ascend-count">0</strong></div>
+                            </div>
+                            <p class="text-[10px] text-slate-400 mb-2">
+                                Pasif parça bonusu: <span id="shard-passive" class="text-purple-300 font-mono">+%0</span>
+                            </p>
+                            <button id="btn-ascend" class="ascend-btn">
+                                <span>🔱 YÜKSEL</span>
+                                <span id="ascend-gain" class="ascend-gain">+0 💠</span>
+                            </button>
+                            <p class="text-[10px] text-slate-500 mt-2" id="ascend-info"></p>
+                        </div>
+
+                        <div id="skill-grid" class="skill-grid mt-4"></div>
+                    </div>
+
+                    <!-- KARA BORSA -->
+                    <div class="p-4 hidden" data-panelgroup="right" data-panel="market">
+                        <h2 class="panel-title" style="color: #ef4444;">🏴‍☠️ KARA BORSA</h2>
+                        <div id="black-market-panel" class="hidden">
+                            <div class="text-xs text-slate-400 mb-3">
+                                Kalıcı güçlendirmeler satın al. Faz geçişlerinden ve yükselişten etkilenmez.
+                            </div>
+                            <div class="mini-stat mb-3"><span>Toplam Çarpan</span><strong id="bm-mult-display">x1.00</strong></div>
+                            <button id="btn-black-market-buy"
+                                class="w-full bg-gradient-to-r from-red-900 to-slate-900 hover:from-red-800 hover:to-slate-800 border border-red-500/30 text-white font-bold py-3 rounded-xl shadow-lg relative overflow-hidden group">
+                                <span class="relative z-10 flex flex-col items-center">
+                                    <span>GİZLİ KASA AÇ</span>
+                                    <span class="text-xs font-mono text-red-300" id="bm-cost-display">100.00K</span>
+                                </span>
+                                <div class="absolute inset-0 bg-red-500/10 transform scale-x-0 group-hover:scale-x-100 transition-transform origin-left"></div>
+                            </button>
+                            <div id="bm-inventory" class="grid grid-cols-4 gap-2 mt-4"></div>
+                        </div>
+                        <p class="text-xs text-slate-500 locked-note" id="bm-locked-note">
+                            🔒 Kara Borsa <strong>Faz 2</strong>'de açılır. Önce Yilong'un hedefine ulaş.
+                        </p>
+                    </div>
+                </div>
+            </div>
         </div>
 
-    </div> <!-- END GAME WORLD WRAPPER -->
+        <!-- MOBİL ALT GEZİNME -->
+        <nav class="mobile-nav lg:hidden">
+            <button data-jump="skibidi-toilet::">🚽<span>Tıkla</span></button>
+            <button data-jump="market-section::">📈<span>Borsa</span></button>
+            <button data-jump="right-column:right:upgrades">⚡<span>Yükselt</span></button>
+            <button data-jump="right-column:right:generators">⚙️<span>Üretim</span></button>
+            <button data-jump="left-column:left:portfolio">💼<span>Portföy</span></button>
+        </nav>
+    </div>
 
-    <!-- Mesaj Modal -->
-    <div id="message-box"
-        class="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 opacity-0 pointer-events-none transition-opacity duration-300 px-4">
-        <div class="glass-panel p-8 rounded-3xl max-w-md w-full text-center transform scale-90 transition-transform duration-300"
-            style="border: 2px solid rgba(0,240,255,0.3); box-shadow: 0 0 50px rgba(0,240,255,0.2);"
-            id="message-content-box">
+    <!-- ================= MODALLER ================= -->
+
+    <div id="message-box" class="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 opacity-0 pointer-events-none transition-opacity duration-300 px-4">
+        <div class="glass-panel p-6 md:p-8 rounded-3xl max-w-md w-full text-center transform scale-90 transition-transform duration-300 max-h-[85vh] overflow-y-auto"
+            style="border: 2px solid rgba(0,240,255,0.3); box-shadow: 0 0 50px rgba(0,240,255,0.2);" id="message-content-box">
             <div class="mb-6" id="message-text"></div>
             <button id="message-close"
                 class="w-full text-white font-bold font-display py-3 px-8 rounded-lg shadow-lg transition-all transform hover:-translate-y-1 active:translate-y-0"
@@ -969,1848 +446,273 @@
         </div>
     </div>
 
-    <!-- Mobile Slot Modal -->
-    <div id="mobile-slot-modal"
-        class="fixed inset-0 z-50 bg-black/90 hidden flex flex-col items-center justify-center p-4">
+    <!-- Mobil slot -->
+    <div id="mobile-slot-modal" class="fixed inset-0 z-50 bg-black/90 hidden flex-col items-center justify-center p-4">
         <div class="w-full max-w-sm glass-panel p-6 rounded-2xl relative">
-            <button onclick="toggleMobileSlot()"
-                class="absolute top-2 right-2 text-white/50 hover:text-white text-2xl">&times;</button>
-            <h2 class="text-2xl font-black text-center mb-6 font-display"
-                style="color: var(--neon-gold); text-shadow: 0 0 15px rgba(255,207,0,0.4);">🎰 MOBILE SLOTS</h2>
-
+            <button onclick="toggleMobileSlot()" class="absolute top-2 right-2 text-white/50 hover:text-white text-2xl">&times;</button>
+            <h2 class="text-2xl font-black text-center mb-6 font-display" style="color: var(--neon-gold); text-shadow: 0 0 15px rgba(255,207,0,0.4);">🎰 MOBILE SLOTS</h2>
             <div class="grid grid-cols-3 gap-2 mb-6 bg-black/40 p-2 rounded-xl border border-white/10">
-                <div class="slot-reel h-20" id="m-reel-1">
-                    <div class="reel-inner" id="m-reel-inner-1">
-                        <div class="slot-symbol">🍒</div>
-                    </div>
-                </div>
-                <div class="slot-reel h-20" id="m-reel-2">
-                    <div class="reel-inner" id="m-reel-inner-2">
-                        <div class="slot-symbol">🍒</div>
-                    </div>
-                </div>
-                <div class="slot-reel h-20" id="m-reel-3">
-                    <div class="reel-inner" id="m-reel-inner-3">
-                        <div class="slot-symbol">🍒</div>
-                    </div>
-                </div>
+                <div class="slot-reel h-20" id="m-reel-1"><div class="reel-inner" id="m-reel-inner-1"><div class="slot-symbol">🍒</div></div></div>
+                <div class="slot-reel h-20" id="m-reel-2"><div class="reel-inner" id="m-reel-inner-2"><div class="slot-symbol">🍒</div></div></div>
+                <div class="slot-reel h-20" id="m-reel-3"><div class="reel-inner" id="m-reel-inner-3"><div class="slot-symbol">🍒</div></div></div>
             </div>
-
             <div class="text-center mb-4">
-                <p class="text-sm text-slate-400">Bedel: <span class="font-bold" id="m-slot-cost"
-                        style="color: var(--neon-cyan);">500</span></p>
-                <p class="text-lg font-bold font-display" id="m-slot-status" style="color: var(--neon-gold);">Şansını
-                    Dene!</p>
+                <p class="text-sm text-slate-400">Bedel: <span class="font-bold" id="m-slot-cost" style="color: var(--neon-cyan);">500</span></p>
+                <p class="text-lg font-bold font-display" id="m-slot-status" style="color: var(--neon-gold);">Şansını Dene!</p>
             </div>
-
             <div class="flex gap-2 w-full">
-                <button id="m-spin-btn" class="flex-1 text-black font-bold font-display py-4 rounded-lg"
-                    style="background: var(--neon-gold);">ÇEVİR!</button>
-                <button id="m-spin-all-in-btn" class="hidden flex-1 text-white font-bold font-display py-4 rounded-lg"
-                    style="background: var(--neon-magenta);">ALL
-                    IN!</button>
+                <button id="m-spin-btn" class="flex-1 text-black font-bold font-display py-4 rounded-lg" style="background: var(--neon-gold);">ÇEVİR!</button>
+                <button id="m-spin-all-in-btn" class="hidden flex-1 text-white font-bold font-display py-4 rounded-lg" style="background: var(--neon-magenta);">ALL IN!</button>
             </div>
         </div>
     </div>
 
-    <!-- Gacha Modal -->
-    <div id="gacha-modal"
-        class="fixed inset-0 z-[100] bg-black/95 flex flex-col items-center justify-center opacity-0 pointer-events-none transition-opacity duration-300 backdrop-blur-md">
-        <h2 class="text-3xl md:text-5xl font-black text-red-500 mb-8 animate-pulse tracking-widest uppercase">GİZLİ KASA
-        </h2>
+    <!-- Gacha -->
+    <div id="gacha-modal" class="fixed inset-0 z-[100] bg-black/95 flex flex-col items-center justify-center opacity-0 pointer-events-none transition-opacity duration-300 backdrop-blur-md">
+        <h2 class="text-3xl md:text-5xl font-black text-red-500 mb-6 animate-pulse tracking-widest uppercase">GİZLİ KASA</h2>
         <p class="text-slate-400 mb-8 animate-bounce">Bir kart seç...</p>
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-8 w-full max-w-5xl px-4" id="gacha-cards">
-            <!-- Cards injected by JS -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-8 w-full max-w-5xl px-4" id="gacha-cards"></div>
+    </div>
+
+    <!-- Başarımlar -->
+    <div id="modal-achievements" class="sk-modal hidden">
+        <div class="sk-modal-box max-w-3xl">
+            <div class="sk-modal-head">
+                <h2>🏆 BAŞARIMLAR</h2>
+                <div class="sk-modal-sub">
+                    <span id="achievement-count">0 / 0</span> ·
+                    Toplam bonus <strong id="achievement-bonus">+%0</strong>
+                </div>
+                <button class="sk-modal-x" data-closemodal="achievements">&times;</button>
+            </div>
+            <div id="achievement-grid" class="ach-grid"></div>
         </div>
     </div>
 
-    <!-- VERSION BADGE -->
-    <div class="fixed bottom-2 left-2 z-50 text-[10px] font-mono opacity-60 pointer-events-none font-display"
-        style="color: var(--neon-cyan); text-shadow: 0 0 5px rgba(0,240,255,0.5);">
-        V3.3
+    <!-- Ayarlar -->
+    <div id="modal-settings" class="sk-modal hidden">
+        <div class="sk-modal-box max-w-xl">
+            <div class="sk-modal-head">
+                <h2>⚙️ AYARLAR</h2>
+                <button class="sk-modal-x" data-closemodal="settings">&times;</button>
+            </div>
+
+            <div class="settings-body">
+                <h3 class="section-label">SES & GÖRÜNTÜ</h3>
+                <label class="set-row">
+                    <span>Ses seviyesi <em id="set-volume-label">70%</em></span>
+                    <input type="range" id="set-volume" min="0" max="100" value="70">
+                </label>
+                <label class="set-row"><span>Sesi kapat</span><input type="checkbox" id="set-muted"></label>
+                <label class="set-row"><span>Hareketi azalt (düşük donanım / erişilebilirlik)</span><input type="checkbox" id="set-motion"></label>
+                <label class="set-row">
+                    <span>Partikül yoğunluğu</span>
+                    <select id="set-particles">
+                        <option value="off">Kapalı</option>
+                        <option value="low">Düşük</option>
+                        <option value="normal">Normal</option>
+                        <option value="high">Yüksek</option>
+                    </select>
+                </label>
+                <label class="set-row">
+                    <span>Sayı biçimi</span>
+                    <select id="set-format">
+                        <option value="short">Kısa (1.23M)</option>
+                        <option value="sci">Bilimsel (1.23e6)</option>
+                    </select>
+                </label>
+                <label class="set-row"><span>FPS göstergesi</span><input type="checkbox" id="set-fps"></label>
+
+                <h3 class="section-label mt-4">OYUN</h3>
+                <label class="set-row">
+                    <span>Otomatik kayıt aralığı</span>
+                    <select id="set-autosave">
+                        <option value="5">5 saniye</option>
+                        <option value="15">15 saniye</option>
+                        <option value="30">30 saniye</option>
+                        <option value="60">60 saniye</option>
+                    </select>
+                </label>
+                <label class="set-row"><span>Yükselişte onay sor</span><input type="checkbox" id="set-confirm-ascend"></label>
+
+                <h3 class="section-label mt-4">KAYIT</h3>
+                <div class="flex gap-2 flex-wrap">
+                    <button id="btn-save-now" class="set-btn">💾 Şimdi Kaydet</button>
+                    <button id="btn-export" class="set-btn">📤 Dışa Aktar</button>
+                    <button id="btn-import" class="set-btn">📥 İçe Aktar</button>
+                    <button id="btn-hard-reset" class="set-btn danger">💀 Her Şeyi Sıfırla</button>
+                </div>
+                <textarea id="save-textarea" class="save-area" placeholder="Kayıt metni buraya gelir / buraya yapıştır…" spellcheck="false"></textarea>
+            </div>
+        </div>
     </div>
 
-    <!-- PHASE 4 ENDING MODAL (SIMULATION CRASHED) -->
+    <!-- Yardım -->
+    <div id="modal-help" class="sk-modal hidden">
+        <div class="sk-modal-box max-w-2xl">
+            <div class="sk-modal-head">
+                <h2>❓ NASIL OYNANIR</h2>
+                <button class="sk-modal-x" data-closemodal="help">&times;</button>
+            </div>
+            <div class="help-body">
+                <p>Amacın basit: <strong>Yilong Ma'dan daha zengin ol.</strong> Bunun beş yolu var.</p>
+
+                <h4>🚽 Tıkla</h4>
+                <p>Tuvalete tıkla. Hızlı tıklamak <strong>kombo</strong> biriktirir, her yığın kazancını %1 artırır.
+                   Kombo tavana ulaşınca <strong>FEVER MODE</strong> açılır: 8 saniye boyunca her şey 3 katına çıkar.</p>
+
+                <h4>⚙️ Otomatikleştir</h4>
+                <p>Üreticiler sen tıklamasan da çalışır — sekme kapalıyken bile. Her üreticiden 10, 25, 50, 100…
+                   adet aldıkça o üreticinin çıktısı ikiye katlanır.</p>
+
+                <h4>📈 Yatırım Yap</h4>
+                <p>14 varlık gerçek bir fiyat modeliyle hareket eder: eğilim, boğa/ayı rejimleri ve rastgele şoklar.
+                   Ortalama maliyetin ve kâr/zararın takip edilir. <strong>Limit emri</strong> kurarak sen yokken
+                   alım satım yaptırabilirsin. Piyasa olayları (çöküş, boğa koşusu, rug pull) fiyatları altüst eder.</p>
+
+                <h4>🗿 Rakibini Tanı</h4>
+                <p>Yilong'un gerçek bir portföyü var ve momentum stratejisiyle işlem yapıyor. Sen öne geçtikçe
+                   ruh hali bozulur ve saldırganlaşır: kansellenme, vergi denetimi, DDoS, düşmanca devralma.
+                   Her saldırı önce <strong>uyarı bandıyla</strong> haber verilir — pozisyonunu kapatmak için birkaç saniyen var.</p>
+
+                <h4>🔱 Yüksel</h4>
+                <p>Faz 2'den sonra <strong>Sigma Yükselişi</strong> açılır. Koşunu sıfırlar, karşılığında kalıcı
+                   Sigma Parçası verir. Parçalar yetenek ağacında kalıcı güce dönüşür. Başarımlar, kara borsa
+                   eşyaları ve hikâye ilerlemen korunur.</p>
+
+                <h4>⌨️ Kısayollar</h4>
+                <div class="key-grid">
+                    <div><kbd>Boşluk</kbd> Tıkla</div>
+                    <div><kbd>1</kbd>–<kbd>4</kbd> Sol paneller</div>
+                    <div><kbd>Q W E R</kbd> Sağ paneller</div>
+                    <div><kbd>A</kbd> Başarımlar</div>
+                    <div><kbd>S</kbd> Ayarlar</div>
+                    <div><kbd>H</kbd> Bu ekran</div>
+                    <div><kbd>M</kbd> Sesi aç/kapat</div>
+                    <div><kbd>Esc</kbd> Kapat</div>
+                </div>
+
+                <p class="text-xs text-slate-500 mt-4">Oyun her 15 saniyede bir otomatik kaydeder. Ayarlardan kaydını
+                    dışa aktarıp başka bir tarayıcıya taşıyabilirsin.</p>
+            </div>
+            <button class="sk-modal-ok" data-closemodal="help">ANLADIM, BAŞLAYALIM</button>
+        </div>
+    </div>
+
+    <!-- Çevrimdışı rapor -->
+    <div id="modal-offline" class="sk-modal hidden">
+        <div class="sk-modal-box max-w-md text-center">
+            <div class="sk-modal-head justify-center"><h2>🌙 TEKRAR HOŞ GELDİN</h2></div>
+            <div id="offline-body" class="p-2"></div>
+            <button class="sk-modal-ok" id="modal-close-offline">DEVAM ET</button>
+        </div>
+    </div>
+
+    <!-- Onay -->
+    <div id="modal-confirm" class="sk-modal hidden">
+        <div class="sk-modal-box max-w-md text-center">
+            <div class="confirm-icon" id="confirm-icon">❓</div>
+            <h2 class="confirm-title" id="confirm-title">Emin misin?</h2>
+            <div class="confirm-body" id="confirm-body"></div>
+            <div class="flex gap-3 mt-5">
+                <button class="sk-modal-ok flex-1" id="confirm-ok">ONAYLA</button>
+                <button class="sk-modal-cancel flex-1" id="confirm-cancel">VAZGEÇ</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="version-badge" class="fixed bottom-2 left-2 z-50 text-[10px] font-mono opacity-60 pointer-events-none font-display"
+        style="color: var(--neon-cyan); text-shadow: 0 0 5px rgba(0,240,255,0.5);">V4.0</div>
+
+    <!-- ================= HİKÂYE KATMANLARI ================= -->
+
     <div id="p4-ending-modal"
         class="fixed inset-0 z-[200] bg-black/95 flex flex-col items-center justify-center opacity-0 pointer-events-none transition-opacity duration-1000 backdrop-blur-xl">
-        <div class="matrix-modal p-8 md:p-12 rounded-2xl max-w-3xl w-full mx-4 text-center">
-            <h1 class="text-5xl md:text-7xl font-black mb-6 matrix-text tracking-widest font-mono">SIMÜLASYON KIRILDI</h1>
-            <p class="text-xl md:text-2xl text-green-500/80 mb-12 font-mono">
-                "Firewall çöktü. Gerçeği görmenin vakti geldi.<br>
-                Seçimini yap."
+        <div class="matrix-modal p-6 md:p-12 rounded-2xl max-w-3xl w-full mx-4 text-center">
+            <h1 class="text-4xl md:text-7xl font-black mb-6 matrix-text tracking-widest font-mono">SİMÜLASYON KIRILDI</h1>
+            <p class="text-lg md:text-2xl text-green-500/80 mb-10 font-mono">
+                "Firewall çöktü. Gerçeği görmenin vakti geldi.<br>Seçimini yap."
             </p>
-
-            <div class="flex flex-col md:flex-row justify-center gap-8 items-center w-full px-4">
-                <!-- RED PILL -->
+            <div class="flex flex-col md:flex-row justify-center gap-6 md:gap-8 items-center w-full px-4">
                 <button onclick="playRedPillEnding()"
                     class="pill-btn group relative w-full md:w-1/2 p-6 rounded-3xl flex flex-col items-center gap-4 border-2 border-red-900/50 hover:border-red-500 overflow-hidden bg-black/50">
                     <div class="w-24 h-12 rounded-full pill-red mb-2 flex items-center justify-center animate-pulse shadow-[0_0_30px_rgba(255,0,0,0.6)]">
                         <span class="text-white font-bold tracking-widest text-sm">UYAN</span>
                     </div>
                     <h3 class="text-2xl font-black text-red-500">KIRMIZI HAP</h3>
-                    <p class="text-xs text-red-300/80 text-center font-mono">
-                        Sistemi kapat ve gerçekliğe dön.<br>
-                        "Tüm bu hırs ne içindi?"
-                    </p>
+                    <p class="text-xs text-red-300/80 text-center font-mono">Sistemi kapat ve gerçekliğe dön.<br>"Tüm bu hırs ne içindi?"</p>
                 </button>
-
-                <!-- BLUE PILL -->
                 <button onclick="playBluePillEnding()"
                     class="pill-btn group relative w-full md:w-1/2 p-6 rounded-3xl flex flex-col items-center gap-4 border-2 border-blue-900/50 hover:border-blue-500 overflow-hidden bg-black/50">
                     <div class="w-24 h-12 rounded-full pill-blue mb-2 flex items-center justify-center shadow-[0_0_30px_rgba(0,0,255,0.6)]">
                         <span class="text-white font-bold tracking-widest text-sm">GÜÇ</span>
                     </div>
                     <h3 class="text-2xl font-black text-blue-500">MAVİ HAP</h3>
-                    <p class="text-xs text-blue-300/80 text-center font-mono">
-                        Simülasyonun Tanrısı ol.<br>
-                        "Mimar Modu (God Mode)"
-                    </p>
+                    <p class="text-xs text-blue-300/80 text-center font-mono">Simülasyonun Tanrısı ol.<br>"Mimar Modu (God Mode)"</p>
                 </button>
             </div>
         </div>
     </div>
 
-    <!-- CREDITS (RED PILL) SCREEN -->
     <div id="credits-screen" class="fixed inset-0 z-[300] bg-black hidden flex-col items-center justify-center p-4 overflow-hidden">
-        <div id="credits-content" class="credits-container w-full max-w-4xl">
-            <!-- Text injected via JS -->
-        </div>
+        <div id="credits-content" class="credits-container w-full max-w-4xl"></div>
     </div>
 
     <div id="white-flash" class="white-flash-overlay"></div>
     <div id="pitch-black" class="pitch-black-void"></div>
 
-    <!-- DEV CONSOLE WRAPPER (Injected in JS) -->
-
-    <!-- PHASE 3 MULTIVERSE MODAL -->
     <div id="p3-multiverse-modal"
-        class="fixed inset-0 z-[100] bg-black flex flex-col items-center justify-center opacity-0 pointer-events-none transition-opacity duration-1000">
-        <h1 class="text-4xl md:text-6xl font-black text-white mb-2 glitch-text tracking-widest font-display">SYSTEM
-            REBOOT</h1>
-        <p class="text-slate-400 mb-10 font-mono">Select timeline initialization...</p>
-
+        class="fixed inset-0 z-[100] bg-black flex flex-col items-center justify-center opacity-0 pointer-events-none transition-opacity duration-1000 overflow-y-auto py-8">
+        <h1 class="text-3xl md:text-6xl font-black text-white mb-2 glitch-text tracking-widest font-display">SYSTEM REBOOT</h1>
+        <p class="text-slate-400 mb-8 font-mono">Select timeline initialization...</p>
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-6xl w-full px-4">
-            <!-- RED ROT -->
             <button onclick="initPhase3('red_rot')"
                 class="group relative bg-black border-2 border-red-900 hover:border-red-500 p-6 rounded-xl flex flex-col items-center gap-4 transition-all hover:scale-105 overflow-hidden">
                 <div class="absolute inset-0 bg-red-900/10 group-hover:bg-red-900/30 animate-pulse"></div>
                 <div class="text-5xl">🩸</div>
                 <h3 class="text-2xl font-black text-red-500">THE RED ROT</h3>
-                <p class="text-xs text-red-300 text-center font-mono">
-                    HYPER-INFLATION DETECTED.<br>
-                    Prices double every 30s.<br>
-                    Cash rots 1%/sec.
-                </p>
+                <p class="text-xs text-red-300 text-center font-mono">HYPER-INFLATION DETECTED.<br>Bedeller sürekli şişer.<br>Nakit saniyede %1 çürür.</p>
                 <div class="bg-red-900/50 px-3 py-1 rounded text-xs text-white">HARDCORE SURVIVAL</div>
             </button>
-
-            <!-- THE MATRIX -->
             <button onclick="initPhase3('matrix')"
                 class="group relative bg-black border-2 border-green-900 hover:border-green-500 p-6 rounded-xl flex flex-col items-center gap-4 transition-all hover:scale-105 overflow-hidden">
                 <div class="absolute inset-0 bg-green-900/10 group-hover:bg-green-900/30 animate-pulse"></div>
                 <div class="text-5xl">📟</div>
                 <h3 class="text-2xl font-black text-green-500 font-mono">THE MATRIX</h3>
-                <p class="text-xs text-green-300 text-center font-mono">
-                    CRYPTO ANARCHY.<br>
-                    Fiat Banned. Crypto Volatility 500%.<br>
-                    Mouse Hacked (No Clicking).
-                </p>
+                <p class="text-xs text-green-300 text-center font-mono">CRYPTO ANARCHY.<br>Fiat yasak. Kripto oynaklığı x5.<br>Fare hacklendi (tıklama yok).</p>
                 <div class="bg-green-900/50 px-3 py-1 rounded text-xs text-white">PASSIVE ONLY</div>
             </button>
-
-            <!-- THE VOID -->
             <button onclick="initPhase3('void')"
                 class="group relative bg-black border-2 border-slate-700 hover:border-white p-6 rounded-xl flex flex-col items-center gap-4 transition-all hover:scale-105 overflow-hidden">
                 <div class="absolute inset-0 bg-white/5 group-hover:bg-white/10 animate-pulse"></div>
                 <div class="text-5xl opacity-50">👻</div>
-                <h3 class="text-2xl font-black text-slate-300 blur-[1px] group-hover:blur-0 transition-all">THE VOID
-                </h3>
-                <p class="text-xs text-slate-400 text-center font-mono">
-                    ENTROPY RISING.<br>
-                    Assets are deleted randomly.<br>
-                    Pay Data to restore.
-                </p>
+                <h3 class="text-2xl font-black text-slate-300 blur-[1px] group-hover:blur-0 transition-all">THE VOID</h3>
+                <p class="text-xs text-slate-400 text-center font-mono">ENTROPY RISING.<br>Varlıkların rastgele siliniyor.<br>Hiçbir şey kalıcı değil.</p>
                 <div class="bg-slate-800 px-3 py-1 rounded text-xs text-white">CHAOS MODE</div>
             </button>
         </div>
     </div>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            // --- OYUN DEĞİŞKENLERİ ---
-            let YilongBaseWealth = 5000000; // Yilong Ma'nın NAKİT serveti (Dinamik artıyor)
-            let hasWonGame = false;
-
-            // Phase 2 Gacha Items (Black Market)
-            const blackMarketItems = [
-                { id: 'bm_gold_toilet', name: 'Golden Toilet', mult: 2.0, rarity: 'LEGENDARY', color: '#fbbf24' },
-                { id: 'bm_diamond_flush', name: 'Diamond Flush', mult: 1.5, rarity: 'EPIC', color: '#38bdf8' },
-                { id: 'bm_skibidi_crown', name: 'Skibidi Crown', mult: 1.25, rarity: 'RARE', color: '#c084fc' },
-                { id: 'bm_fanum_shield', name: 'Fanum Shield', mult: 1.1, rarity: 'COMMON', color: '#94a3b8' },
-                { id: 'bm_cyber_attack', name: 'Cyber Attack', type: 'sabotage', val: 0.10, rarity: 'EPIC', color: '#ef4444' },
-                { id: 'bm_market_crash', name: 'Market Crash', type: 'sabotage', val: 0.25, rarity: 'LEGENDARY', color: '#b91c1c' }
-            ];
-
-            // Global erişim için window'a ata
-            window.gameState = {
-                phase: 1, // Phase 1 or 2
-                score: 0,
-                totalWealth: 0,
-                clicks: 0,
-                clickPower: 1,
-                multiplier: 1,
-                marketPassiveRate: 0,
-                gameStartTime: Date.now(),
-                slotWins: 0,
-
-                // Black Market
-                blackMarketCost: 100000,
-                blackMarketBuffs: [], // Array of collected item IDs
-
-                // Mechanics
-                clickDebuff: 1, // 1 = Normal, 0.5 = Canceled
-
-                // PHASE 3 VARS
-                p3_universe: null,
-                p3_firewallHealth: 100,
-                p3_entropyTimer: 0,
-                p3_exploitCost: 1000000000000,
-
-                // Yükseltme Seviyeleri
-                lvlPpc: 1,
-                lvlMulti: 0,
-                lvlTax: 0,
-
-                // Yükseltme Maliyetleri
-                costPpc: 15,
-                costMulti: 2500,
-                costTax: 10000
-            };
-
-            // Kolay erişim için yerel değişken referansı
-            let gameState = window.gameState;
-
-            // --- PHASE 3 LOGIC ---
-            const triggerPhase3 = () => {
-                gameState.phase = 3;
-
-                // Hide Game UI
-                document.getElementById('game-world').classList.add('hidden');
-                document.getElementById('message-box').style.opacity = 0;
-                document.getElementById('message-box').style.pointerEvents = 'none';
-
-                // Show BSOD
-                const bsod = document.getElementById('bsod-layer');
-                bsod.classList.remove('hidden');
-                bsod.classList.add('flex');
-
-                // Audio Cut & Phase 3 Setup
-                if (synth) {
-                    synth.triggerRelease();
-                    synth.volume.value = -12; // Lower volume
-                    // Add BitCrusher (Distortion)
-                    const crusher = new Tone.BitCrusher(4).toDestination();
-                    synth.disconnect();
-                    synth.connect(crusher);
-                }
-
-                // BSOD Counter
-                let percent = 0;
-                const interval = setInterval(() => {
-                    percent += Math.floor(Math.random() * 5);
-                    if (percent > 100) percent = 100;
-                    document.getElementById('bsod-percent').textContent = percent;
-                }, 500);
-
-                // 10s -> Blackout
-                setTimeout(() => {
-                    clearInterval(interval);
-                    bsod.classList.add('hidden');
-                    bsod.classList.remove('flex');
-                    document.getElementById('blackout-layer').classList.remove('hidden');
-
-                    // 3s -> Reboot
-                    setTimeout(() => {
-                        // RESET FOR PHASE 3
-                        gameState.score = 1000;
-                        gameState.clicks = 0;
-                        for (let k in assets) {
-                            assets[k].count = 0;
-                            assets[k].price = assets[k].history[0];
-                        }
-                        gameState.lvlPpc = 1; gameState.costPpc = 15;
-                        gameState.lvlMulti = 0; gameState.costMulti = 2500;
-                        gameState.lvlTax = 0; gameState.costTax = 10000;
-                        gameState.clickPower = 1;
-                        gameState.multiplier = 1;
-                        gameState.marketPassiveRate = 0;
-                        recalculateMultipliers();
-
-                        document.getElementById('blackout-layer').classList.add('hidden');
-
-                        // Phase 3 Visuals: Grayscale, High Contrast, Static Noise
-                        const overlay = document.createElement('div');
-                        overlay.className = 'crt-overlay';
-                        // Lightweight static noise via Data URI
-                        overlay.style.backgroundImage = 'url("data:image/svg+xml,%3Csvg viewBox=\'0 0 200 200\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cfilter id=\'noiseFilter\'%3E%3CfeTurbulence type=\'fractalNoise\' baseFrequency=\'0.65\' numOctaves=\'3\' stitchTiles=\'stitch\'/%3E%3C/filter%3E%3Crect width=\'100%25\' height=\'100%25\' filter=\'url(%23noiseFilter)\'/%3E%3C/svg%3E")';
-                        overlay.style.opacity = '0.05';
-                        overlay.style.mixBlendMode = 'overlay';
-                        document.body.appendChild(overlay);
-
-                        document.body.style.background = "#000";
-                        // Grayscale 100% and High Contrast
-                        document.body.style.filter = "grayscale(100%) contrast(150%)";
-                        document.body.style.transition = "filter 2s";
-
-                        // Disable resource-intensive background animations
-                        const scanline = document.querySelector('.scanline-overlay');
-                        if (scanline) scanline.style.display = 'none';
-
-                        // Fade in Multiverse (Blink)
-                        const mvModal = document.getElementById('p3-multiverse-modal');
-                        mvModal.className += " blink-fade-in";
-                        mvModal.style.opacity = 1;
-                        mvModal.style.pointerEvents = 'auto';
-
-                        if (synth) synth.triggerAttackRelease("C1", "4n"); // Reboot sound
-
-                    }, 3000);
-                }, 10000);
-            };
-
-            window.initPhase3 = (universe) => {
-                gameState.p3_universe = universe;
-
-                // Hide Modal
-                document.getElementById('p3-multiverse-modal').style.opacity = 0;
-                document.getElementById('p3-multiverse-modal').style.pointerEvents = 'none';
-
-                // Show Game World
-                document.getElementById('game-world').classList.remove('hidden');
-
-                // Apply Universe Specifics
-                if (universe === 'matrix') {
-                    // Delete Fiat
-                    delete assets['tl'];
-                    delete assets['usd'];
-                    delete assets['eur'];
-                    // Disable Click
-                    gameState.clickPower = 0;
-                    createPopup("MOUSE HACKED", "#00ff00", window.innerWidth / 2, window.innerHeight / 2);
-                } else if (universe === 'void') {
-                    // Start Entropy
-                    createPopup("ENTROPY STARTED", "#ffffff", window.innerWidth / 2, window.innerHeight / 2);
-                } else {
-                    // Red Rot
-                    createPopup("INFLATION STARTED", "#ff0000", window.innerWidth / 2, window.innerHeight / 2);
-                }
-
-                // Start Loop
-                startPhase3Loop();
-                updateUI();
-            };
-
-            // --- PHASE 4 (ENDING) LOGIC ---
-            let p3IntervalId = null;
-
-            window.playRedPillEnding = async () => {
-                const endingModal = document.getElementById('p4-ending-modal');
-                endingModal.style.opacity = 0;
-                endingModal.style.pointerEvents = 'none';
-
-                const creditsScreen = document.getElementById('credits-screen');
-                creditsScreen.classList.remove('hidden');
-                creditsScreen.classList.add('flex');
-
-                // Fade out audio over 5 seconds
-                if (synth && synth.volume) {
-                    synth.volume.rampTo(-60, 5);
-                }
-
-                // Stop any other active sounds or loops implicitly by hiding the world
-                document.getElementById('game-world').classList.add('hidden');
-
-                const playTimeSeconds = Math.floor((Date.now() - gameState.gameStartTime) / 1000);
-                const m = Math.floor(playTimeSeconds / 60);
-                const s = playTimeSeconds % 60;
-                const timeStr = `${m} dakika ${s} saniye`;
-
-                const messages = [
-                    "Sonsuzluk arayışın...",
-                    "Milyarlarca Gyatt...",
-                    "Yilong Ma ile olan bitmek bilmez rekabetin...",
-                    "Hepsi bir yanılsamaydı.",
-                    "Sayılar ekranında parladı ve söndü.",
-                    "Hiçbir gerçek değeri yoktu.",
-                    `Toplam ${formatNumber(gameState.score)} Gyatt biriktirdin.`,
-                    `Farene ${formatNumber(gameState.clicks)} kez tıkladın.`,
-                    `Hayatının ${timeStr}'sini bu ekrana verdin.`,
-                    "Peki elinde ne kaldı?",
-                    "Sadece bir boşluk."
-                ];
-
-                const finalMessage = "Simülasyon bitti. Artık dinlenebilirsin...";
-                const container = document.getElementById('credits-content');
-
-                const sleep = ms => new Promise(r => setTimeout(r, ms));
-
-                // 1. Sıralı, akışkan mesajlar
-                for (let i = 0; i < messages.length; i++) {
-                    const msgEl = document.createElement('div');
-                    msgEl.className = 'credit-msg text-xl md:text-3xl font-mono text-slate-300 tracking-wide w-full';
-                    msgEl.textContent = messages[i];
-                    container.appendChild(msgEl);
-
-                    // Fade out & Collapse timeline (CSS animasyonu 6s sürüyor. 5s sonra çökmeye başlasın)
-                    setTimeout(() => {
-                        msgEl.classList.add('collapse');
-                    }, 5000);
-
-                    // Bir sonraki yazıyı eklemeden önce bekle
-                    await sleep(3000);
-                }
-
-                // Son yazının kaybolması için biraz daha bekle (DOM'u temizlemek için)
-                await sleep(4000);
-                container.innerHTML = ''; // Ekranı tamamen temizle
-
-                // 2. Merkezdeki Final Mesajı
-                const finalEl = document.createElement('div');
-                finalEl.className = 'credit-final-msg text-3xl md:text-5xl font-mono text-white tracking-widest font-black';
-                finalEl.textContent = finalMessage;
-                creditsScreen.appendChild(finalEl);
-
-                // CSS final-msg-anim 10s sürüyor, 8. saniyede flash başlasın
-                await sleep(8000);
-
-                // 3. Beyaz Flaş Patlaması
-                const flash = document.getElementById('white-flash');
-                flash.style.opacity = 1;
-
-                // Flaş en parlak anındayken (yaklaşık 1s sonra) ekranı pitch black'e alıyoruz
-                // ve flaşı yavaşça kapatıyoruz
-                await sleep(1000);
-                const voidScreen = document.getElementById('pitch-black');
-                voidScreen.classList.add('active');
-                voidScreen.style.opacity = 1;
-
-                await sleep(100);
-                flash.style.opacity = 0;
-
-                // 4. Sonsuz Siyahlık (Oyun tamamen kilitlendi)
-                // Her şey pitch-black div'inin arkasında kalacak, cursor:none yapıldı CSS'de.
-            };
-
-            window.playBluePillEnding = () => {
-                const endingModal = document.getElementById('p4-ending-modal');
-                endingModal.style.opacity = 0;
-                endingModal.style.pointerEvents = 'none';
-
-                gameState.phase = 4;
-
-                // Return to normal-ish visuals, but keep it divine/hacked
-                document.body.style.filter = "contrast(120%) hue-rotate(180deg)";
-                document.body.style.background = "linear-gradient(135deg, #001133, #000000)";
-
-                // Ensure the Exploit button is hidden if it exists
-                const exploitBtn = document.getElementById('p3-exploit-btn');
-                if (exploitBtn) exploitBtn.remove();
-
-                if (synth) synth.triggerAttackRelease(["C5", "E5", "G5", "C6"], "1n");
-
-                renderDevConsole();
-
-                // Start the main game loop again (or keep it running)
-                // We'll use the volatility loop to keep the game alive
-                // We don't need p3 specific logic anymore
-            };
-
-            const renderDevConsole = () => {
-                const leftPanel = document.querySelector('.lg\\:flex-col.w-1\\/4');
-                if (!leftPanel) return;
-
-                const devPanel = document.createElement('div');
-                devPanel.className = 'dev-console-panel p-5 rounded-3xl mt-4 relative overflow-hidden group border-t-4';
-                devPanel.style.borderTopColor = 'var(--neon-gold)';
-
-                devPanel.innerHTML = `
-                    <div class="absolute inset-0 bg-blue-500/5 group-hover:bg-blue-500/10 transition-colors"></div>
-                    <h2 class="text-xl font-black mb-4 flex items-center gap-2 relative z-10 font-display" style="color: var(--neon-gold); text-shadow: 0 0 10px rgba(255,207,0,0.5);">
-                        👑 MİMAR MODU
-                    </h2>
-
-                    <div class="space-y-3 relative z-10">
-                        <div class="bg-black/50 p-2 rounded-lg border border-white/10">
-                            <span class="text-[10px] text-slate-400 block mb-1">PİYASA KONTROLÜ</span>
-                            <div class="flex gap-2">
-                                <button id="btn-pump-all" class="flex-1 bg-green-600/30 hover:bg-green-500/50 text-green-400 border border-green-500/50 rounded py-2 font-bold text-xs transition-all active:scale-95">PUMP ALL (x10)</button>
-                                <button id="btn-crash-all" class="flex-1 bg-red-600/30 hover:bg-red-500/50 text-red-400 border border-red-500/50 rounded py-2 font-bold text-xs transition-all active:scale-95">CRASH ALL (/10)</button>
-                            </div>
-                        </div>
-
-                        <div class="bg-black/50 p-2 rounded-lg border border-white/10">
-                            <span class="text-[10px] text-slate-400 block mb-1">YILONG KONTROLÜ</span>
-                            <div class="flex gap-2">
-                                <button id="btn-steal-yilong" class="flex-1 bg-purple-600/30 hover:bg-purple-500/50 text-purple-400 border border-purple-500/50 rounded py-2 font-bold text-xs transition-all active:scale-95">STEAL 50%</button>
-                                <button id="btn-donate-yilong" class="flex-1 bg-blue-600/30 hover:bg-blue-500/50 text-blue-400 border border-blue-500/50 rounded py-2 font-bold text-xs transition-all active:scale-95">DONATE 1B</button>
-                            </div>
-                        </div>
-
-                        <div class="bg-black/50 p-2 rounded-lg border border-white/10">
-                            <span class="text-[10px] text-slate-400 block mb-1">HİLELER</span>
-                            <button id="btn-infinite-rizz" class="w-full bg-yellow-600/30 hover:bg-yellow-500/50 text-yellow-400 border border-yellow-500/50 rounded py-2 font-bold text-xs transition-all active:scale-95 shadow-[0_0_10px_rgba(255,207,0,0.2)]">SONSUZ RIZZ (1M Tık Gücü)</button>
-                        </div>
-                    </div>
-                `;
-
-                leftPanel.appendChild(devPanel);
-
-                // Bind actions
-                document.getElementById('btn-pump-all').addEventListener('click', () => {
-                    for(let k in assets) assets[k].price *= 10;
-                    createPopup("PUMP IT! 🚀", "#4ade80", 150, 200);
-                    if(synth) synth.triggerAttackRelease("C6", "16n");
-                    updateUI();
-                });
-
-                document.getElementById('btn-crash-all').addEventListener('click', () => {
-                    for(let k in assets) {
-                        assets[k].price /= 10;
-                        if(assets[k].price < 0.01) assets[k].price = 0.01;
-                    }
-                    createPopup("CRASH! 📉", "#ef4444", 150, 200);
-                    if(sellSynth) sellSynth.triggerAttackRelease("C2", "8n");
-                    updateUI();
-                });
-
-                document.getElementById('btn-steal-yilong').addEventListener('click', () => {
-                    const stolen = YilongBaseWealth * 0.5;
-                    YilongBaseWealth -= stolen;
-                    gameState.score += stolen;
-                    createPopup(`STOLEN +${formatNumber(stolen)}`, "#c084fc", 150, 300);
-                    if(synth) synth.triggerAttackRelease("A5", "16n");
-                    updateUI();
-                });
-
-                document.getElementById('btn-donate-yilong').addEventListener('click', () => {
-                    const amount = 1000000000;
-                    if(gameState.score >= amount) {
-                        gameState.score -= amount;
-                        YilongBaseWealth += amount;
-                        createPopup("CHARITY -1B", "#60a5fa", 150, 300);
-                        if(synth) synth.triggerAttackRelease("E4", "16n");
-                        updateUI();
-                    } else {
-                        createPopup("NOT ENOUGH GYATT", "#ef4444", 150, 300);
-                    }
-                });
-
-                document.getElementById('btn-infinite-rizz').addEventListener('click', () => {
-                    gameState.clickPower = 1000000;
-                    createPopup("GOD MODE ON", "#facc15", window.innerWidth/2, window.innerHeight/2);
-                    if(synth) synth.triggerAttackRelease(["C4", "E4", "G4", "C5"], "2n");
-                    document.getElementById('btn-infinite-rizz').disabled = true;
-                    document.getElementById('btn-infinite-rizz').classList.add('opacity-50', 'grayscale');
-                });
-            };
-
-            window.triggerEndingSequence = () => {
-                // Pause the game loop for Phase 3
-                if (p3IntervalId) clearInterval(p3IntervalId);
-
-                // Show Phase 4 Modal
-                const endingModal = document.getElementById('p4-ending-modal');
-                endingModal.style.opacity = 1;
-                endingModal.style.pointerEvents = 'auto';
-
-                // Glitch the screen text one last time
-                document.body.style.filter = "invert(1) grayscale(100%)";
-                setTimeout(() => {
-                    document.body.style.filter = "grayscale(100%) contrast(150%)";
-                }, 500);
-
-                if (synth) synth.triggerAttackRelease(["C2", "C3", "C4"], "1n");
-            };
-
-            const startPhase3Loop = () => {
-                p3IntervalId = setInterval(() => {
-                    // Firewall Healing
-                    if (gameState.p3_firewallHealth < 100) {
-                        gameState.p3_firewallHealth += 0.5;
-                        if (gameState.p3_firewallHealth > 100) gameState.p3_firewallHealth = 100;
-                    }
-
-                    // Universe Mechanics
-                    if (gameState.p3_universe === 'red_rot') {
-                        // Rot Cash 1%
-                        gameState.score *= 0.99;
-                        // Inflation: Upgrade Costs & Exploit Cost
-                        const factor = 1.023;
-                        gameState.costPpc = Math.max(gameState.costPpc + 1, Math.floor(gameState.costPpc * factor));
-                        gameState.costMulti = Math.max(gameState.costMulti + 1, Math.floor(gameState.costMulti * factor));
-                        gameState.costTax = Math.max(gameState.costTax + 1, Math.floor(gameState.costTax * factor));
-                        gameState.p3_exploitCost *= 1.005;
-                    } else if (gameState.p3_universe === 'matrix') {
-                        // High Volatility is handled in volatility loop.
-                        // Here we can add passive income buff?
-                    } else if (gameState.p3_universe === 'void') {
-                        // Entropy: Delete asset randomly
-                        if (Math.random() < 0.1) { // 10% chance per second
-                            const keys = Object.keys(assets);
-                            if (keys.length > 0) {
-                                const target = keys[Math.floor(Math.random() * keys.length)];
-                                if (assets[target].count > 0) {
-                                    assets[target].count = Math.floor(assets[target].count * 0.9); // Lose 10%
-                                    createPopup(`ENTROPY: ${assets[target].name} LOST`, "#ffffff", 100, 100);
-                                }
-                            }
-                        }
-                    }
-
-                    updateUI();
-                }, 1000);
-            };
-
-            // Elementler
-            const els = {
-                score: document.getElementById('score'),
-                wealth: document.getElementById('total-wealth'),
-                yilongWealth: document.getElementById('realtime-yilong-wealth'),
-                yilongWealthDisplaySmall: document.getElementById('yilong-ma-servet-display'),
-                wealthProgress: document.getElementById('wealth-progress'),
-                dynamicTargetText: document.getElementById('dynamic-target'),
-                yilongAvatar: document.getElementById('yilong-avatar'),
-                skibidi: document.getElementById('skibidi-toilet'),
-                popupCont: document.getElementById('popup-container'),
-                floaterCont: document.getElementById('floater-container'),
-                msgBox: document.getElementById('message-box'),
-                msgContent: document.getElementById('message-content-box'),
-                msgText: document.getElementById('message-text'),
-                msgClose: document.getElementById('message-close'),
-
-                // İstatistikler
-                statClicks: document.getElementById('stat-clicks'),
-                statSlotWin: document.getElementById('stat-slot-win'),
-                statTime: document.getElementById('stat-time'),
-
-                // Yükseltme Butonları & Textler
-                btnPpc: document.getElementById('upgrade-ppc'),
-                btnMulti: document.getElementById('upgrade-multi'),
-                btnTax: document.getElementById('upgrade-tax'),
-
-                txtLvlPpc: document.getElementById('lvl-ppc'),
-                txtCostPpc: document.getElementById('cost-ppc'),
-                txtLvlMulti: document.getElementById('lvl-multi'),
-                txtCostMulti: document.getElementById('cost-multi'),
-                txtLvlTax: document.getElementById('lvl-tax'),
-                txtCostTax: document.getElementById('cost-tax'),
-
-                // Slot
-                spinBtn: document.getElementById('spin-btn'),
-                spinAllInBtn: document.getElementById('spin-all-in-btn'),
-                slotCost: document.getElementById('slot-cost'),
-                slotCostContainer: document.getElementById('slot-cost-container'),
-                slotBetInputContainer: document.getElementById('slot-bet-input-container'),
-                slotBetInput: document.getElementById('slot-bet-input'),
-                slotStatus: document.getElementById('slot-status'),
-                reels: [
-                    document.getElementById('reel-inner-1'),
-                    document.getElementById('reel-inner-2'),
-                    document.getElementById('reel-inner-3')
-                ],
-                // Mobile Slot
-                mSpinBtn: document.getElementById('m-spin-btn'),
-                mSpinAllInBtn: document.getElementById('m-spin-all-in-btn'),
-                mSlotCost: document.getElementById('m-slot-cost'),
-                mSlotStatus: document.getElementById('m-slot-status'),
-                mReels: [
-                    document.getElementById('m-reel-inner-1'),
-                    document.getElementById('m-reel-inner-2'),
-                    document.getElementById('m-reel-inner-3')
-                ]
-            };
-
-            // Varlıklar - TİPLERE AYRILDI
-            // OPTIMIZATION: Reduced initial history array size from 20 to 10
-            let assets = {
-                // FIAT (Para Birimleri)
-                'tl': { name: "TL", type: "fiat", color: "#f472b6", price: 1.0, count: 0, history: Array(10).fill(1.0) },
-                'usd': { name: "USD", type: "fiat", color: "#4ade80", price: 35.0, count: 0, history: Array(10).fill(35.0) },
-                'eur': { name: "EUR", type: "fiat", color: "#fb923c", price: 38.0, count: 0, history: Array(10).fill(38.0) },
-
-                // TECH (Teknoloji Hisseleri)
-                'nvda': { name: "NVDA", type: "tech", color: "#76b900", price: 130.0, count: 0, history: Array(10).fill(130.0) },
-                'googl': { name: "GOOGL", type: "tech", color: "#ea4335", price: 175.0, count: 0, history: Array(10).fill(175.0) },
-                'aapl': { name: "AAPL", type: "tech", color: "#a3a3a3", price: 220.0, count: 0, history: Array(10).fill(220.0) },
-                'tsla': { name: "TSLA", type: "tech", color: "#e11d48", price: 240.0, count: 0, history: Array(10).fill(240.0) },
-                'msft': { name: "MSFT", type: "tech", color: "#0ea5e9", price: 420.0, count: 0, history: Array(10).fill(420.0) },
-
-                // CRYPTO & METALS
-                'btc': { name: "BTC", type: "crypto", color: "#ef4444", price: 65000.0, count: 0, history: Array(10).fill(65000.0) },
-                'aura': { name: "AURA", type: "crypto", color: "#c084fc", price: 500.0, count: 0, history: Array(10).fill(500.0) },
-                'xau': { name: "Altın", type: "metal", color: "#facc15", price: 2500.0, count: 0, history: Array(10).fill(2500.0) },
-            };
-
-            // Ses Motoru
-            let synth, sellSynth, slotSynth;
-            const initAudio = async () => {
-                if (Tone.context.state !== 'running') await Tone.start();
-                if (!synth) {
-                    // OPTIMIZATION: Limit polyphony to 4 voices
-                    synth = new Tone.PolySynth(Tone.Synth, {
-                        maxPolyphony: 4,
-                        oscillator: { type: "sine" },
-                        envelope: { attack: 0.001, decay: 0.06, sustain: 0, release: 0.04 },
-                        volume: -18
-                    }).toDestination();
-
-                    sellSynth = new Tone.MembraneSynth().toDestination();
-
-                    slotSynth = new Tone.Synth({
-                        oscillator: { type: "square" },
-                        envelope: { attack: 0.01, decay: 0.2, sustain: 0, release: 0.2 }
-                    }).toDestination();
-                }
-            };
-
-            // Formatlama
-            const formatNumber = (num) => {
-                if (num < 1_000) return Math.floor(num).toString();
-                if (num < 1_000_000) return (num / 1_000).toFixed(2) + "K";
-                if (num < 1_000_000_000) return (num / 1_000_000).toFixed(2) + "M";
-                if (num < 1_000_000_000_000) return (num / 1_000_000_000).toFixed(2) + "B";
-                return (num / 1_000_000_000_000).toFixed(2) + "T";
-            };
-
-            // Mesaj Kutusu Göster
-            const showMessage = (htmlContent) => {
-                els.msgText.innerHTML = htmlContent;
-                els.msgBox.style.opacity = 1;
-                els.msgBox.style.pointerEvents = 'auto';
-                els.msgContent.style.transform = 'scale(1)';
-            };
-
-            els.msgClose.addEventListener('click', () => {
-                els.msgBox.style.opacity = 0;
-                els.msgBox.style.pointerEvents = 'none';
-                els.msgContent.style.transform = 'scale(0.9)';
-            });
-
-            // --- GÖRSEL EFEKTLER ---
-            const createPopup = (text, color = '#fff', x, y) => {
-                const popup = document.createElement('div');
-                popup.className = 'click-popup text-2xl md:text-4xl';
-                popup.textContent = text;
-                popup.style.color = color;
-
-                const finalX = x || (Math.random() * 80 + 10) + "%";
-                const finalY = y || (Math.random() * 40 + 30) + "%";
-
-                if (typeof x === 'number') {
-                    popup.style.left = `${x}px`;
-                    popup.style.top = `${y}px`;
-                } else {
-                    popup.style.left = finalX;
-                    popup.style.top = finalY;
-                }
-
-                popup.style.setProperty('--rot', `${Math.random() * 40 - 20}deg`);
-                els.popupCont.appendChild(popup);
-                setTimeout(() => popup.remove(), 800);
-            };
-
-            const createParticles = (x, y, count = 3, colorSet = ['#8b5cf6', '#fff']) => {
-                for (let i = 0; i < count; i++) {
-                    const particle = document.createElement('div');
-                    particle.classList.add('particle');
-
-                    const size = Math.random() * 8 + 4;
-                    particle.style.width = `${size}px`;
-                    particle.style.height = `${size}px`;
-                    particle.style.backgroundColor = colorSet[Math.floor(Math.random() * colorSet.length)];
-
-                    particle.style.left = `${x}px`;
-                    particle.style.top = `${y}px`;
-
-                    const angle = Math.random() * Math.PI * 2;
-                    const velocity = Math.random() * 100 + 50;
-
-                    particle.style.setProperty('--tx', `${Math.cos(angle) * velocity}px`);
-                    particle.style.setProperty('--ty', `${Math.sin(angle) * velocity}px`);
-
-                    document.body.appendChild(particle);
-                    setTimeout(() => particle.remove(), 800);
-                }
-            };
-
-            const createFloater = () => {
-                const floaters = ['🗿', '💜', '🤓', '🍑', '✨', '🔥', '👽', '👻', '👑', '💯', '💩', '💸', '🚽', '🧠'];
-                const el = document.createElement('div');
-                el.className = 'floater';
-                el.textContent = floaters[Math.floor(Math.random() * floaters.length)];
-                el.style.left = `${Math.random() * 100}vw`;
-                el.style.animationDuration = `${Math.random() * 15 + 10}s`;
-                els.floaterCont.appendChild(el);
-                setTimeout(() => el.remove(), 25000);
-            };
-
-            // --- OYUN MANTIĞI ---
-
-            const handleClick = (e) => {
-                initAudio();
-
-                let isCrit = Math.random() < 0.05;
-                let gain = gameState.clickPower * gameState.multiplier * gameState.clickDebuff;
-                if (isCrit) gain *= 3;
-
-                gameState.score += gain;
-                gameState.clicks++;
-
-                if (synth) {
-                    const notes = ["C2", "D2", "E2", "F2", "G2"];
-                    synth.triggerAttackRelease(notes[Math.floor(Math.random() * notes.length)], "64n");
-                }
-
-                const rect = els.skibidi.getBoundingClientRect();
-                const x = e ? e.clientX : (rect.left + rect.width / 2);
-                const y = e ? e.clientY : (rect.top + rect.height / 2);
-
-                if (isCrit) {
-                    createPopup("CRITICAL GYATT!", "#facc15", x, y);
-                    createParticles(x, y, 3, ['#facc15', '#f87171']);
-                } else {
-                    createPopup(`+${formatNumber(gain)}`, "#c084fc", x, y);
-                    createParticles(x, y, 1);
-                }
-
-                els.skibidi.style.transform = `scale(0.95) rotate(${Math.random() * 10 - 5}deg)`;
-                setTimeout(() => els.skibidi.style.transform = 'scale(1) rotate(0deg)', 80);
-
-                updateUI();
-            };
-
-            els.skibidi.addEventListener('pointerdown', handleClick);
-
-            // --- YÜKSELTMELER (LOGIC) ---
-            const buyUpgrade = (costKey, lvlKey, type) => {
-                if (gameState.score >= gameState[costKey]) {
-                    gameState.score -= gameState[costKey];
-                    gameState[lvlKey]++;
-                    gameState[costKey] = Math.floor(gameState[costKey] * 1.6);
-
-                    if (type === 'ppc') gameState.clickPower += 1;
-                    // Auto Clicker Logic Removed
-                    if (type === 'multi') gameState.multiplier *= 1.5;
-                    if (type === 'tax') gameState.marketPassiveRate += 0.005;
-
-                    if (synth) synth.triggerAttackRelease("C6", "16n");
-                    createPopup("LEVEL UP!", "#4ade80", window.innerWidth / 2, window.innerHeight / 2);
-
-                    updateUI();
-                }
-            };
-
-            els.btnPpc.addEventListener('click', () => buyUpgrade('costPpc', 'lvlPpc', 'ppc'));
-            els.btnMulti.addEventListener('click', () => buyUpgrade('costMulti', 'lvlMulti', 'multi'));
-            els.btnTax.addEventListener('click', () => buyUpgrade('costTax', 'lvlTax', 'tax'));
-
-            // --- OTO TIKLAYICI REMOVED ---
-            setInterval(() => {
-                // Removed Auto Clicker Gain Logic
-
-                if (gameState.marketPassiveRate > 0) {
-                    let marketValue = 0;
-                    for (let key in assets) {
-                        marketValue += assets[key].count * assets[key].price;
-                    }
-                    if (marketValue > 0) {
-                        gameState.score += (marketValue * gameState.marketPassiveRate) / 10;
-                    }
-                }
-
-                updateUI();
-            }, 100);
-
-            // --- PHASE 2 TRANSITION LOGIC ---
-            const triggerPhase2 = () => {
-                gameState.phase = 2;
-
-                // 1. HARD RESET (Assets & Basic Upgrades)
-                gameState.score = 10000; // Small fighting chance
-                gameState.clicks = 0;
-                gameState.clickPower = 10; // Start slightly stronger
-                gameState.multiplier = 1;
-                gameState.marketPassiveRate = 0;
-                gameState.slotWins = 0;
-
-                // Reset Upgrades
-                gameState.lvlPpc = 1; gameState.costPpc = 15;
-                gameState.lvlMulti = 0; gameState.costMulti = 2500;
-                gameState.lvlTax = 0; gameState.costTax = 10000;
-
-                // Reset Assets
-                for (let k in assets) {
-                    assets[k].count = 0;
-                    assets[k].price = assets[k].history[0]; // Reset price roughly to base
-                }
-
-                // Apply Black Market Buffs (Permanent Multipliers)
-                recalculateMultipliers();
-
-                // 2. YILONG EVOLUTION -> SIGMA STATUE
-                YilongBaseWealth = 50000000; // New Base: 50M
-                els.yilongAvatar.innerHTML = '🗿'; // Sigma Statue
-                els.yilongAvatar.parentElement.classList.remove('bg-yellow-500/20', 'border-yellow-500/30');
-                els.yilongAvatar.parentElement.classList.add('bg-stone-500/20', 'border-stone-500/30');
-
-                // Change UI Colors to reflect Phase 2
-                document.body.style.background = "linear-gradient(-45deg, #2a0a10, #450a1f, #1a0505, #000000)";
-
-                // Audio Atmosphere
-                if (synth) synth.triggerAttackRelease("A1", "2n");
-
-                // 3. SHOW TRANSITION MESSAGE (DEVLET VERGİSİ / TAX EVENT)
-                els.msgContent.className += " border-red-600 shadow-[0_0_50px_red] animate-bounce-short";
-                showMessage(`
-                    <h2 class="text-5xl font-black text-red-600 mb-6 tracking-tighter animate-pulse">⚠️ DEVLET VERGİSİ ⚠️</h2>
-                    <div class="text-8xl mb-6 animate-bounce">🏛️</div>
-                    <p class="text-xl text-slate-300 mb-6 italic border-l-4 border-red-500 pl-4 py-2 bg-red-900/20">
-                        "Sen kiminle dans ettiğini bilmiyorsun..." <br>
-                        <span class="text-sm not-italic text-stone-400 mt-2 block">- Sigma Yilong</span>
-                    </p>
-                    <p class="text-sm text-slate-400 mb-8">
-                        Devlet ve Yilong işbirliği yaptı. Tüm varlıklarına el konuldu.<br>
-                        Geriye sadece <strong>10,000 Gyatt</strong> ve <strong>Kara Borsa</strong> erişimi kaldı.
-                    </p>
-                    <div class="bg-black/50 p-4 rounded-xl border border-red-500/30">
-                         <span class="text-red-400 font-mono text-xs">YENİ HEDEF:</span>
-                         <span class="text-2xl font-black text-white block">500.00M</span>
-                    </div>
-                `);
-
-                // Update UI visibility for Phase 2 elements
-                renderBlackMarketUI();
-
-                // Enable Phase 2 Slot Betting
-                els.slotCostContainer.classList.add('hidden');
-                els.slotBetInputContainer.classList.remove('hidden');
-                els.slotBetInputContainer.classList.add('flex');
-
-                updateUI();
-            };
-
-            const recalculateMultipliers = () => {
-                let bmMult = 1;
-                gameState.blackMarketBuffs.forEach(buffId => {
-                    const item = blackMarketItems.find(i => i.id === buffId);
-                    if (item) bmMult *= item.mult;
-                });
-                gameState.multiplier *= bmMult;
-            };
-
-            const renderBlackMarketUI = () => {
-                let bmContainer = document.getElementById('black-market-panel');
-                if (!bmContainer) {
-                    const upgradesCol = document.getElementById('right-panel');
-                    bmContainer = document.createElement('div');
-                    bmContainer.id = 'black-market-panel';
-                    bmContainer.className = 'glass-panel rounded-3xl p-5 border-t-4 border-red-600 mt-4';
-                    bmContainer.innerHTML = `
-                        <h2 class="text-xl font-bold mb-4 flex items-center gap-2 text-red-500">
-                            <span class="bg-red-500/20 p-2 rounded-lg text-red-500">🏴‍☠️</span>
-                            Kara Borsa
-                        </h2>
-                        <div class="text-xs text-slate-400 mb-3">
-                            Kalıcı güçlendirmeler satın al. Resetten etkilenmez.
-                        </div>
-                        <button id="btn-black-market-buy" class="w-full bg-gradient-to-r from-red-900 to-slate-900 hover:from-red-800 hover:to-slate-800 border border-red-500/30 text-white font-bold py-3 rounded-xl shadow-lg relative overflow-hidden group">
-                            <span class="relative z-10 flex flex-col items-center">
-                                <span>GİZLİ KASA AÇ</span>
-                                <span class="text-xs font-mono text-red-300" id="bm-cost-display">100.00K</span>
-                            </span>
-                            <div class="absolute inset-0 bg-red-500/10 transform scale-x-0 group-hover:scale-x-100 transition-transform origin-left"></div>
-                        </button>
-                        <div id="bm-inventory" class="grid grid-cols-4 gap-2 mt-4"></div>
-                    `;
-                    upgradesCol.appendChild(bmContainer);
-                    document.getElementById('btn-black-market-buy').addEventListener('click', buyBlackMarketItem);
-                }
-                updateBlackMarketUI();
-            };
-
-            const updateBlackMarketUI = () => {
-                const btn = document.getElementById('btn-black-market-buy');
-                const costDisplay = document.getElementById('bm-cost-display');
-                if (!btn) return;
-
-                costDisplay.textContent = formatNumber(gameState.blackMarketCost);
-
-                if (gameState.score < gameState.blackMarketCost) {
-                    btn.disabled = true;
-                    btn.classList.add('opacity-50', 'grayscale');
-                } else {
-                    btn.disabled = false;
-                    btn.classList.remove('opacity-50', 'grayscale');
-                }
-
-                const inv = document.getElementById('bm-inventory');
-                inv.innerHTML = '';
-                gameState.blackMarketBuffs.forEach(buffId => {
-                    const item = blackMarketItems.find(i => i.id === buffId);
-                    if (item) {
-                        const el = document.createElement('div');
-                        el.className = 'aspect-square rounded-lg bg-slate-800 border flex items-center justify-center text-xl relative group cursor-help';
-                        el.style.borderColor = item.color;
-                        el.textContent = '📦';
-                        el.innerHTML = `
-                            <div class="absolute inset-0 flex items-center justify-center text-2xl">🎁</div>
-                            <div class="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 w-32 bg-black/90 border border-white/10 p-2 rounded text-[10px] text-center pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity z-50">
-                                <strong style="color:${item.color}">${item.name}</strong><br>
-                                x${item.mult} Mult
-                            </div>
-                        `;
-                        inv.appendChild(el);
-                    }
-                });
-            };
-
-            const buyBlackMarketItem = () => {
-                if (gameState.score >= gameState.blackMarketCost) {
-                    gameState.score -= gameState.blackMarketCost;
-
-                    // Update Cost: 10x
-                    gameState.blackMarketCost = gameState.blackMarketCost * 10;
-                    updateUI();
-
-                    openGachaModal();
-                }
-            };
-
-            const openGachaModal = () => {
-                const modal = document.getElementById('gacha-modal');
-                const container = document.getElementById('gacha-cards');
-
-                modal.style.opacity = 1;
-                modal.style.pointerEvents = 'auto';
-                container.innerHTML = '';
-
-                let hasPicked = false;
-
-                // Create 4 Cards
-                for (let i = 0; i < 4; i++) {
-                    const card = document.createElement('div');
-                    card.className = "aspect-[3/4] bg-gradient-to-br from-slate-800 to-black border-2 border-red-900/50 rounded-xl cursor-pointer transform hover:scale-105 transition-all duration-300 relative overflow-hidden group shadow-[0_0_30px_rgba(220,38,38,0.2)]";
-                    card.innerHTML = `
-                        <div class="absolute inset-0 flex items-center justify-center text-6xl opacity-20 group-hover:opacity-100 transition-opacity">❓</div>
-                        <div class="absolute inset-0 bg-red-500/10 opacity-0 group-hover:opacity-20 transition-opacity"></div>
-                    `;
-
-                    card.addEventListener('click', () => {
-                        if (hasPicked) return;
-                        hasPicked = true;
-
-                        // Select Item
-                        const roll = Math.random();
-                        let item;
-                        if (roll < 0.05) {
-                            // Legendary (0 or 5)
-                            item = Math.random() < 0.5 ? blackMarketItems[0] : blackMarketItems[5];
-                        }
-                        else if (roll < 0.20) {
-                            // Epic (1 or 4)
-                            item = Math.random() < 0.5 ? blackMarketItems[1] : blackMarketItems[4];
-                        }
-                        else if (roll < 0.50) item = blackMarketItems[2]; // Rare
-                        else item = blackMarketItems[3]; // Common
-
-                        // Reveal Animation for Selected Card
-                        card.style.transform = "rotateY(180deg)";
-                        card.style.transition = "transform 0.6s";
-
-                        setTimeout(() => {
-                            card.style.transform = "rotateY(0deg)";
-                            card.className = "aspect-[3/4] bg-slate-900 border-4 rounded-xl flex flex-col items-center justify-center gap-4 shadow-[0_0_50px_currentColor] scale-110 z-50";
-                            card.style.borderColor = item.color;
-                            card.style.color = item.color;
-                            card.innerHTML = `
-                                <div class="text-6xl animate-bounce">🎁</div>
-                                <div class="text-center px-2">
-                                    <h3 class="font-bold text-xl leading-tight">${item.name}</h3>
-                                    <p class="text-xs text-white mt-2 font-mono">${item.type === 'sabotage' ? 'Yilong -%' + (item.val * 100) : 'x' + item.mult + ' Mult'}</p>
-                                    <p class="text-[10px] mt-1 opacity-70">${item.rarity}</p>
-                                </div>
-                            `;
-
-                            if (synth) synth.triggerAttackRelease(["C4", "G4", "C5"], "4n");
-
-                            // Process Reward
-                            if (item.type === 'sabotage') {
-                                const reduction = YilongBaseWealth * item.val;
-                                YilongBaseWealth -= reduction;
-                                createPopup(`Yilong: -${formatNumber(reduction)}`, "#ef4444", 90, 10);
-                                // Visual Glitch
-                                document.body.style.filter = "invert(1)";
-                                setTimeout(() => document.body.style.filter = "none", 100);
-                            } else {
-                                gameState.blackMarketBuffs.push(item.id);
-                                recalculateMultipliers();
-                            }
-                            updateUI();
-
-                            // Close Modal after delay
-                            setTimeout(() => {
-                                modal.style.opacity = 0;
-                                modal.style.pointerEvents = 'none';
-                            }, 2500);
-
-                        }, 300);
-
-                        // Fade out other cards
-                        Array.from(container.children).forEach(c => {
-                            if (c !== card) c.style.opacity = 0.2;
-                        });
-                    });
-
-                    container.appendChild(card);
-                }
-            };
-
-            // --- SLOT MAKİNESİ ---
-            const slotSymbols = ['🍒', '🍋', '🍇', '💎', '7️⃣', '🚽', '6️⃣', '8️⃣', '9️⃣'];
-            const slotWeights = [25, 20, 15, 10, 8, 2, 8, 6, 6];
-            const slotWeightsP2 = [20, 15, 12, 10, 12, 5, 10, 8, 8]; // Phase 2 Boosted Odds
-            let isSpinning = false;
-            let slotCost = 500; // Phase 1 Fixed Cost
-
-            const getRandomSymbol = () => {
-                const weights = gameState.phase === 2 ? slotWeightsP2 : slotWeights;
-                const rand = Math.random() * 100;
-                let sum = 0;
-                for (let i = 0; i < weights.length; i++) {
-                    sum += weights[i];
-                    if (rand <= sum) return slotSymbols[i];
-                }
-                return slotSymbols[0];
-            };
-
-            const spinSlots = async (isMobile = false, overrideBet = -1) => {
-                let currentBet = slotCost;
-
-                // Phase 2+: Use custom bet or override
-                if (overrideBet > 0) {
-                    currentBet = overrideBet;
-                } else if (gameState.phase >= 2) {
-                    const val = parseInt(els.slotBetInput.value);
-                    if (isNaN(val) || val < 100) {
-                        els.slotStatus.textContent = "Min Bet: 100";
-                        return;
-                    }
-                    if (val > gameState.score) {
-                        els.slotStatus.textContent = "Yetersiz Bakiye";
-                        return;
-                    }
-                    currentBet = val;
-                } else {
-                    // Phase 1 check
-                    if (gameState.score < slotCost) return;
-                }
-
-                if (isSpinning) return;
-                if (gameState.score < currentBet) return; // Safety check
-
-                // Initialize audio to prevent freeze
-                await initAudio();
-
-                gameState.score -= currentBet;
-                isSpinning = true;
-
-                const btn = isMobile ? els.mSpinBtn : els.spinBtn;
-                const allInBtn = isMobile ? els.mSpinAllInBtn : els.spinAllInBtn;
-                const status = isMobile ? els.mSlotStatus : els.slotStatus;
-                const currentReels = isMobile ? els.mReels : els.reels;
-
-                btn.disabled = true;
-                btn.classList.add('opacity-50');
-                if (allInBtn) {
-                    allInBtn.disabled = true;
-                    allInBtn.classList.add('opacity-50');
-                }
-                status.textContent = "Çeviriliyor...";
-                status.className = "text-yellow-200 animate-pulse";
-
-                let spins = 0;
-                const spinInterval = setInterval(() => {
-                    currentReels.forEach(reel => {
-                        // OPTIMIZATION: Use textContent instead of innerHTML to reduce layout thrashing
-                        // We assume the .slot-symbol div already exists inside the reel
-                        const symbolDiv = reel.querySelector('.slot-symbol');
-                        const randomSymbol = slotSymbols[Math.floor(Math.random() * slotSymbols.length)];
-
-                        if (symbolDiv) {
-                            symbolDiv.textContent = randomSymbol;
-                        } else {
-                            // Fallback if structure is missing
-                            reel.innerHTML = `<div class="slot-symbol">${randomSymbol}</div>`;
-                        }
-                    });
-
-                    if (slotSynth) slotSynth.triggerAttackRelease("C4", "32n");
-                    spins++;
-                }, 100);
-
-                setTimeout(() => {
-                    clearInterval(spinInterval);
-                    const results = [getRandomSymbol(), getRandomSymbol(), getRandomSymbol()];
-
-                    currentReels.forEach((reel, i) => {
-                        const symbolDiv = reel.querySelector('.slot-symbol');
-                        if (symbolDiv) {
-                            symbolDiv.textContent = results[i];
-                            // Ensure text size is correct for result
-                            if (!symbolDiv.classList.contains('text-4xl')) {
-                                // Add if needed, though default CSS might handle it.
-                                // The original code added text-4xl only on result.
-                                symbolDiv.classList.add('text-4xl');
-                            }
-                        } else {
-                            reel.innerHTML = `<div class="slot-symbol text-4xl">${results[i]}</div>`;
-                        }
-                    });
-
-                    let winMult = 0;
-                    let winText = "";
-                    let winColor = "text-slate-400";
-                    let isSpecialWin = false;
-
-                    const isPhase2 = gameState.phase === 2;
-
-                    // 1. ÖZEL KURAL: 7 - 8 - 9
-                    if (results[0] === '7️⃣' && results[1] === '8️⃣' && results[2] === '9️⃣') {
-                        winMult = isPhase2 ? 60 : 50;
-                        const winAmount = currentBet * winMult;
-                        gameState.score += winAmount;
-                        gameState.slotWins += winAmount;
-                        status.textContent = isPhase2 ? "SIGMA GRINDSET! x60" : "BÜYÜK İKRAMİYE! x50";
-                        status.className = "text-fuchsia-400 font-bold jackpot-anim";
-                        createPopup(`+${formatNumber(winAmount)}`, "#f0abfc", window.innerWidth / 2, window.innerHeight / 2);
-                        if (synth) synth.triggerAttackRelease(["C4", "E4", "G4", "C5", "E5", "G5"], "2n");
-                        isSpecialWin = true;
-                    }
-                    // 2. ÖZEL KURAL: 6 ve 7 Yanyana
-                    else if ((results[0] === '6️⃣' && results[1] === '7️⃣') || (results[1] === '6️⃣' && results[2] === '7️⃣')) {
-                        winMult = isPhase2 ? 50 : 10;
-                        const winAmount = currentBet * winMult;
-                        gameState.score += winAmount;
-                        gameState.slotWins += winAmount;
-                        status.textContent = isPhase2 ? "YAN YANA 6 & 7! x50" : "YAN YANA 6 & 7! x10";
-                        status.className = "text-orange-400 font-bold jackpot-anim";
-                        createPopup(`+${formatNumber(winAmount)}`, "#fb923c", window.innerWidth / 2, window.innerHeight / 2);
-                        if (synth) synth.triggerAttackRelease(["C5", "G5"], "4n");
-                        isSpecialWin = true;
-                    }
-                    // Standart Kurallar
-                    else if (results[0] === results[1] && results[1] === results[2]) {
-                        const mToilet = isPhase2 ? 1000 : 500;
-                        const m7 = isPhase2 ? 200 : 100;
-                        const mDiamond = isPhase2 ? 100 : 50;
-                        const mBase = isPhase2 ? 40 : 20;
-
-                        if (results[0] === '🚽') winMult = mToilet;
-                        else if (results[0] === '7️⃣') winMult = m7;
-                        else if (results[0] === '💎') winMult = mDiamond;
-                        else winMult = mBase;
-
-                        winText = "JACKPOT! 🔥";
-                        winColor = "text-green-400 font-bold jackpot-anim";
-                        if (synth) synth.triggerAttackRelease(["C5", "E5", "G5", "C6"], "4n");
-                    } else if (results[0] === results[1] || results[1] === results[2] || results[0] === results[2]) {
-                        winMult = isPhase2 ? 5 : 3;
-                        winText = "Güzel! 👍";
-                        winColor = "text-cyan-400 font-bold";
-                    } else {
-                        winText = "Tekrar dene 💀";
-                        winColor = "text-slate-400";
-                    }
-
-                    if (!isSpecialWin) {
-                        status.textContent = winText;
-                        status.className = winColor;
-                        if (winMult > 0) {
-                            const winAmount = currentBet * winMult;
-                            gameState.score += winAmount;
-                            gameState.slotWins += winAmount;
-                            createPopup(`+${formatNumber(winAmount)}`, "#facc15", window.innerWidth / 2, window.innerHeight / 2);
-                        }
-                    }
-
-                    isSpinning = false;
-                    btn.disabled = false;
-                    btn.classList.remove('opacity-50');
-                    if (allInBtn) {
-                        allInBtn.disabled = false;
-                        allInBtn.classList.remove('opacity-50');
-                    }
-                    updateUI();
-                }, 2000);
-            };
-
-            els.spinBtn.addEventListener('click', () => spinSlots(false));
-            els.mSpinBtn.addEventListener('click', () => spinSlots(true));
-            if (els.spinAllInBtn) els.spinAllInBtn.addEventListener('click', () => spinSlots(false, gameState.score));
-            if (els.mSpinAllInBtn) els.mSpinAllInBtn.addEventListener('click', () => spinSlots(true, gameState.score));
-
-
-            // --- MARKET SİSTEMİ ---
-            const marketListContainer = document.getElementById('market-list-container');
-
-            const createMarketItemHTML = (key, asset) => {
-                const div = document.createElement('details');
-                div.className = "market-box glass-panel rounded-xl border border-white/5 overflow-hidden group transition-all duration-300";
-                div.id = `market-${key}-container`;
-
-                div.innerHTML = `
-                    <summary class="p-4 cursor-pointer flex items-center justify-between hover:bg-white/5 transition-colors select-none">
-                        <div class="flex items-center gap-3">
-                            <div class="w-10 h-10 rounded-lg bg-slate-800 flex items-center justify-center font-bold text-lg shadow-lg" style="color: ${asset.color}; text-shadow: 0 0 10px ${asset.color}40;">
-                                ${asset.name.substring(0, 1)}
-                            </div>
-                            <div class="text-left">
-                                <h3 class="font-bold text-slate-200 leading-tight flex items-center gap-2">
-                                    ${asset.name}
-                                    <span class="text-[9px] px-1.5 py-0.5 rounded ${asset.type === 'tech' ? 'bg-blue-500/20 text-blue-300' : asset.type === 'fiat' ? 'bg-green-500/20 text-green-300' : 'bg-purple-500/20 text-purple-300'} uppercase border border-white/10">${asset.type}</span>
-                                </h3>
-                                <div class="text-xs text-slate-500">Adet: <span id="count-${key}" class="text-slate-300 font-mono">0</span></div>
-                            </div>
-                        </div>
-                        <div class="flex items-center gap-4">
-                            <div class="text-right">
-                                <div id="price-${key}" class="font-mono font-bold text-slate-300 transition-colors duration-500">${asset.price.toFixed(2)}</div>
-                            </div>
-                            <div class="drag-handle opacity-50 hover:opacity-100 cursor-grab active:cursor-grabbing p-1 hidden md:block">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="12" r="1"></circle><circle cx="9" cy="5" r="1"></circle><circle cx="9" cy="19" r="1"></circle><circle cx="15" cy="12" r="1"></circle><circle cx="15" cy="5" r="1"></circle><circle cx="15" cy="19" r="1"></circle></svg>
-                            </div>
-                        </div>
-                    </summary>
-
-                    <div class="p-4 bg-black/20 border-t border-white/5 space-y-4">
-                        <div class="h-24 w-full rounded-lg overflow-hidden bg-slate-900/50 relative border border-white/5">
-                             <canvas id="chart-${key}"></canvas>
-                        </div>
-                        <div class="grid grid-cols-4 gap-2">
-                            <button class="bg-emerald-600/20 hover:bg-emerald-600/40 text-emerald-400 border border-emerald-500/30 rounded-lg py-2 font-bold text-xs transition-all active:scale-95" data-action="buy" data-asset="${key}">AL</button>
-                            <button class="bg-emerald-600/20 hover:bg-emerald-600/40 text-emerald-400 border border-emerald-500/30 rounded-lg py-2 font-bold text-xs transition-all active:scale-95" data-action="buy-all" data-asset="${key}">MAX</button>
-                            <button class="bg-rose-600/20 hover:bg-rose-600/40 text-rose-400 border border-rose-500/30 rounded-lg py-2 font-bold text-xs transition-all active:scale-95" data-action="sell" data-asset="${key}">SAT</button>
-                            <button class="bg-rose-600/20 hover:bg-rose-600/40 text-rose-400 border border-rose-500/30 rounded-lg py-2 font-bold text-xs transition-all active:scale-95" data-action="sell-all" data-asset="${key}">HEPSİ</button>
-                        </div>
-                    </div>
-                `;
-
-                marketListContainer.appendChild(div);
-
-                const ctx = document.getElementById(`chart-${key}`).getContext('2d');
-                const gradient = ctx.createLinearGradient(0, 0, 0, 100);
-                gradient.addColorStop(0, `${asset.color}80`);
-                gradient.addColorStop(1, 'transparent');
-
-                asset.chart = new Chart(ctx, {
-                    type: 'line',
-                    data: {
-                        labels: asset.history.map((_, i) => i),
-                        datasets: [{
-                            data: asset.history,
-                            borderColor: asset.color,
-                            borderWidth: 2,
-                            backgroundColor: gradient,
-                            fill: true,
-                            pointRadius: 0,
-                            tension: 0.3
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: { legend: { display: false }, tooltip: { enabled: false } },
-                        scales: { x: { display: false }, y: { display: false } },
-                        animation: false,
-                        elements: {
-                            point: {
-                                radius: 0 // Disable points for performance
-                            }
-                        }
-                    }
-                });
-            };
-
-            Object.keys(assets).forEach(key => createMarketItemHTML(key, assets[key]));
-
-            new Sortable(marketListContainer, {
-                animation: 200,
-                handle: '.drag-handle',
-                ghostClass: 'sortable-ghost',
-                easing: "cubic-bezier(1, 0, 0, 1)"
-            });
-
-            marketListContainer.addEventListener('click', (e) => {
-                const btn = e.target.closest('button');
-                if (!btn) return;
-
-                const action = btn.dataset.action;
-                const key = btn.dataset.asset;
-                const asset = assets[key];
-
-                if (!asset) return;
-
-                if (action === 'buy' && gameState.score >= asset.price) {
-                    gameState.score -= asset.price;
-                    asset.count++;
-                } else if (action === 'buy-all') {
-                    const max = Math.floor(gameState.score / asset.price);
-                    if (max > 0) {
-                        gameState.score -= max * asset.price;
-                        asset.count += max;
-                    }
-                } else if (action === 'sell' && asset.count > 0) {
-                    gameState.score += asset.price;
-                    asset.count--;
-                    if (sellSynth) sellSynth.triggerAttackRelease("F2", "32n");
-                } else if (action === 'sell-all' && asset.count > 0) {
-                    gameState.score += asset.count * asset.price;
-                    asset.count = 0;
-                    if (sellSynth) sellSynth.triggerAttackRelease("F2", "32n");
-                }
-
-                updateUI();
-            });
-
-            // --- FİYAT DALGALANMASI & VOLATİLİTE ---
-            // OPTIMIZATION: Increased interval from 3000ms to 6000ms
-            setInterval(() => {
-                for (let key in assets) {
-                    const asset = assets[key];
-
-                    // VICTORY PUMP (Phase 2 Only)
-                    if (gameState.gameWon && asset.count > 0 && gameState.phase !== 3) {
-                        asset.price *= 1.25; // +25% every tick (Exponential Growth)
-                        createPopup("🚀", "#10b981", Math.random() * window.innerWidth, Math.random() * window.innerHeight);
-                    } else {
-                        // Standard Volatility
-                        let volatility = 0.02;
-                        if (asset.type === 'crypto') volatility = 0.08;
-                        if (asset.type === 'tech') volatility = 0.04;
-
-                        const change = (Math.random() - 0.48) * volatility;
-                        asset.price += asset.price * change;
-                    }
-
-                    if (asset.price < 0.1) asset.price = 0.1;
-
-                    asset.history.push(asset.price);
-                    // OPTIMIZATION: Reduced history length from 20 to 10
-                    if (asset.history.length > 10) asset.history.shift();
-
-                    if (asset.chart) {
-                        asset.chart.data.datasets[0].data = asset.history;
-                        asset.chart.update('none');
-                    }
-
-                    const priceEl = document.getElementById(`price-${key}`);
-                    if (priceEl) {
-                        priceEl.textContent = asset.price.toFixed(2);
-                        const prev = asset.history[asset.history.length - 2] || asset.price;
-                        priceEl.className = `font-mono font-bold transition-colors duration-500 ${asset.price >= prev ? 'text-emerald-400' : 'text-rose-400'}`;
-                    }
-                }
-            }, 6000);
-
-            // DOM Update Helper
-            const updateText = (el, text) => {
-                if (el && el.textContent !== text) {
-                    el.textContent = text;
-                }
-            };
-
-            const updateHTML = (el, html) => {
-                if (el && el.innerHTML !== html) {
-                    el.innerHTML = html;
-                }
-            };
-
-            // --- UI GÜNCELLEME ---
-            window.updateUI = () => {
-                updateText(els.score, formatNumber(gameState.score));
-                // CPS Logic Removed
-                updateText(els.statClicks, formatNumber(gameState.clicks));
-                updateText(els.statSlotWin, formatNumber(gameState.slotWins));
-
-                let tw = gameState.score;
-                for (let k in assets) {
-                    tw += assets[k].count * assets[k].price;
-                    updateText(document.getElementById(`count-${k}`), formatNumber(assets[k].count));
-                }
-
-                gameState.totalWealth = tw;
-                updateText(els.wealth, formatNumber(gameState.totalWealth));
-
-                // --- YILONG vs PLAYER (RIVALRY LOGIC) ---
-
-                if (gameState.phase === 3) {
-                    // PHASE 3 FIREWALL UI
-                    updateHTML(els.yilongAvatar, '🔥');
-                    const nameLabel = els.yilongAvatar.parentElement.nextElementSibling.querySelector('h3');
-                    if (nameLabel) updateText(nameLabel, "THE FIREWALL");
-
-                    updateText(els.yilongWealth, gameState.p3_firewallHealth.toFixed(1) + "% INTEGRITY");
-                    if (els.yilongWealth.style.color !== "rgb(239, 68, 68)") {
-                        els.yilongWealth.style.color = "#ef4444";
-                    }
-                    updateText(els.dynamicTargetText, "DESTROY");
-
-                    const newWidth = gameState.p3_firewallHealth + "%";
-                    if (els.wealthProgress.style.width !== newWidth) {
-                        els.wealthProgress.style.width = newWidth;
-                    }
-                    els.wealthProgress.parentElement.classList.remove('bg-slate-800');
-                    els.wealthProgress.parentElement.classList.add('bg-red-900');
-
-                    // Inject Exploit Button if not exists
-                    if (!document.getElementById('p3-exploit-btn')) {
-                        const upgrades = document.getElementById('upgrades-list');
-                        const btn = document.createElement('button');
-                        btn.id = 'p3-exploit-btn';
-                        btn.className = "upgrade-btn w-full bg-red-600 hover:bg-red-500 border-2 border-red-400 rounded-xl p-4 font-black text-white animate-pulse mt-4";
-                        btn.innerHTML = `LAUNCH EXPLOIT (Attack) <br> <span class='text-[10px] font-mono'>Cost: ${formatNumber(gameState.p3_exploitCost)}</span>`;
-                        btn.onclick = () => {
-                            const cost = gameState.p3_exploitCost;
-                            if (gameState.score >= cost) {
-                                gameState.score -= cost;
-                                gameState.p3_firewallHealth -= 5; // 5% damage
-                                createPopup("HIT! -5%", "#ff0000", window.innerWidth / 2, window.innerHeight / 2);
-                                if (gameState.p3_firewallHealth <= 0) {
-                                    gameState.p3_firewallHealth = 0;
-                                    triggerEndingSequence();
-                                }
-                                updateUI();
-                            }
-                        };
-                        upgrades.prepend(btn);
-                    }
-                } else {
-                    // PHASE 1 & 2
-                    const currentYilongWealth = YilongBaseWealth;
-                    const displayYilong = formatNumber(currentYilongWealth);
-                    const targetMult = gameState.phase === 2 ? 10 : 2;
-                    const currentTarget = currentYilongWealth * targetMult;
-                    const displayTarget = formatNumber(currentTarget);
-
-                    updateText(els.yilongWealth, displayYilong);
-                    updateText(els.yilongWealthDisplaySmall, displayYilong);
-                    updateText(els.dynamicTargetText, displayTarget);
-
-                    let progress = (gameState.totalWealth / currentTarget) * 100;
-                    if (progress < 0) progress = 0;
-                    if (progress > 100) progress = 100;
-                    const newProgress = `${progress}%`;
-                    if (els.wealthProgress.style.width !== newProgress) {
-                        els.wealthProgress.style.width = newProgress;
-                    }
-
-                    // KAZANMA KONTROLÜ (Phase 1 -> Phase 2 Transition)
-                    if (gameState.phase === 1 && gameState.totalWealth >= currentTarget) {
-                        triggerPhase2();
-                    }
-
-                    // NEW: Phase 2 Victory (True Ending)
-                    if (gameState.phase === 2 && gameState.totalWealth >= currentTarget && !gameState.gameWon) {
-                        gameState.gameWon = true;
-
-                        // 1. Visual Changes
-                        updateHTML(els.yilongAvatar, '😭');
-                        els.yilongAvatar.parentElement.classList.remove('bg-stone-500/20', 'border-stone-500/30');
-                        els.yilongAvatar.parentElement.classList.add('bg-red-500/20', 'border-red-500/30');
-
-                        // Background Change (King Theme)
-                        document.body.style.background = "linear-gradient(-45deg, #fcd34d, #059669, #fbbf24, #10b981)";
-                        document.body.style.backgroundSize = "400% 400%";
-
-                        // Update Names
-                        const nameLabel = els.yilongAvatar.parentElement.nextElementSibling.querySelector('h3');
-                        if (nameLabel) updateText(nameLabel, "BROKE YILONG");
-                        updateText(els.yilongWealthDisplaySmall.previousElementSibling, "BROKE YILONG");
-
-                        // Player Ascension
-                        updateText(els.skibidi, '👑');
-
-                        // 2. Market Manipulation (Force Green)
-                        for (let k in assets) {
-                            assets[k].price *= 5; // Pump it
-                        }
-
-                        // 3. Victory Modal
-                        showMessage(`
-                            <h2 class="text-5xl font-black text-yellow-400 mb-6 tracking-tighter animate-pulse">👑 PIYASANIN YENİ SAHİBİ SENSİN! 👑</h2>
-                            <p class="text-xl text-slate-300 mb-6">
-                                "Yilong Ma diz çöktü. Artık kuralları sen koyuyorsun."
-                            </p>
-                            <div class="text-8xl mb-6 animate-bounce">🗿</div>
-                            <p class="text-sm text-slate-400 mb-8">
-                                Sonsuz servet ve güç senin elinde.
-                            </p>
-                            <button id="victory-continue" class="bg-yellow-500 hover:bg-yellow-400 text-black px-8 py-4 rounded-xl font-black text-xl shadow-[0_0_30px_rgba(234,179,8,0.5)] transition-all transform hover:scale-105">
-                                SONSUZ MODDA DEVAM ET
-                            </button>
-                        `);
-
-                        setTimeout(() => {
-                            const btn = document.getElementById('victory-continue');
-                            if (btn) btn.addEventListener('click', () => {
-                                // Trigger Phase 3 Transition instead of closing
-                                triggerPhase3();
-                            });
-                        }, 100);
-
-                        if (synth) synth.triggerAttackRelease(["C4", "E4", "G4", "C5", "E5", "G5", "C6", "E6"], "1n");
-                    }
-                }
-
-                // Phase 2 UI Update
-                if (gameState.phase === 2) {
-                    if (typeof updateBlackMarketUI === 'function') updateBlackMarketUI();
-                }
-
-                // Buton Durumları
-                updateText(els.txtLvlPpc, gameState.lvlPpc.toString());
-                updateText(els.txtCostPpc, formatNumber(gameState.costPpc));
-                if (els.btnPpc.disabled !== (gameState.score < gameState.costPpc)) {
-                    els.btnPpc.disabled = gameState.score < gameState.costPpc;
-                }
-
-                // Auto Button Logic Removed
-
-                updateText(els.txtLvlMulti, gameState.lvlMulti.toString());
-                updateText(els.txtCostMulti, formatNumber(gameState.costMulti));
-                if (els.btnMulti.disabled !== (gameState.score < gameState.costMulti)) {
-                    els.btnMulti.disabled = gameState.score < gameState.costMulti;
-                }
-
-                updateText(els.txtLvlTax, gameState.lvlTax.toString());
-                updateText(els.txtCostTax, formatNumber(gameState.costTax));
-                if (els.btnTax.disabled !== (gameState.score < gameState.costTax)) {
-                    els.btnTax.disabled = gameState.score < gameState.costTax;
-                }
-
-                updateText(els.slotCost, formatNumber(slotCost));
-                updateText(els.mSlotCost, formatNumber(slotCost));
-
-                // Toggle All In Visibility
-                if (gameState.phase >= 2) {
-                    if (els.spinAllInBtn) els.spinAllInBtn.classList.remove('hidden');
-                    if (els.mSpinAllInBtn) els.mSpinAllInBtn.classList.remove('hidden');
-                } else {
-                    if (els.spinAllInBtn) els.spinAllInBtn.classList.add('hidden');
-                    if (els.mSpinAllInBtn) els.mSpinAllInBtn.classList.add('hidden');
-                }
-
-                if (gameState.score < slotCost) {
-                    els.spinBtn.disabled = true;
-                    els.mSpinBtn.disabled = true;
-                    els.spinBtn.classList.add('opacity-50');
-                    els.mSpinBtn.classList.add('opacity-50');
-                    if (els.spinAllInBtn) els.spinAllInBtn.disabled = true;
-                    if (els.mSpinAllInBtn) els.mSpinAllInBtn.disabled = true;
-                } else if (!isSpinning) {
-                    els.spinBtn.disabled = false;
-                    els.mSpinBtn.disabled = false;
-                    els.spinBtn.classList.remove('opacity-50');
-                    els.mSpinBtn.classList.remove('opacity-50');
-                    if (els.spinAllInBtn) {
-                        els.spinAllInBtn.disabled = false;
-                        els.spinAllInBtn.classList.remove('opacity-50');
-                    }
-                    if (els.mSpinAllInBtn) {
-                        els.mSpinAllInBtn.disabled = false;
-                        els.mSpinAllInBtn.classList.remove('opacity-50');
-                    }
-                }
-            };
-
-            const updateUI = window.updateUI;
-
-            setInterval(() => {
-                const seconds = Math.floor((Date.now() - gameState.gameStartTime) / 1000);
-                const m = Math.floor(seconds / 60).toString().padStart(2, '0');
-                const s = (seconds % 60).toString().padStart(2, '0');
-                els.statTime.textContent = `${m}:${s}`;
-
-                // Manual CPS Logic Removed
-            }, 1000);
-
-            // OPTIMIZATION: Reduced floater generation from 2000ms to 4000ms
-            setInterval(createFloater, 4000);
-
-            // Developer Skip Button
-            const devSkipBtn = document.getElementById('dev-skip-btn');
-            if (devSkipBtn) {
-                devSkipBtn.addEventListener('click', () => {
-                    // Provide massive resources to instantly skip the current phase
-                    gameState.score += 1000000000000;
-                    gameState.totalWealth += 1000000000000;
-                    gameState.clickPower += 1000000;
-                    createPopup("DEV HACK: +1 TRILLION", "#ef4444", 100, 100);
-                    updateUI();
-                });
-            }
-
-            // --- SKITTER SİSTEMİ (MANİPÜLASYON) ---
-            const skitterMessagesEl = document.getElementById('skitter-messages');
-
-            // Tweet Atma Fonksiyonu
-            const postSkitt = (msg, author = "Yilong Ma", isNew = false) => {
-                const div = document.createElement('div');
-                // Eğer yeni bir manipülasyon tweeti ise parlama efekti ekle
-                const extraClass = isNew ? "new-skitt-glow" : "bg-white/5 border-white/10";
-
-                div.className = `${extraClass} p-3 rounded-xl border mb-2 flex flex-col gap-1 transition-all duration-500`;
-                div.innerHTML = `
-                    <div class="flex justify-between items-center">
-                        <span class="font-bold text-xs ${author === "Yilong Ma" ? 'text-yellow-400' : 'text-sky-400'}">${author}</span>
-                        <span class="text-[8px] text-slate-500">Şimdi</span>
-                    </div>
-                    <p class="text-xs text-slate-300 leading-snug">${msg}</p>
-                `;
-                skitterMessagesEl.prepend(div);
-                if (skitterMessagesEl.children.length > 20) skitterMessagesEl.lastChild.remove();
-
-                // İKON ZIPLATMA (Sadece burada çağırılıyor artık)
-                const skitterFeed = document.getElementById('skitter-feed');
-                if (!skitterFeed.open) {
-                    const icon = document.getElementById('skitter-icon');
-                    // Önce varsa sil, sonra tekrar ekle ki animasyon resetlensin
-                    icon.classList.remove('animate-bounce');
-                    void icon.offsetWidth; // Trigger reflow
-                    icon.classList.add('animate-bounce');
-
-                    // 3 saniye sonra zıplamayı durdur
-                    setTimeout(() => icon.classList.remove('animate-bounce'), 3000);
-                }
-
-                // 5 Saniye sonra mesajın parlamasını kaldır
-                if (isNew) {
-                    setTimeout(() => {
-                        div.classList.remove("new-skitt-glow");
-                        div.classList.add("bg-white/5", "border-white/10");
-                    }, 5000);
-                }
-            };
-
-            // Yilong Ma Piyasayı Manipüle Ediyor (Phase 2 Toxic Updates included)
-            setInterval(() => {
-                if (Math.random() < 0.5) { // %50 şansla tweet
-                    const isPhase2 = gameState.phase === 2;
-                    let phrase = "";
-                    const keys = Object.keys(assets);
-                    const targetKey = keys[Math.floor(Math.random() * keys.length)];
-                    const target = assets[targetKey];
-                    const marketItem = document.getElementById(`market-${targetKey}-container`);
-
-                    if (isPhase2) {
-                        // PHASE 2 TOXICITY (100% Rate)
-                        const toxic = [
-                            "Babanın şirketini de satın alacağım.",
-                            "Ağlama duvarı sağ tarafta ->",
-                            "Tuvalet kağıdı bile alamayacaksın.",
-                            "Fakirler ağlamasın.",
-                            "Borsa benim oyun alanım.",
-                            "Senin servetin benim bahşişim."
-                        ];
-                        phrase = toxic[Math.floor(Math.random() * toxic.length)];
-
-                        // Phase 2 extra annoying buff
-                        if (Math.random() < 0.3) {
-                            // Cancel Culture Debuff (30% Chance)
-                            if (Math.random() < 0.3) {
-                                gameState.clickDebuff = 0.5;
-                                phrase = `<span class="text-red-500 font-black">🚫 CANCELED! Tık gücün %50 düştü!</span>`;
-                                createPopup("CANCELED! 📉", "#ef4444", window.innerWidth / 2, window.innerHeight / 2);
-                                setTimeout(() => { gameState.clickDebuff = 1; }, 10000);
-                            }
-                        }
-                    } else {
-                        // STANDARD LOGIC (Phase 1)
-                        if (target.type === 'fiat') {
-                            phrase = `Bütün paramı ${target.name}'ye yatırdım. Diğer kağıt paralar çöp! 🚮`;
-
-                            for (let k in assets) {
-                                if (k === targetKey) {
-                                    assets[k].price *= (1 + (Math.random() * 0.15 + 0.05)); // %5-%20 Artış
-                                } else if (assets[k].type === 'fiat') {
-                                    assets[k].price *= (1 - (Math.random() * 0.05 + 0.02)); // %2-%7 Düşüş (Rakipler)
-                                }
-                            }
-                        }
-                        else if (target.type === 'tech') {
-                            phrase = `${target.name} geleceği inşa ediyor. Yapay zeka, roketler, her şey! 🚀`;
-                            assets[targetKey].price *= 1.10; // %10 net artış
-                        }
-                        else {
-                            phrase = `${target.name} aya çıkıyor! Hold hold hold! 💎🙌`;
-                            assets[targetKey].price *= 1.20; // %20 artış
-                        }
-
-                        // YILONG MA KAZANIYOR! (Servetine ekle)
-                        let profit = 0;
-                        if (isPhase2) {
-                            // Phase 2 Scaling: 1% - 4% of Current Wealth
-                            profit = YilongBaseWealth * (Math.random() * 0.03 + 0.01);
-                        } else {
-                            profit = Math.floor(Math.random() * 50000) + 10000;
-                        }
-
-                        YilongBaseWealth += profit; // Kendi serveti artıyor
-                        createPopup(`Yilong: +${formatNumber(profit)}`, "#facc15", 90, 10); // Sağ üstte popup
-
-                        // VARLIĞI PARLAT (Piyasa Listesinde)
-                        if (marketItem) {
-                            marketItem.classList.add('highlight-asset');
-                            setTimeout(() => marketItem.classList.remove('highlight-asset'), 3000);
-                        }
-
-                        // TWEET AT (isNew = true ile parlamasını sağla)
-                        postSkitt(phrase, "Yilong Ma", true);
-                        updateUI();
-                    }
-                } // Close outer if
-            }, 12000); // 12 saniyede bir
-
-            postSkitt("5 Milyon dolarım var. Sizi geçeceğim! 😎");
-            updateUI();
-
-            // Phase 2 Asset Tax (60 Seconds)
-            setInterval(() => {
-                if (gameState.phase === 2 && !gameState.gameWon) {
-                    const taxAmount = gameState.totalWealth * 0.15;
-
-                    gameState.score -= taxAmount;
-                    YilongBaseWealth += taxAmount;
-
-                    showMessage(`
-                        <h2 class="text-3xl font-black text-red-600 mb-4 animate-pulse">⚠️ VARLIK VERGİSİ</h2>
-                        <p class="text-slate-300">Yilong Ma'nın lobisi sayesinde varlık vergisi çıktı.</p>
-                        <p class="text-red-500 font-bold text-xl mt-4">-${formatNumber(taxAmount)} Gyatt</p>
-                        <p class="text-xs text-slate-500 mt-1">Hesabından çekildi ve Yilong'a aktarıldı.</p>
-                    `);
-
-                    if (synth) synth.triggerAttackRelease("A1", "8n");
-                    updateUI();
-                }
-            }, 60000);
-
-        });
-
-        function toggleMobileSlot() {
-            const modal = document.getElementById('mobile-slot-modal');
-            modal.classList.toggle('hidden');
-        }
-    </script>
+    <!-- ================= MOTOR ================= -->
+    <script src="src/js/00-core.js"></script>
+    <script src="src/js/10-content.js"></script>
+    <script src="src/js/20-state.js"></script>
+    <script src="src/js/25-balance.js"></script>
+    <script src="src/js/30-audio.js"></script>
+    <script src="src/js/32-fx.js"></script>
+    <script src="src/js/34-clicker.js"></script>
+    <script src="src/js/36-production.js"></script>
+    <script src="src/js/40-market.js"></script>
+    <script src="src/js/44-yilong.js"></script>
+    <script src="src/js/46-slots.js"></script>
+    <script src="src/js/48-blackmarket.js"></script>
+    <script src="src/js/50-achievements.js"></script>
+    <script src="src/js/52-quests.js"></script>
+    <script src="src/js/54-prestige.js"></script>
+    <script src="src/js/56-skitter.js"></script>
+    <script src="src/js/60-narrative.js"></script>
+    <script src="src/js/70-ui.js"></script>
+    <script src="src/js/90-main.js"></script>
 </body>
 
 </html>
