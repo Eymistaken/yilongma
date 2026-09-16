@@ -1,0 +1,15 @@
+# Skibidi Clicker statik bir site: derleme adımı yok, depo kökü doğrudan
+# yayınlanır. index.html, CSS ve JS'i göreli yollarla yüklediği için site
+# hiçbir dış kaynağa bağlı olmadan kendi kendine çalışır.
+[build]
+  publish = "."
+  command = ""
+
+# Oyun kodu sık değişiyor; tarayıcı eski sürüme takılmasın diye her istekte
+# doğrulama yaptırıyoruz. Dosyalar küçük, maliyeti ihmal edilebilir.
+[[headers]]
+  for = "/*"
+  [headers.values]
+    Cache-Control = "public, max-age=0, must-revalidate"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
