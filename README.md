@@ -12,13 +12,20 @@ Tarayıcıda çalışır, kurulum gerektirmez, ilerlemen otomatik kaydedilir.
 
 ## 🎮 Oyna
 
-**Canlı:** https://eymistaken.github.io/yilongma/
+**Canlı:** https://yilongmaa-eymistaken.vercel.app
 
 **Yerel:** Depoyu indir ve `index.html` dosyasını tarayıcında aç. Kurulum,
 derleme adımı ya da sunucu gerekmez.
 
-> GitHub Pages kurulumu: Settings → Pages → Source: "Deploy from a branch" →
-> `main` / `(root)` → Save.
+> Vercel'deki sayfa `index.html`'i kendi üzerinde barındırır; CSS ve JS'i bu
+> deponun sabitlenmiş bir commit'inden jsDelivr üzerinden çeker. Depoyu Vercel
+> projesine bağlarsan (Vercel → yilongmaa → Settings → Git) her push otomatik
+> yayına girer ve bu sabitlemeye gerek kalmaz.
+>
+> GitHub Pages şu an kapalı. Açmak için: Settings → Pages → Source:
+> "Deploy from a branch" → `main` / `(root)` → Save. Açtığında oyun
+> `https://eymistaken.github.io/yilongma/` adresinden de tamamen kendi
+> kendine yeterli şekilde çalışır.
 
 ---
 
