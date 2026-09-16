@@ -92,11 +92,7 @@
         s.buffs.victoryPump = false;
 
         // Rakip de yeniden kuruluyor — faz seviyesine uygun sermayeyle.
-        s.yilong.cash = s.phase >= 2 ? 50000000 : 5000000;
-        s.yilong.holdings = {};
-        s.yilong.pending = null;
-        s.yilong.nextActionIn = 60;
-        SK.yilong.recomputeNetWorth();
+        SK.yilong.reset(s.phase);
 
         SK.fx.hideBanner();
         document.body.classList.remove('fever-active');

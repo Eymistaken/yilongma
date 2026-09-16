@@ -22,10 +22,35 @@
         return total;
     }
 
+    /** Rakibin faz başına başlangıç sermayesi. */
+    const baseCapital = () => (st().phase >= 2 ? 50000000 : 5000000);
+
+    /**
+     * Rakibin düşebileceği en düşük servet. Sabotajlar (kara borsa eşyaları,
+     * Mimar Modu hırsızlığı) serveti çarpımsal olarak azalttığı için onu
+     * sıfıra keyfi kadar yaklaştırabiliyordu. Pasif geliri de servetiyle
+     * orantılı olduğundan bir kez dibe vurduğunda asla toparlanamıyor,
+     * oyuncunun elindeki 1000 Gyatt bile onu "ÇÖKMÜŞ" gösteriyordu.
+     * Taban sermaye bu ölüm sarmalını kırar; sabotaj hâlâ %75'e kadar
+     * indirebildiği için etkisini kaybetmez.
+     */
+    const wealthFloor = () => baseCapital() * 0.25;
+
     function recomputeNetWorth() {
-        const net = y().cash + holdingsValue();
-        y().netWorth = isFinite(net) ? Math.max(0, net) : 0;
-        return y().netWorth;
+        const yi = y();
+
+        if (!isFinite(yi.cash)) yi.cash = baseCapital();
+        if (yi.cash < 0) yi.cash = 0;        // devralma ödemesi nakdi eksiye düşürebiliyordu
+
+        let net = yi.cash + holdingsValue();
+        const floor = wealthFloor();
+        if (net < floor) {
+            yi.cash += floor - net;
+            net = floor;
+        }
+
+        yi.netWorth = isFinite(net) ? net : baseCapital();
+        return yi.netWorth;
     }
 
     /** Oyuncunun serveti / Yilong'un serveti. Ruh halini bu oran belirler. */
@@ -266,8 +291,11 @@
         const yi = y();
 
         // Gelirinin bir kısmı düzenli olarak nakde akar: rakip de büyüyor.
-        const passive = yi.netWorth * (s.phase === 2 ? 0.0035 : s.phase >= 3 ? 0 : 0.0018);
-        yi.cash += passive;
+        // Sadece Faz 3'te durur — orada kutusu Firewall'a dönüştüğü için
+        // rakip diye bir şey kalmaz. Faz 4'te (Mimar Modu) kutusu ekranda
+        // durduğundan işlemeye devam etmeli, yoksa donuk görünüyordu.
+        const rate = s.phase === 3 ? 0 : (s.phase >= 2 ? 0.0035 : 0.0018);
+        yi.cash += yi.netWorth * rate;
 
         secondsSinceTrade++;
         if (secondsSinceTrade >= 8) {
@@ -343,17 +371,22 @@
 
     /* ---------------------------------------------------------------- SETUP */
 
-    /** Faz geçişinde rakip evrim geçirir: yeni sermaye, yeni portföy. */
-    function evolve(phase) {
+    /**
+     * Rakibi sıfırdan kurar: faza uygun sermaye, boş portföy, temiz sayaçlar.
+     * Hem faz geçişleri hem de Sigma Yükselişi bunu kullanır, böylece
+     * sıfırlama sonrası rakip her yerde aynı şekilde diriliyor.
+     */
+    function reset(phase) {
         const yi = y();
-        if (phase === 2) {
-            yi.cash = 50000000;
-            yi.holdings = {};
-            yi.nextActionIn = 30;
-        }
+        yi.cash = phase >= 2 ? 50000000 : 5000000;
+        yi.holdings = {};
+        yi.pending = null;
+        yi.nextActionIn = phase >= 2 ? 30 : 60;
         recomputeNetWorth();
-        lastMoodId = null;
+        lastMoodId = null;   // avatar/isim bir sonraki karede tazelensin
     }
+
+    const evolve = (phase) => reset(phase);
 
     function init() {
         recomputeNetWorth();
@@ -361,7 +394,8 @@
     }
 
     SK.yilong = {
-        init, tick, render, evolve, recomputeNetWorth, currentMood,
-        targetWealth, wealthRatio, holdingsValue, scheduleSabotage
+        init, tick, render, evolve, reset, recomputeNetWorth, currentMood,
+        targetWealth, wealthRatio, holdingsValue, scheduleSabotage,
+        baseCapital, wealthFloor
     };
 })(window.SK);

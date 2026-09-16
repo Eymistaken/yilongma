@@ -151,7 +151,9 @@
         SK.clicker.decayCombo();
         SK.clicker.checkFeverEnd();
 
-        if (s.phase < 3) SK.yilong.tick();
+        // Faz 3'te bu kutu Firewall'a dönüşüyor; diğer tüm fazlarda (Mimar Modu
+        // dahil) rakip işlemeye devam etmeli, yoksa kutusu donup kalıyordu.
+        if (s.phase !== 3) SK.yilong.tick();
         SK.skitter.tick();
         SK.achievements.check();
         SK.quests.check();
