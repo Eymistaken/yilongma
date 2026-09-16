@@ -12,20 +12,17 @@ Tarayıcıda çalışır, kurulum gerektirmez, ilerlemen otomatik kaydedilir.
 
 ## 🎮 Oyna
 
-**Canlı:** https://yilongmaa-eymistaken.vercel.app
-
 **Yerel:** Depoyu indir ve `index.html` dosyasını tarayıcında aç. Kurulum,
-derleme adımı ya da sunucu gerekmez.
+derleme adımı ya da sunucu gerekmez — oyun hiçbir dış kaynağa bağlı olmadan
+kendi kendine çalışır.
 
-> Vercel'deki sayfa `index.html`'i kendi üzerinde barındırır; CSS ve JS'i bu
-> deponun sabitlenmiş bir commit'inden jsDelivr üzerinden çeker. Depoyu Vercel
-> projesine bağlarsan (Vercel → yilongmaa → Settings → Git) her push otomatik
-> yayına girer ve bu sabitlemeye gerek kalmaz.
->
-> GitHub Pages şu an kapalı. Açmak için: Settings → Pages → Source:
-> "Deploy from a branch" → `main` / `(root)` → Save. Açtığında oyun
-> `https://eymistaken.github.io/yilongma/` adresinden de tamamen kendi
-> kendine yeterli şekilde çalışır.
+**Yayına almak için** iki hazır yol var; `netlify.toml` zaten depoda:
+
+- **Netlify** — app.netlify.com → projeyi GitHub deposuna bağla. Her push
+  otomatik yayına girer.
+- **GitHub Pages** — Settings → Pages → Source: "Deploy from a branch" →
+  `main` / `(root)` → Save. Ardından oyun
+  `https://eymistaken.github.io/yilongma/` adresinde yayınlanır.
 
 ---
 
