@@ -524,25 +524,13 @@
                 <label class="set-row"><span>FPS göstergesi</span><input type="checkbox" id="set-fps"></label>
 
                 <h3 class="section-label mt-4">OYUN</h3>
-                <label class="set-row">
-                    <span>Otomatik kayıt aralığı</span>
-                    <select id="set-autosave">
-                        <option value="5">5 saniye</option>
-                        <option value="15">15 saniye</option>
-                        <option value="30">30 saniye</option>
-                        <option value="60">60 saniye</option>
-                    </select>
-                </label>
                 <label class="set-row"><span>Yükselişte onay sor</span><input type="checkbox" id="set-confirm-ascend"></label>
 
-                <h3 class="section-label mt-4">KAYIT</h3>
-                <div class="flex gap-2 flex-wrap">
-                    <button id="btn-save-now" class="set-btn">💾 Şimdi Kaydet</button>
-                    <button id="btn-export" class="set-btn">📤 Dışa Aktar</button>
-                    <button id="btn-import" class="set-btn">📥 İçe Aktar</button>
-                    <button id="btn-hard-reset" class="set-btn danger">💀 Her Şeyi Sıfırla</button>
+                <h3 class="section-label mt-4">KAYIT DURUMU</h3>
+                <p class="text-xs text-slate-400">İlerleme kaydı kapalıdır. Çıkıp girdiğinizde veya sayfayı yenilediğinizde oyun her zaman sıfırdan başlar.</p>
+                <div class="flex gap-2 flex-wrap mt-2">
+                    <button id="btn-hard-reset" class="set-btn danger">🔄 Oyunu Baştan Başlat</button>
                 </div>
-                <textarea id="save-textarea" class="save-area" placeholder="Kayıt metni buraya gelir / buraya yapıştır…" spellcheck="false"></textarea>
             </div>
         </div>
     </div>

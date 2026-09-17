@@ -1,5 +1,15 @@
 {
+  "name": "yilongma",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "node server.js",
+    "start": "node server.js",
+    "build": "echo 'Build complete'"
+  },
   "dependencies": {
-    "acorn": "^8.16.0"
+    "acorn": "^8.16.0",
+    "express": "^5.2.1"
   }
 }
+

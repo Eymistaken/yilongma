@@ -44,12 +44,10 @@
 
         wireEvents();
 
-        // Çevrimdışı kazanç: yeni oyunda gösterilmez.
+        // Çevrimdışı kazanç kontrolü (kayıt kapalı olduğu için sıfırdan başlar)
         if (!loaded.fresh) {
             const report = SK.computeOffline(SK.state);
             if (report) SK.ui.showOfflineReport(report);
-        } else {
-            SK.ui.openModal('help');
         }
 
         // Oturum sayacı her açılışta sıfırdan başlar (maraton başarımı için).
@@ -72,18 +70,12 @@
         SK.on('market:trade', () => { uiDirty = true; });
         SK.on('achievement:unlocked', () => { uiDirty = true; });
 
-        // Sekme gizlenince kaydet; geri gelince çevrimdışı farkı işle.
+        // Çevrimdışı / sekme olayları
         document.addEventListener('visibilitychange', () => {
-            if (document.hidden) {
-                SK.saveGame(true);
-            } else {
-                const report = SK.computeOffline(SK.state);
-                if (report && report.seconds > 120) SK.ui.showOfflineReport(report);
+            if (!document.hidden) {
                 SK.state.meta.lastSave = Date.now();
             }
         });
-
-        window.addEventListener('beforeunload', () => SK.saveGame(true));
 
         // Mobil slot modalini HTML'deki inline onclick çağırıyor.
         window.toggleMobileSlot = () => {
@@ -101,7 +93,6 @@
 
         economyAccumulator += dt;
         secondAccumulator += dt;
-        autosaveAccumulator += dt;
 
         while (economyAccumulator >= ECONOMY_STEP) {
             economyAccumulator -= ECONOMY_STEP;
@@ -111,12 +102,6 @@
         if (secondAccumulator >= 1) {
             secondAccumulator -= 1;
             secondStep();
-        }
-
-        const interval = SK.state.settings.autosaveSeconds || 15;
-        if (autosaveAccumulator >= interval) {
-            autosaveAccumulator = 0;
-            SK.saveGame(true);
         }
 
         renderStep();

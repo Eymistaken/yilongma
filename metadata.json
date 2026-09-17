@@ -1,0 +1,8 @@
+{
+  "name": "Skibidi Clicker: Rivalry",
+  "description": "Yilong Ma'yı geçmek için tıkla, yatırım yap, yüksel.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

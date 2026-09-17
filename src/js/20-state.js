@@ -208,92 +208,44 @@
         return JSON.stringify(copy);
     }
 
-    let saveBlocked = false;
-
     function save(silent) {
-        if (saveBlocked) return false;
-        try {
-            localStorage.setItem(SAVE_KEY, serialize(SK.state));
-            SK.state.meta.lastSave = Date.now();
-            if (!silent) SK.emit('save:done');
-            return true;
-        } catch (err) {
-            console.warn('[SK] Kayıt başarısız:', err);
-            SK.emit('save:failed', err);
-            return false;
-        }
+        // İlerleme kaydetme devre dışı: çıkıp girince sıfırdan başlanır
+        return false;
     }
 
     function load() {
-        let raw = null;
-        try {
-            raw = localStorage.getItem(SAVE_KEY);
-        } catch (err) {
-            // Gizli sekme / depolama kapalı — oyun kayıtsız çalışmaya devam eder.
-            console.warn('[SK] localStorage okunamıyor, kayıtsız mod:', err);
-            saveBlocked = true;
-            return { state: defaultState(), fresh: true };
-        }
-        if (!raw) return { state: defaultState(), fresh: true };
-
-        try {
-            const parsed = JSON.parse(raw);
-            return { state: migrate(parsed), fresh: false };
-        } catch (err) {
-            console.error('[SK] Kayıt bozuk, sıfırdan başlanıyor:', err);
-            try { localStorage.setItem(SAVE_KEY + '_corrupt', raw); } catch (_) { /* yoksay */ }
-            return { state: defaultState(), fresh: true };
-        }
+        wipe(); // Varsa eski kayıtları temizle
+        return { state: defaultState(), fresh: true };
     }
 
     function wipe() {
-        try { localStorage.removeItem(SAVE_KEY); } catch (_) { /* yoksay */ }
+        try {
+            localStorage.removeItem(SAVE_KEY);
+            localStorage.removeItem(SAVE_KEY + '_corrupt');
+        } catch (_) { /* yoksay */ }
     }
+
+    // Başlangıçta mevcut kayıtları sil
+    wipe();
 
     /* ------------------------------------------------------- EXPORT/IMPORT */
 
-    /** Base64 metin — panoya kopyalanıp başka tarayıcıya taşınabilir. */
+    /** Kaydetme kapalı olduğu için dışa/içe aktarma devre dışı */
     function exportSave() {
-        const json = serialize(SK.state);
-        return btoa(unescape(encodeURIComponent(json)));
+        return '';
     }
 
     function importSave(text) {
-        const json = decodeURIComponent(escape(atob(String(text).trim())));
-        const parsed = JSON.parse(json);
-        if (!parsed || typeof parsed !== 'object' || !parsed.stats) {
-            throw new Error('Tanınmayan kayıt formatı');
-        }
-        return migrate(parsed);
+        return defaultState();
     }
 
     /* ---------------------------------------------------- OFFLINE PROGRESS */
 
     /**
-     * Sekme kapalıyken geçen süreyi ödüle çevirir. Tam verim vermez —
-     * aksi halde oyunu açık bırakmanın anlamı kalmaz.
+     * İlerleme kaydedilmediği için çevrimdışı ilerleme hesaplanmaz.
      */
     function computeOffline(state) {
-        const elapsedMs = Date.now() - (state.meta.lastSave || Date.now());
-        const elapsed = Math.floor(elapsedMs / 1000);
-        if (elapsed < 60) return null;
-
-        const skillLevel = state.prestige.skills.offline || 0;
-        const rate = 0.5 + skillLevel * 0.10;                // %50 taban
-        const capHours = 8 + skillLevel * 2;                 // 8 saat taban
-        const capped = Math.min(elapsed, capHours * 3600);
-
-        const cps = SK.computeCPS(state);
-        const earned = cps * capped * rate;
-        if (earned <= 0) return null;
-
-        return {
-            seconds: elapsed,
-            cappedSeconds: capped,
-            capped: elapsed > capped,
-            rate,
-            earned
-        };
+        return null;
     }
 
     /* ---------------------------------------------------------------- INIT */

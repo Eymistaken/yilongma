@@ -296,7 +296,7 @@
         SK.byId('set-motion').checked = s.reducedMotion;
         SK.byId('set-particles').value = s.particles;
         SK.byId('set-format').value = s.numberFormat;
-        SK.byId('set-autosave').value = String(s.autosaveSeconds);
+        if (SK.byId('set-autosave')) SK.byId('set-autosave').value = String(s.autosaveSeconds);
         SK.byId('set-fps').checked = s.showFps;
         SK.byId('set-confirm-ascend').checked = s.confirmAscend;
         SK.setText(SK.byId('set-volume-label'), Math.round(s.volume * 100) + '%');
@@ -327,76 +327,61 @@
         });
         SK.byId('set-particles').addEventListener('change', (e) => { s().particles = e.target.value; });
         SK.byId('set-format').addEventListener('change', (e) => { s().numberFormat = e.target.value; });
-        SK.byId('set-autosave').addEventListener('change', (e) => { s().autosaveSeconds = Number(e.target.value); });
+        if (SK.byId('set-autosave')) {
+            SK.byId('set-autosave').addEventListener('change', (e) => { s().autosaveSeconds = Number(e.target.value); });
+        }
         SK.byId('set-fps').addEventListener('change', (e) => {
             s().showFps = e.target.checked;
             applySettings();
         });
         SK.byId('set-confirm-ascend').addEventListener('change', (e) => { s().confirmAscend = e.target.checked; });
 
-        SK.byId('btn-save-now').addEventListener('click', () => {
-            const ok = SK.saveGame();
-            SK.fx.toast({
-                icon: ok ? '💾' : '⛔',
-                title: ok ? 'Kaydedildi' : 'Kayıt başarısız',
-                body: ok ? '' : 'Tarayıcı depolaması engelli olabilir.',
-                color: ok ? '#4ade80' : '#ef4444', ms: 2600
+        const btnSaveNow = SK.byId('btn-save-now');
+        if (btnSaveNow) {
+            btnSaveNow.addEventListener('click', () => {
+                SK.fx.toast({
+                    icon: 'ℹ️',
+                    title: 'Kayıt Devre Dışı',
+                    body: 'İlerleme kaydı kapalıdır. Çıkıp girdiğinizde sıfırdan başlanır.',
+                    color: '#38bdf8', ms: 2600
+                });
             });
-        });
+        }
 
-        SK.byId('btn-export').addEventListener('click', async () => {
-            const text = SK.exportSave();
-            const area = SK.byId('save-textarea');
-            area.value = text;
-            area.select();
-            let copied = false;
-            try {
-                await navigator.clipboard.writeText(text);
-                copied = true;
-            } catch (_) {
-                // Pano izni yoksa metin zaten seçili; kullanıcı elle kopyalar.
-            }
-            SK.fx.toast({
-                icon: '📤', title: copied ? 'Panoya kopyalandı' : 'Kayıt kutuya yazıldı',
-                body: copied ? '' : 'Metni elle kopyalayabilirsin.', color: '#38bdf8', ms: 3200
+        const btnExport = SK.byId('btn-export');
+        if (btnExport) {
+            btnExport.addEventListener('click', () => {
+                SK.fx.toast({
+                    icon: 'ℹ️', title: 'Kayıt Kapalı',
+                    body: 'İlerleme kaydetme devre dışıdır.', color: '#38bdf8', ms: 2600
+                });
             });
-        });
+        }
 
-        SK.byId('btn-import').addEventListener('click', () => {
-            const text = SK.byId('save-textarea').value.trim();
-            if (!text) {
-                SK.fx.toast({ icon: '⛔', title: 'Kutu boş', body: 'Önce kayıt metnini yapıştır.', color: '#ef4444', ms: 3000 });
-                return;
-            }
-            confirm({
-                icon: '📥', title: 'Kaydı içe aktar',
-                body: 'Mevcut ilerlemen tamamen değiştirilecek. Devam edilsin mi?',
-                confirmText: 'İÇE AKTAR',
-                onConfirm: () => {
-                    try {
-                        const next = SK.importSave(text);
-                        SK.state = window.gameState = next;
-                        SK.saveGame(true);
+        const btnImport = SK.byId('btn-import');
+        if (btnImport) {
+            btnImport.addEventListener('click', () => {
+                SK.fx.toast({
+                    icon: 'ℹ️', title: 'Kayıt Kapalı',
+                    body: 'İlerleme kaydetme devre dışıdır.', color: '#38bdf8', ms: 2600
+                });
+            });
+        }
+
+        const btnHardReset = SK.byId('btn-hard-reset');
+        if (btnHardReset) {
+            btnHardReset.addEventListener('click', () => {
+                confirm({
+                    icon: '🔄', title: 'Oyunu Baştan Başlat',
+                    body: 'Mevcut oyun sıfırlanacak ve en baştan başlayacak.',
+                    confirmText: 'YENİDEN BAŞLAT',
+                    onConfirm: () => {
+                        SK.wipeSave();
                         location.reload();
-                    } catch (err) {
-                        console.error('[SK] İçe aktarma hatası:', err);
-                        SK.fx.toast({ icon: '⛔', title: 'Geçersiz kayıt', body: String(err.message || err), color: '#ef4444', ms: 4200 });
                     }
-                }
+                });
             });
-        });
-
-        SK.byId('btn-hard-reset').addEventListener('click', () => {
-            confirm({
-                icon: '💀', title: 'Her şeyi sıfırla',
-                body: 'Başarımlar, Sigma Parçaları, yetenekler ve tüm ilerleme <strong>kalıcı olarak</strong> silinir. Bu işlem geri alınamaz.',
-                confirmText: 'HEPSİNİ SİL',
-                onConfirm: () => {
-                    SK.wipeSave();
-                    location.reload();
-                }
-            });
-        });
+        }
     }
 
     /* ---------------------------------------------------- MİKTAR SEÇİCİLER */
