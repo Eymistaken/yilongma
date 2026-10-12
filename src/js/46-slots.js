@@ -81,7 +81,8 @@
         const s = st();
         if (overrideBet > 0) return { bet: Math.floor(overrideBet) };
         if (s.phase >= 2) {
-            const val = parseInt(els.betInput.value, 10);
+            const raw = els.betInput ? els.betInput.value : '';
+            const val = parseInt(raw, 10);
             if (isNaN(val) || val < 100) return { error: 'Min bahis: 100' };
             if (val > s.score) return { error: 'Yetersiz bakiye' };
             return { bet: val };
@@ -106,20 +107,38 @@
         const bet = resolved.bet;
         if (s.score < bet || bet <= 0) { SK.audio.play('error'); return; }
 
-        await SK.audio.init();
+        // Kilidi EŞZAMANLI koy: `await` sonrasına bırakılırsa hızlı art arda
+        // tıklamalar korumayı atlayıp birden çok bahsi aynı anda işletiyordu.
+        // Ayrıca butonlar ve durum metni hemen güncellenir, ölü tıklama hissi kalmaz.
+        spinning = true;
+        setSpinButtons(true);
+        if (status) {
+            SK.setText(status, 'Çeviriliyor...');
+            status.className = 'text-xs font-bold text-yellow-200 animate-pulse';
+        }
+
+        try {
+            await SK.audio.init();
+        } catch (_) { /* ses yoksa da oyun sürer */ }
+
+        // Bekleme sırasında bakiye erimiş olabilir (sabotaj/piyasa) — tekrar doğrula.
+        if (s.score < bet || bet <= 0) {
+            spinning = false;
+            setSpinButtons(false);
+            if (status) {
+                SK.setText(status, 'Yetersiz bakiye');
+                status.className = 'text-xs font-bold text-slate-400';
+            }
+            SK.audio.play('error');
+            SK.emit('ui:dirty');
+            return;
+        }
 
         const isAllIn = overrideBet !== undefined && overrideBet > 0;
         s.score -= bet;
         s.stats.spins++;
-        spinning = true;
 
-        const btn = isMobile ? els.mSpinBtn : els.spinBtn;
-        const allIn = isMobile ? els.mAllInBtn : els.allInBtn;
         const reels = isMobile ? els.mReels : els.reels;
-
-        setSpinButtons(true);
-        SK.setText(status, 'Çeviriliyor...');
-        status.className = 'text-yellow-200 animate-pulse';
 
         const rollTimer = setInterval(() => {
             reels.forEach(r => setReel(r, SK.pick(SK.SLOT_SYMBOLS), false));
@@ -133,8 +152,10 @@
             reels.forEach((r, i) => setReel(r, results[i], true));
 
             const outcome = evaluate(results);
-            SK.setText(status, outcome.text);
-            status.className = outcome.cls;
+            if (status) {
+                SK.setText(status, outcome.text);
+                status.className = outcome.cls;
+            }
 
             if (outcome.mult > 0) {
                 const win = bet * outcome.mult * (s.derived.slotBonus || 1);
@@ -175,9 +196,15 @@
     function render() {
         const s = st();
         SK.setText(els.cost, SK.formatNumber(SK.SLOT_BASE_COST));
-        SK.setText(els.mCost, SK.formatNumber(SK.SLOT_BASE_COST));
 
         const p2 = s.phase >= 2;
+        // Faz 2+ mobilde sabit bedel göstermek yerine gerçek bahsi göster.
+        let mCost = SK.SLOT_BASE_COST;
+        if (p2 && els.betInput) {
+            const v = parseInt(els.betInput.value, 10);
+            if (!isNaN(v) && v > 0) mCost = v;
+        }
+        SK.setText(els.mCost, SK.formatNumber(mCost));
         SK.toggleClass(els.costBox, 'hidden', p2);
         SK.toggleClass(els.betBox, 'hidden', !p2);
         SK.toggleClass(els.betBox, 'flex', p2);
@@ -210,8 +237,8 @@
 
     function init() {
         cacheEls();
-        els.spinBtn.addEventListener('click', () => spin(false));
-        els.mSpinBtn.addEventListener('click', () => spin(true));
+        if (els.spinBtn) els.spinBtn.addEventListener('click', () => spin(false));
+        if (els.mSpinBtn) els.mSpinBtn.addEventListener('click', () => spin(true));
         if (els.allInBtn) els.allInBtn.addEventListener('click', () => spin(false, st().score));
         if (els.mAllInBtn) els.mAllInBtn.addEventListener('click', () => spin(true, st().score));
         render();

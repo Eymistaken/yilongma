@@ -348,7 +348,7 @@
         A('profit_1m',  '🤑', 'Kâr Realize',      'Toplam 1M realize kâr',          s => s.stats.realizedProfit >= 1e6),
         A('profit_1b',  '📿', 'Piyasa Kâhini',    'Toplam 1B realize kâr',          s => s.stats.realizedProfit >= 1e9, 0.03),
         A('diversify',  '🧺', 'Çeşitlendirme',    'Aynı anda 8 farklı varlık tut',
-            s => Object.keys(s.holdings).filter(k => s.holdings[k] && s.holdings[k].count > 0).length >= 8, 0.02),
+            s => Object.keys(s.assets).filter(k => s.assets[k] && s.assets[k].count > 0).length >= 8, 0.02),
         A('order_first','📋', 'Limitli Emir',     'İlk limit emrini kur',           s => s.stats.ordersPlaced >= 1),
         A('order_50',   '🤖', 'Algo Tüccar',      '50 limit emri gerçekleşsin',     s => s.stats.ordersFilled >= 50, 0.02),
         A('event_ride', '🎢', 'Dalgada Sörf',     'Bir piyasa olayı sırasında sat', s => s.stats.eventSells >= 1),
